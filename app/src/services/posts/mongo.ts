@@ -164,6 +164,20 @@ export class MongoPostStore implements PostStore {
       return handleError(e);
     }
   }
+  async updateOne(id: string, pubkey: string, cypher_json: string): Promise<boolean | Error> {
+    try {
+      const q = { id, pubkey };
+      const u = { $set: { cypher_json } };
+      
+      const status = await postStore.updateOne(q, u);
+      if (status instanceof mongoose.Error) {
+        return handleError(status);
+      };
+      return true;
+    } catch (e) {
+      return handleError(e);
+    }
+  }
 
 }
 

@@ -222,3 +222,30 @@ export async function handlePutKeys(req, res) {
     respond(result.code, result.message, res, request);
   }
 }
+
+
+export async function handleEditPost(req, res) {
+  const request = parseRequest(req);
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      throw {
+        code: 400,
+        message: errors.array()
+      }
+    }
+
+
+    const status = await posts.editOne( req.body.post_id, request.headers['x-client-pubkey'], req.body.cypher_json);
+    if (status instanceof Error) throw status;
+
+    const response = {
+      status
+    };
+    respond(200, response, res, request);
+  }
+  catch (e) {
+    const result = filterError(e, r_500, request);
+    respond(result.code, result.message, res, request);
+  }
+}
