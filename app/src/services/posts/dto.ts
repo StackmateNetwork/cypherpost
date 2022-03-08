@@ -235,8 +235,7 @@ export async function handleEditPost(req, res) {
       }
     }
 
-
-    const status = await posts.editOne( req.body.post_id, request.headers['x-client-pubkey'], req.body.cypher_json);
+    const status = await posts.editOne(req.body.post_id, request.headers['x-client-pubkey'], req.body.cypher_json);
     if (status instanceof Error) throw status;
 
     const response = {

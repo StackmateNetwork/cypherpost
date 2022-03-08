@@ -173,14 +173,14 @@ export class MongoPostStore implements PostStore {
     try {
       const q = { id, owner };
       const u = { $set: { cypher_json, edited: true } };
-      console.log({q,u})
+      // console.log({q,u})
 
       const status = await postStore.updateOne(q, u);
       if (status instanceof mongoose.Error) {
         return handleError(status);
       };
-      console.log({status})
-      return true;
+      
+      return status.modifiedCount > 0;
     } catch (e) {
       return handleError(e);
     }

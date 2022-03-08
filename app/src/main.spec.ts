@@ -152,6 +152,7 @@ let c_profile_set: TestProfileSet;
 let a_post_set: TestPostSet;
 let b_post_set: TestPostSet;
 let c_post_set: TestPostSet;
+let c_post_edit_set: TestPostSet;
 
 let endpoint;
 let body;
@@ -325,6 +326,26 @@ async function createPostRequest(expiry: number, post_set: TestPostSet, key_set:
     pubkey: key_set.identity_pubkey
   }
 }
+
+async function editPostRequest(post_set: TestPostSet, key_set: TestKeySet) {
+  const endpoint = "/api/v2/posts/edit";
+  const nonce = Date.now();
+  const body = {
+    post_id: post_set.post_id,
+    cypher_json: post_set.cypher,
+  };
+
+  const message = `POST ${endpoint} ${JSON.stringify(body)} ${nonce}`;
+  const signature = await bitcoin.sign(message, key_set.identity_private) as string;
+
+  return {
+    nonce,
+    endpoint,
+    body,
+    signature: signature,
+    pubkey: key_set.identity_pubkey
+  }
+}
 async function createPostsGetSelfRequest(key_set: TestKeySet) {
   const endpoint = "/api/v2/posts/self";
   const nonce = Date.now();
@@ -478,6 +499,8 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     b_post_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Buy, "Stacking", false), b_key_set.cypherpost_parent, init_posts_ds);
 
     c_post_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Sell, "Contact me on Signal.", false), c_key_set.cypherpost_parent, init_posts_ds);
+    c_post_edit_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Sell, "Contact me on Threema.", false), c_key_set.cypherpost_parent, init_posts_ds);
+
     // ------------------ (◣_◢) ------------------    
   });
 
@@ -694,6 +717,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
       request_a0 = await createPostRequest(Date.now() + 10000, a_post_set, a_key_set);
       request_b = await createPostRequest(Date.now() + 10000, b_post_set, b_key_set);
       request_c = await createPostRequest(Date.now() + 10000, c_post_set, c_key_set);
+
       request_a_get_self = await createPostsGetSelfRequest(a_key_set);
       request_b_get_self = await createPostsGetSelfRequest(b_key_set);
       request_c_get_self = await createPostsGetSelfRequest(c_key_set);
@@ -768,6 +792,25 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           done();
         });
     });
+    // it("EDITS POSTS: C ", function (done) {
+    //   chai
+    //     .request(server)
+    //     .post(request_c_edit.endpoint)
+    //     .set({
+    //       "x-client-pubkey": request_c_edit.pubkey,
+    //       "x-nonce": request_c_edit.nonce,
+    //       "x-client-signature": request_c_edit.signature
+    //     })
+    //     .send({
+    //       post_id: c_post_set.post_id,
+    //       cypher_json: c_post_edit_set.cypher
+    //     })
+    //     .end((err, res) => {
+    //       res.should.have.status(200);
+    //       expect(res.body['status']).to.equal(true);
+    //       done();
+    //     });
+    // });
     it("GETS A SELF POSTS", function (done) {
       chai
         .request(server)
@@ -812,8 +855,10 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
         })
         .end((err, res) => {
           res.should.have.status(200);
+
           expect(res.body['posts'].length === 1).to.equal(true);
           expect(res.body['posts'][0].cypher_json).to.equal(c_post_set.cypher);
+          // expect(res.body['posts'][0].edited).to.equal(true);
           done();
         });
     });
@@ -975,6 +1020,47 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
         });
     });
   });
+  describe("UPDATED POST BY C", function () {
+    let request_c_edit, request_c_get_self;
+    it("CREATES EDIT/GET POST REQUESTS", async function () {
+      request_c_edit = await editPostRequest(c_post_set, c_key_set);
+      request_c_get_self = await createPostsGetSelfRequest(c_key_set);
+    });
+    it("EDITS POSTS: C ", function (done) {
+      chai
+        .request(server)
+        .post(request_c_edit.endpoint)
+        .set({
+          "x-client-pubkey": request_c_edit.pubkey,
+          "x-nonce": request_c_edit.nonce,
+          "x-client-signature": request_c_edit.signature
+        })
+        .send(request_c_edit.body)
+        .end((err, res) => {
+          res.should.have.status(200);
+          expect(res.body['status']).to.equal(true);
+          done();
+        });
+    });
+    it("GETS C SELF POSTS", function (done) {
+      chai
+        .request(server)
+        .get(request_c_get_self.endpoint)
+        .set({
+          "x-client-pubkey": request_c_get_self.pubkey,
+          "x-nonce": request_c_get_self.nonce,
+          "x-client-signature": request_c_get_self.signature,
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+
+          expect(res.body['posts'].length === 1).to.equal(true);
+          expect(res.body['posts'][0].cypher_json).to.equal(c_post_set.cypher);
+          expect(res.body['posts'][0].edited).to.equal(true);
+          done();
+        });
+    });
+  });
 
   describe("REVOKE A->B TRUST", function () {
     let request_a;
@@ -1062,7 +1148,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     let request_a,
       request_b,
       request_c;
-      
+
     it("CREATES SERVER IDENTITY REQUEST", async function () {
       request_a = await createServerIdentityRequest(a_key_set);
     });

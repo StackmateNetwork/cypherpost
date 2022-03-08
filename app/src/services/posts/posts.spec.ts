@@ -117,7 +117,7 @@ describe("Initalizing Test: Profile Service", function () {
     it("FIND ONE new post BY ID (edited)", async function () {
       const response = await posts.findManyById([post3_id], genesis_filter);
       if(response instanceof Error) throw response;
-      console.log({response})
+      // console.log({response})
       expect(response[0]['edited']).to.equal(true);
     });
     
