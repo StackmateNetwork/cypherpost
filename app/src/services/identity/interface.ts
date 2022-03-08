@@ -21,7 +21,7 @@ export interface UserIdentity{
   genesis : number;
   username: string;
   pubkey:string;
-}
+};
 
 export enum IdentityIndex{
   Username,

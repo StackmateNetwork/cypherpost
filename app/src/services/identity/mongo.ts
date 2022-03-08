@@ -117,45 +117,4 @@ export class MongoIdentityStore implements IdentityStore {
     }
   }
 }
-
-// async function ensureUnique(identity: UserIdentity): Promise<boolean | Error> {
-//   try {
-//     const doc = await identityStore.findOne({ username: identity.username }).exec();
-//     if (doc === null) return true;
-
-//     if (doc) {
-//       const err = doc.validateSync();
-//       if (err instanceof mongoose.Error) {
-//         return handleError(err);
-//       }
-
-//       return handleError({
-//         code: 409,
-//         message:
-//           "Username Exists"
-//       });
-//     } else {
-//       const doc = await identityStore.findOne({ pubkey: identity.pubkey }).exec();
-//       if (doc === null) return true;
-
-//       if (doc) {
-//         const err = doc.validateSync();
-//         if (err instanceof mongoose.Error) {
-//           return handleError(err);
-//         }
-
-//         return handleError({
-//           code: 409,
-//           message:
-//             "Public Key Exists"
-//         });
-//       } else return true;
-
-//     }
-
-
-//   } catch (e) {
-//     return handleError(e);
-//   }
-// }
 // ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------
