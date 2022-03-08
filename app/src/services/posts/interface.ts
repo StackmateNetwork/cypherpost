@@ -32,6 +32,7 @@ export interface UserPost {
   owner?: string;
   cypher_json?: string;
   derivation_scheme?: string;
+  edited?: boolean;
 }
 
 export enum PostStoreIndex {

@@ -21,10 +21,11 @@
 ## Run on localhost
 
 ```bash
-# PULL REPO TO YOUR HOME FOLDER
-
+# CREATE AND PULL REPO INTO THE FOLLOWING BASE FOLDER
+mkdir ~/satoshi-stack/cypherpost
+cd ~/satoshi-stack/cypherpost/app
+git clone git@github.com:StackmateNetwork/cypherpost.git
 # add node_modules and compiled ts code in dist
-cd ~/cypherpost/app
 npm i
 tsc
 // If changes are made to any .ts file, run tsc again and restart container

@@ -5,7 +5,7 @@ services:
     build:
       context: ../app
       dockerfile: Dockerfile.main
-    image: cypherpost-node
+    image: cypherpost-node-ts
     container_name: application
     restart: unless-stopped
     environment:

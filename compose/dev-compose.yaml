@@ -5,7 +5,7 @@ services:
     build:
       context: ../app
       dockerfile: Dockerfile.dev
-    image: cypherpost-node
+    image: cypherpost-node-ts
     container_name: application
     restart: unless-stopped
     environment:
@@ -61,7 +61,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: $HOME/cypherpost/app
+      device: $HOME/satoshi-stack/cypherpost/app
       o: bind
   cp-server-keys:
     driver: local
@@ -73,7 +73,6 @@ volumes:
   cp-datadb:
   cp-configdb:
   cp-web-root:
-  
 
 networks:
   cypherpostnetwork:

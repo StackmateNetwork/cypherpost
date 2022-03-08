@@ -34,7 +34,8 @@ export class CypherpostPosts implements PostInterface {
       expiry,
       cypher_json,
       derivation_scheme,
-      reference: reference || "NONE"
+      reference: reference || "NONE",
+      edited: false,
     }
 
     const status = await store.createOne(post);
