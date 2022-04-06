@@ -61,13 +61,13 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: $HOME/satoshi-stack/cypherpost/app
+      device: $REPO
       o: bind
   cp-server-keys:
     driver: local
     driver_opts:
       type: none
-      device: $HOME/.keys
+      device: $KEYS
       o: bind
   cp-server-logs:
   cp-datadb:

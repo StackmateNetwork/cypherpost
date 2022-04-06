@@ -20,57 +20,87 @@
 
 ## Run on localhost
 
-```bash
-# CREATE AND PULL REPO INTO THE FOLLOWING BASE FOLDER
-mkdir ~/satoshi-stack/cypherpost
-cd ~/satoshi-stack/cypherpost/app
+You must have npm installed.
+To get the latest version of npm visit: https://nodejs.org/en/
+
+```
+# Install typescript and browserify
+sudo npm i -g typescript browserify
+```
+
+```
 git clone git@github.com:StackmateNetwork/cypherpost.git
+```
+
+```
+cd cypherpost/app
 # add node_modules and compiled ts code in dist
 npm i
 tsc
 // If changes are made to any .ts file, run tsc again and restart container
+```
 
-# create signing keys
-openssl genrsa -out ~/.keys/sats_sig.pem 2048
-openssl rsa -in ~/.keys/sats_sig.pem -outform PEM -pubout -out $HOME/.keys/sats_sig.pub
-
-# compile front-end js
-cd ~/cypherpost/app/src/services/client/public
+```
+# install client dependencies
+cd src/services/client/public/js
+npm i
 # compile.bash compiles each client side js module into  *_bundle.js files containing all dependency code
+cd ..
 ./compile.bash
-
 # If changes are made to any files in public/js, run compile.bash again
+```
 
-# start containers
-cd ~/cypherpost/compose
+```
+# setup dev compose environment
+cd ../../../../../compose
+./setup.sh
 docker-compose -f dev-compose.yaml up -d
+```
 
+YOU CAN NOW ACCESS THE CLIENT ON `localhost` in your browser.
+
+### NOTE: The development client does not work on Safari. Use Firefox or Chromium.
+
+```
 # to stop all containers
 docker-compose -f dev-compose.yaml down
+```
 
+```
 # if changes made to Dockerfiles -  rebuild all containers
 docker-compose -f dev-compose.yaml up -d --build --force-recreate
+```
 
+```
 # rebuild single container : node
 docker-compose -f dev-compose.yaml up -d --build --force-recreate --no-deps node
+```
 
+```
 # for errors related to volumes
 bash delete_volumes.sh
+```
 
-# you might have to add localhost to /etc/hosts
+```
+# Add localhost to /etc/hosts to access client on the browser as localhost
+
 echo "::1     localhost" | sudo tee -a /etc/hosts
+```
 
+```
 # log node
 docker logs -f application
 # log nginx
 docker logs -f server
 # log mongo
 docker logs -f database
-
-# restart a container
-docker restart application
+```
 
 ```
+# restart a container
+docker restart application
+```
+
 
 ## Run tests
 
