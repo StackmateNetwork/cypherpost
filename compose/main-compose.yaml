@@ -10,6 +10,8 @@ services:
     restart: unless-stopped
     environment:
       - APP_PORT=3021
+      - TYPE=$TYPE
+      - SECRET=$SECRET
     ports:
       - "3021:3021"
     volumes:
@@ -56,6 +58,8 @@ services:
       - dhparam:/etc/ssl/certs
     depends_on:
       - node
+    environment:
+      - DOMAIN=$DOMAIN
     networks:
       - cypherpostnetwork
 
@@ -68,35 +72,34 @@ services:
       - web-root:/var/www/html
     depends_on:
       - nginx
-    command: certonly --webroot --webroot-path=/var/www/html --email tech@stackmate.in --agree-tos --no-eff-email --dry-run -d cypherpost.io
+    command: certonly --webroot --webroot-path=/var/www/html --email $EMAIL --agree-tos --no-eff-email $CERTBOT_RUNMODE -d $DOMAIN
     networks:
       - cypherpostnetwork
-
 
 volumes:
   cp-server-keys:
     driver: local
     driver_opts:
       type: none
-      device: /mnt/persistence/node/.keys
+      device: $NODE_VOLUME/.keys
       o: bind
   cp-server-logs:
     driver: local
     driver_opts:
       type: none
-      device: /mnt/persistence/node/winston
+      device: $NODE_VOLUME/winston
       o: bind
   cp-datadb:
     driver: local
     driver_opts:
       type: none
-      device: /mnt/persistence/mongo/data/db
+      device: $MONGO_VOLUME/data/db
       o: bind
   cp-configdb:
     driver: local
     driver_opts:
       type: none
-      device: /mnt/persistence/mongo/configdb
+      device: $MONGO_VOLUME/configdb
       o: bind
   web-root:
   certbot-etc:
@@ -105,9 +108,8 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /mnt/persistence/certs/dhparam/
+      device: $CERTS_VOLUME
       o: bind
-
 
 networks:
   cypherpostnetwork:
