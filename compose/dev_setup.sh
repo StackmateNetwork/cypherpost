@@ -20,9 +20,9 @@ printf "\n"
 
 if [[ $server_type == *"priv"* ]] || [[ $server_type == *"PRIV"* ]] ; then
   if [[ $(uname) == "Darwin" ]]; then
-    SECRET=$(echo $RANDOM | md5 );
+    SECRET=$(echo test | md5 );
   else
-    SECRET=$(echo $RANDOM | md5sum );
+    SECRET=$(echo test | md5sum );
   fi
   echo "[*] Setting up as a private server."
   echo "[!] Use the following secret to invite members to your cypherpost server: $SECRET"

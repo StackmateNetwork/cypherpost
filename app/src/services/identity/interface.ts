@@ -4,7 +4,7 @@ Developed @ Stackmate India
 */
 
 export interface IdentityInterface{
-  register(username: string, pubkey: string):Promise<boolean | Error>;
+  register(username: string, pubkey: string, type: RegistrationType):Promise<boolean | Error>;
   verify(pubkey: string, message: string, signature: string): Promise<boolean | Error>;
   all(genesis_filter: Number): Promise<Array<UserIdentity> | Error>;
   remove(pubkey: string): Promise<boolean | Error>;
@@ -21,8 +21,13 @@ export interface UserIdentity{
   genesis : number;
   username: string;
   pubkey:string;
+  verified: boolean;
 };
 
+export enum RegistrationType{
+  Invite,
+  Payment
+}
 export enum IdentityIndex{
   Username,
   Pubkey

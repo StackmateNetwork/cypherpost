@@ -29,6 +29,7 @@ const badges = new CypherpostBadges();
 const posts = new CypherpostPosts();
 const post_keys = new CypherpostPostKeys();
 const db = new MongoDatabase();
+const invite_code = "d8e8fca2dc0f896fd7cb4cb0031ba249";
 
 let server;
 const should = chai.should();
@@ -541,6 +542,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           "x-client-pubkey": request_a.pubkey,
           "x-nonce": request_a.nonce,
           "x-client-signature": request_a.signature,
+          "x-client-invite-code": invite_code
         })
         .send(request_a.body)
         .end((err, res) => {
@@ -559,6 +561,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           "x-client-pubkey": request_b.pubkey,
           "x-nonce": request_b.nonce,
           "x-client-signature": request_b.signature,
+          "x-client-invite-code": invite_code
         })
         .send(request_b.body)
         .end((err, res) => {
@@ -577,6 +580,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           "x-client-pubkey": request_c.pubkey,
           "x-nonce": request_c.nonce,
           "x-client-signature": request_c.signature,
+          "x-client-invite-code": invite_code
         })
         .send(request_c.body)
         .end((err, res) => {
@@ -1105,6 +1109,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           "x-client-pubkey": request_a.pubkey,
           "x-nonce": request_a.nonce,
           "x-client-signature": request_a.signature,
+          "x-client-invite-code": invite_code
         })
         .send(request_a.body)
         .end((err, res) => {

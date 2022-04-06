@@ -1,6 +1,7 @@
 export interface PaymentInterface {
   getAddress(pubkey: string): Promise<string | Error>;
   getHistory(pubkey: string): Promise<UserPayment[] | Error>;
+  getPaymentDetail(txid: string): Promise<PaymentUpdate | Error>;
   getUnconfirmed(): Promise<UserPayment[] | Error>;
   singleUpdate(update: PaymentUpdate): Promise<boolean | Error>;
   batchUpdate(updates: PaymentUpdate[]): Promise<boolean | Error>;

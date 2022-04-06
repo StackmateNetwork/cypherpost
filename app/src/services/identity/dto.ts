@@ -12,9 +12,13 @@ import { CypherpostBadges } from "../badges/badges";
 import { CypherpostPostKeys } from "../posts/keys/post_keys";
 import { CypherpostPosts } from "../posts/posts";
 import { CypherpostIdentity } from "./identity";
+import { RegistrationType } from "./interface";
 
 
 const { validationResult } = require('express-validator');
+
+const TYPE = process.env.TYPE;
+const INVITE_CODE = process.env.SECRET;
 
 const identity = new CypherpostIdentity();
 const badges = new CypherpostBadges();
@@ -65,7 +69,18 @@ export async function handleRegistration(req, res) {
       }
     }
 
-    let status = await identity.register(request.body.username, request.headers['x-client-pubkey']);
+    const registration_type = TYPE.toLowerCase() === "public" ? 
+      RegistrationType.Payment : RegistrationType.Invite;
+    
+    if (registration_type===RegistrationType.Invite){
+      if (request.headers['x-client-invite-code'] != INVITE_CODE){
+        throw {
+          code: 401,
+          message: "Incorrect Invite Code"
+        }
+      }
+    }
+    let status = await identity.register(request.body.username, request.headers['x-client-pubkey'], registration_type);
     if (status instanceof Error) throw status;
     
     const response = {

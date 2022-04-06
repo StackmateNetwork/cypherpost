@@ -53,6 +53,8 @@ cd ..
 
 ### NOTE: MAC users will need to use Docker Desktop < v4.6 and disable gRPC File Sharing in Preferences for volume mounting to work.
 
+### NOTE: SETUP DEV ENVIRONMENT AS PRIVATE SERVER (PUBLIC SERVER WILL FAIL TESTS WITH 402:Payment Required). Tests for public server with payment is still under development.
+
 ```
 # setup dev compose environment
 cd ../../../../../compose

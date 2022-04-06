@@ -27,6 +27,11 @@ const identity_schema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    verified: {
+      type: Boolean,
+      required: true,
+      default: false
+    }
   }
 );
 // ------------------ '(◣ ◢)' ---------------------
@@ -83,6 +88,7 @@ export class MongoIdentityStore implements IdentityStore {
           genesis: doc["genesis"],
           username: doc["username"],
           pubkey: doc["pubkey"],
+          verified: doc["verified"],
         };
 
         return out;
@@ -109,6 +115,7 @@ export class MongoIdentityStore implements IdentityStore {
           genesis: doc["genesis"],
           username: doc["username"],
           pubkey: doc["pubkey"],
+          verified: doc["verified"],
         };
       });
       return identities;

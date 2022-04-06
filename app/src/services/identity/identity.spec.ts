@@ -10,7 +10,7 @@ import { S5Crypto } from "../../lib/crypto/crypto";
 import { DbConnection } from "../../lib/storage/interface";
 import { MongoDatabase } from "../../lib/storage/mongo";
 import { CypherpostIdentity } from "./identity";
-import { UserIdentity } from "./interface";
+import { RegistrationType, UserIdentity } from "./interface";
 
 const bitcoin = new CypherpostBitcoinOps();
 const crypto = new S5Crypto();
@@ -24,6 +24,7 @@ let xpub = "xpub6CAEPnbkCHtuM1BR5iVQsXEkPBzDoEYF3gyHcZSzJW23CEJm55tmVxwVcdSX6FJF
 let xprv = "xprv9yAszH4rMvLc8X6wygxQWPJ1qA9jPmpPgU3gpB3NkAV4KRycXYaWxAd1mPo9yzybuhANVb7WmnjjLWyWjt5tq772RKPpcRF2FAN2nRTBMMC";
 let ecdsa_keys;
 let signature;
+const invite_code = "d8e8fca2dc0f896fd7cb4cb0031ba249";
 /*
 {
   "xprv": "[8f8bb5c0/128'/0'/0']xprv9yAszH4rMvLc8X6wygxQWPJ1qA9jPmpPgU3gpB3NkAV4KRycXYaWxAd1mPo9yzybuhANVb7WmnjjLWyWjt5tq772RKPpcRF2FAN2nRTBMMC/*",
@@ -34,6 +35,7 @@ let userIdentity: UserIdentity = {
   username,
   genesis: Date.now(),
   pubkey:xpub,
+  verified: true
 };
 
 let genesis_filter = 0;
@@ -55,11 +57,11 @@ describe("Initalizing Test: Identity Service", function () {
   });
   describe("IDENTITY SERVICE OPERATIONS:", async function () {
     it("should REGISTER a new user identity", async function () {
-      const response = await identity.register(username, ecdsa_keys.pubkey);
+      const response = await identity.register(username, ecdsa_keys.pubkey, RegistrationType.Invite);
       expect(response).to.equal(true);
     });
     it("should NOT ALLOW REGISTER of DUPLICATE User", async function () {
-      const response = await identity.register(username2, ecdsa_keys.pubkey);
+      const response = await identity.register(username2, ecdsa_keys.pubkey, RegistrationType.Invite);
       expect(response["name"]).to.equal("409");
     });
     it("should VERIFY a user signature", async function () {
