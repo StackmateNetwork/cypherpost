@@ -30,7 +30,6 @@ const identity_schema = new mongoose.Schema(
     verified: {
       type: Boolean,
       required: true,
-      default: false
     }
   }
 );
@@ -38,9 +37,7 @@ const identity_schema = new mongoose.Schema(
 const identityStore = mongoose.model("identity", identity_schema);
 // ------------------ '(◣ ◢)' ---------------------
 export class MongoIdentityStore implements IdentityStore {
-  readMany(usernames: string[]): Promise<UserIdentity[] | Error> {
-    throw new Error("Method not implemented.");
-  }
+
   async createOne(identity: UserIdentity): Promise<boolean | Error> {
     try {
       await identityStore.syncIndexes();
@@ -119,6 +116,24 @@ export class MongoIdentityStore implements IdentityStore {
         };
       });
       return identities;
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+  async updateOne(pubkey: string, verified: boolean): Promise<boolean | Error> {
+    try {
+      const q = { pubkey };
+      const u = { $set: { verified } };
+      // console.log({q,u})
+
+      const status = await identityStore.updateOne(q, u);
+      if (status instanceof mongoose.Error) {
+        return handleError(status);
+      };
+      console.log({status})
+      return status.modifiedCount > 0 || status.matchedCount >0;
+      // if verified if true the document is not updated and will return modifiedCount = 0 
+      // watchout
     } catch (e) {
       return handleError(e);
     }

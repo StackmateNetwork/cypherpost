@@ -64,23 +64,31 @@ describe("Initalizing Test: Identity Service", function () {
       const response = await identity.register(username2, ecdsa_keys.pubkey, RegistrationType.Invite);
       expect(response["name"]).to.equal("409");
     });
-    it("should VERIFY a user signature", async function () {
-      const response = await identity.verify(ecdsa_keys.pubkey,message,signature);
+    it("should AUTHENTICATE a user signature", async function () {
+      const response = await identity.authenticate(ecdsa_keys.pubkey,message,signature);
       expect(response).to.equal(true);
     });
-    it("should GET ALL identities", async function () {
+    it("should VERIFY a user", async function () {
+      const response = await identity.verify(ecdsa_keys.pubkey);
+      expect(response).to.equal(true);
+    });
+    it("should GET ALL identities and CONFIRM that only user is verified", async function () {
       const response = await identity.all(genesis_filter);
       if (response instanceof Error) throw response;
       expect(response.length).to.equal(1);
+      expect(response[0].verified).to.equal(true);
     });
     it("should GET ALL identities with upto date genesis filter", async function () {
       const response = await identity.all(Date.now());
       if (response instanceof Error) throw response;
       expect(response.length).to.equal(0);
     });
-    it("should REMOVE a user identity and verify", async function () {
+    it("should REMOVE a user identity", async function () {
       const response = await identity.remove(ecdsa_keys.pubkey);
       expect(response).to.equal(true);
+      const response_all = await identity.all(genesis_filter);
+      if (response_all instanceof Error) throw response;
+      expect(response_all.length).to.equal(0);
     });
   });
 });

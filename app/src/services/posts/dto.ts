@@ -26,7 +26,7 @@ export async function postMiddleware(req, res, next) {
     const body = JSON.stringify(request.body);
     const message = `${method} ${resource} ${body} ${nonce}`;
 
-    const status = await identity.verify(pubkey, message, signature);
+    const status = await identity.authenticate(pubkey, message, signature);
     // console.log({pubkey,signature,message,status})
 
     if (status instanceof Error) throw status;

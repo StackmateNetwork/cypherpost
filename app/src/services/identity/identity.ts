@@ -25,7 +25,7 @@ const crypto = new S5Crypto();
 const ONE_HOUR = 60 * 60 * 1000;
 
 export class CypherpostIdentity implements IdentityInterface {
-  async verify(pubkey: string, message: string, signature: string): Promise<boolean | Error> {
+  async authenticate(pubkey: string, message: string, signature: string): Promise<boolean | Error> {
     const identity = await store.readOne(pubkey, IdentityIndex.Pubkey);
     if (identity instanceof Error) return identity;
     
@@ -55,12 +55,14 @@ export class CypherpostIdentity implements IdentityInterface {
     const status = await store.createOne(new_identity);
     return status;
   };
-
   async remove(pubkey: string): Promise<boolean | Error> {
     const status = await store.removeOne(pubkey);
     return status;
   }
-
+  async verify(pubkey: string): Promise<boolean | Error> {
+    const status = await store.updateOne(pubkey,true);
+    return status;
+  }
   async all(genesis_filter: Number): Promise<Array<UserIdentity> | Error> {
     const identities = await store.readAll(genesis_filter);
     return identities;
