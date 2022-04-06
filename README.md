@@ -20,6 +20,7 @@
 
 ## Run on localhost
 
+
 You must have npm installed.
 To get the latest version of npm visit: https://nodejs.org/en/
 
@@ -49,6 +50,8 @@ cd ..
 ./compile.bash
 # If changes are made to any files in public/js, run compile.bash again
 ```
+
+### NOTE: MAC users will need to use Docker Desktop < v4.6 and disable gRPC File Sharing in Preferences for volume mounting to work.
 
 ```
 # setup dev compose environment

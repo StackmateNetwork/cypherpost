@@ -33,7 +33,7 @@ else
 fi
 
 TYPE=$server_type
-REPO=$(dirname $(pwd))
+REPO="$(dirname $(pwd))/app"
 echo "[*] Using $REPO as path to development codebase."
 
 
@@ -43,7 +43,7 @@ openssl rsa -in ~/.keys/sats_sig.pem -outform PEM -pubout -out $HOME/.keys/sats_
 echo "[*] Generated new server signing keys."
 
 touch .env
-echo "REPO=$REPO/app" > .env
+echo "REPO=$REPO" > .env
 echo "KEYS=$HOME/.keys" >> .env
 echo "TYPE=$TYPE" >> .env
 echo "SECRET=$SECRET" >> .env

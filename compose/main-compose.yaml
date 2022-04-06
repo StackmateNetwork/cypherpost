@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 
 services:
   node:
@@ -80,36 +80,32 @@ volumes:
   cp-server-keys:
     driver: local
     driver_opts:
-      type: none
+      type: bind
       device: $NODE_VOLUME/.keys
       o: bind
   cp-server-logs:
     driver: local
     driver_opts:
-      type: none
+      type: bind
       device: $NODE_VOLUME/winston
-      o: bind
   cp-datadb:
     driver: local
     driver_opts:
-      type: none
+      type: bind
       device: $MONGO_VOLUME/data/db
-      o: bind
   cp-configdb:
     driver: local
     driver_opts:
-      type: none
+      type: bind
       device: $MONGO_VOLUME/configdb
-      o: bind
   web-root:
   certbot-etc:
   certbot-var:
   dhparam:
     driver: local
     driver_opts:
-      type: none
+      type: bind
       device: $CERTS_VOLUME
-      o: bind
 
 networks:
   cypherpostnetwork:

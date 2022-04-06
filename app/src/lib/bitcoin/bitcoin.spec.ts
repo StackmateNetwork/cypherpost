@@ -51,14 +51,14 @@ let xkeys = {
 
 let expected_ecdsa_pair =  {
   private_key: "3c842fc0e15f2f1395922d432aafa60c35e09ad97c363a37b637f03e7adcb1a7",
-  public_key: "02dfbbf1979269802015da7dba4143ff5935ea502ef3a7276cc650be0d84a9c882",
+  public_key: "dfbbf1979269802015da7dba4143ff5935ea502ef3a7276cc650be0d84a9c882",
 };
 
 const alice_pair = expected_ecdsa_pair;
 
 const bob_pair =  {
   private_key: "d5f984d2ab332345dbf7ddff9f47852125721b2025329e6981c4130671e237d0",
-  public_key: "023946267e8f3eeeea651b0ea865b52d1f9d1c12e851b0f98a3303c15a26cf235d",
+  public_key: "3946267e8f3eeeea651b0ea865b52d1f9d1c12e851b0f98a3303c15a26cf235d",
 };
 
 let expected_shared_secret = "49ab8cb9ba741c6083343688544861872e3b73b3d094b09e36550cf62d06ef1e";
@@ -146,6 +146,9 @@ describe("Initalizing Test:Bitcoin Operations TEST ", function () {
       if (status instanceof Error) throw status;
       expect(status).to.equal(true);
     });
+
+    //test volume update
+    // ranjesh
 
 });
 

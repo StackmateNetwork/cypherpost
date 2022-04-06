@@ -1,4 +1,4 @@
-version: '3'
+version: '3.7'
 
 services:
   node:
@@ -15,7 +15,7 @@ services:
     ports:
       - "3021:3021"
     volumes:
-      - cp-server-code:/home/node/cypherpost/app
+      - cp-server-code:/home/node/cypherpost/app:consistent
       - cp-server-keys:/home/node/.keys
     networks:
       - cypherpostnetwork
@@ -62,13 +62,13 @@ volumes:
   cp-server-code:
     driver: local
     driver_opts:
-      type: none
+      type: bind
       device: $REPO
       o: bind
   cp-server-keys:
     driver: local
     driver_opts:
-      type: none
+      type: bind
       device: $KEYS
       o: bind
   cp-server-logs:
