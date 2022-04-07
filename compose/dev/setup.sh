@@ -66,6 +66,8 @@ echo "[*] Created nginx default.conf with $MY_DOMAIN_NAME as hostname."
 rm -rf .env
 touch .env
 chmod +r .env
+
+echo "COMPOSE_PROJECT_NAME=cypherpost-dev" >> .env
 S=$(echo "SECRET=$SECRET" | perl -pe '~ s/^\s+|\s+$//g') 
 echo $S > .env
 echo "REPO=$REPO_APP" >> .env

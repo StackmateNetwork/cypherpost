@@ -65,7 +65,7 @@ cd ..
 echo "::1     localhost" | sudo tee -a /etc/hosts
 ```
 
-#### NOTE: MAC users will need to use Docker Desktop <= v4.5 and disable gRPC File Sharing in Preferences for volume mounting to work.
+#### NOTE: MAC users will need to use Docker Desktop <= v4.5 and disable gRPC File Sharing in Preferences for volume mounting to work. Unfortunately you will have to bare with that annoying `!` on your taskbar icon.
 
 #### NOTE: SETUP DEV ENVIRONMENT AS PRIVATE SERVER (PUBLIC SERVER WILL FAIL TESTS WITH 402:Payment Required). Tests for public server with payment is still under development.
 
