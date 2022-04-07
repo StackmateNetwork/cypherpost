@@ -10,7 +10,7 @@ import { S5Crypto } from "../../lib/crypto/crypto";
 import { DbConnection } from "../../lib/storage/interface";
 import { MongoDatabase } from "../../lib/storage/mongo";
 import { CypherpostIdentity } from "./identity";
-import { RegistrationType, UserIdentity } from "./interface";
+import { RegistrationType, UserIdentity, VerificationStatus } from "./interface";
 
 const bitcoin = new CypherpostBitcoinOps();
 const crypto = new S5Crypto();
@@ -35,7 +35,7 @@ let userIdentity: UserIdentity = {
   username,
   genesis: Date.now(),
   pubkey:xpub,
-  verified: true
+  status: VerificationStatus.Pending
 };
 
 let genesis_filter = 0;
@@ -69,14 +69,14 @@ describe("Initalizing Test: Identity Service", function () {
       expect(response).to.equal(true);
     });
     it("should VERIFY a user", async function () {
-      const response = await identity.verify(ecdsa_keys.pubkey);
+      const response = await identity.updateStatus(ecdsa_keys.pubkey, VerificationStatus.Verified);
       expect(response).to.equal(true);
     });
     it("should GET ALL identities and CONFIRM that only user is verified", async function () {
       const response = await identity.all(genesis_filter);
       if (response instanceof Error) throw response;
       expect(response.length).to.equal(1);
-      expect(response[0].verified).to.equal(true);
+      expect(response[0].status).to.equal(VerificationStatus.Verified.toString());
     });
     it("should GET ALL identities with upto date genesis filter", async function () {
       const response = await identity.all(Date.now());

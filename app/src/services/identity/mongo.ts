@@ -5,7 +5,7 @@ Developed @ Stackmate India
 // ---------------- ┌∩┐(◣_◢)┌∩┐ -----------------
 import mongoose from "mongoose";
 import { handleError } from "../../lib/errors/e";
-import { IdentityIndex, IdentityStore, UserIdentity } from "./interface";
+import { IdentityIndex, IdentityStore, UserIdentity, VerificationStatus } from "./interface";
 
 // ---------------- ┌∩┐(◣_◢)┌∩┐ -----------------
 
@@ -27,9 +27,10 @@ const identity_schema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    verified: {
-      type: Boolean,
+    status: {
+      type: String,
       required: true,
+      default: "PENDING"
     }
   }
 );
@@ -85,7 +86,7 @@ export class MongoIdentityStore implements IdentityStore {
           genesis: doc["genesis"],
           username: doc["username"],
           pubkey: doc["pubkey"],
-          verified: doc["verified"],
+          status: doc["status"],
         };
 
         return out;
@@ -112,7 +113,7 @@ export class MongoIdentityStore implements IdentityStore {
           genesis: doc["genesis"],
           username: doc["username"],
           pubkey: doc["pubkey"],
-          verified: doc["verified"],
+          status: doc["status"],
         };
       });
       return identities;
@@ -120,18 +121,18 @@ export class MongoIdentityStore implements IdentityStore {
       return handleError(e);
     }
   }
-  async updateOne(pubkey: string, verified: boolean): Promise<boolean | Error> {
+  async updateOne(pubkey: string, status: VerificationStatus): Promise<boolean | Error> {
     try {
       const q = { pubkey };
-      const u = { $set: { verified } };
+      const u = { $set: { status: status.toString() } };
       // console.log({q,u})
 
-      const status = await identityStore.updateOne(q, u);
-      if (status instanceof mongoose.Error) {
-        return handleError(status);
+      const result = await identityStore.updateOne(q, u);
+      if (result instanceof mongoose.Error) {
+        return handleError(result);
       };
-      console.log({status})
-      return status.modifiedCount > 0 || status.matchedCount >0;
+      console.log({result})
+      return result.modifiedCount > 0 || result.matchedCount >0;
       // if verified if true the document is not updated and will return modifiedCount = 0 
       // watchout
     } catch (e) {
