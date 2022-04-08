@@ -13,6 +13,9 @@ apt-get install -y \
     expect \
     jq \
     lsb-release
+
+echo "[*] Installed basic tools"
+
 # Install docker
 curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo \
@@ -21,9 +24,16 @@ echo \
 
 apt-get update
 apt-get install docker-ce docker-ce-cli containerd.io
+echo "[*] Installed docker."
 # test docker
 docker run hello-world
+echo "[*] Tested docker,"
 # Pull repos
 git clone https://github.com/StackmateNetwork/cypherpost.git
 git clone https://github.com/SatoshiPortal/cyphernode.git
+
+
+echo "[*] Cloned cypherpost and cyphernode from github."
+echo "[*] Server initialization complete!"
+
 exit 0

@@ -66,7 +66,7 @@ export async function handleGetPaymentAddress(req, res) {
   }
 }
 
-export async function handleGetPaymentHistory(req, res) {
+export async function handleGetPaymentStatus(req, res) {
   const request = parseRequest(req);
   try {
     const errors = validationResult(req)
@@ -92,3 +92,28 @@ export async function handleGetPaymentHistory(req, res) {
   }
 }
 
+export async function handlePostPaymentNotification(req, res) {
+  const request = parseRequest(req);
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      throw {
+        code: 400,
+        message: errors.array()
+      }
+    }
+
+    // CALL BACK FUNCTION TRIGGERED BY NODE TX WATCHER
+    let status = [];
+  
+    const response = {
+      message: "Cyphernode Rocks!"
+    };
+
+    respond(200, response, res, request);
+  }
+  catch (e) {
+    const result = filterError(e, r_500, request);
+    respond(result.code, result.message, res, request);
+  }
+}

@@ -133,11 +133,9 @@ function delete_vm {
 
 }
 
-
 function debug {
     echo "debugging..."
 }
-
 
 # RUN THIS ONCE
 VOLUME_ID=$(create_volume)

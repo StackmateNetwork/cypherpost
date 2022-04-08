@@ -5,7 +5,7 @@ Developed @ Stackmate India
 // ---------------- ┌∩┐(◣_◢)┌∩┐ -----------------
 import mongoose from "mongoose";
 import { handleError } from "../../lib/errors/e";
-import { CypherpostWallet, CypherpostWalletStore, PaymentStore, PaymentUpdate, UserPayment } from "./interface";
+import { CypherpostWallet, CypherpostWalletStore, PaymentStore, Transaction, UserPayment } from "./interface";
 // ---------------- ┌∩┐(◣_◢)┌∩┐ -----------------
 const payment_schema = new mongoose.Schema(
   {
@@ -24,11 +24,7 @@ const payment_schema = new mongoose.Schema(
       index: true,
       unique: true,
     },
-    index: {
-      type: Number,
-      required: true,
-      unique: true,
-    },
+
     amount: {
       type: Number,
       required: true,
@@ -86,9 +82,8 @@ export class MongoPaymentStore implements PaymentStore {
             genesis: doc["genesis"],
             pubkey: doc["pubkey"],
             address: doc["address"],
-            index: doc["index"],
             amount: doc["amount"],
-            txid: doc["type"],
+            txid: doc["txid"],
             timestamp: doc["timestamp"],
             confirmed: doc["confirmed"],
           }
@@ -115,9 +110,8 @@ export class MongoPaymentStore implements PaymentStore {
             genesis: doc["genesis"],
             pubkey: doc["pubkey"],
             address: doc["address"],
-            index: doc["index"],
             amount: doc["amount"],
-            txid: doc["type"],
+            txid: doc["txid"],
             timestamp: doc["timestamp"],
             confirmed: doc["confirmed"],
           }
@@ -130,7 +124,7 @@ export class MongoPaymentStore implements PaymentStore {
       return handleError(e);
     }
   }
-  async updateOne(update: PaymentUpdate): Promise<boolean | Error> {
+  async updateOne(update: Transaction): Promise<boolean | Error> {
     try {
       const q = { address: update.address };
       const u = {
@@ -149,7 +143,7 @@ export class MongoPaymentStore implements PaymentStore {
       return handleError(e);
     }
   }
-  async bulkUpdate(updates: PaymentUpdate[]): Promise<boolean | Error> {
+  async bulkUpdate(updates: Transaction[]): Promise<boolean | Error> {
     try {
       const status = await paymentStore.bulkWrite(updates.map((item) => {
         return {
@@ -183,113 +177,113 @@ export class MongoPaymentStore implements PaymentStore {
     }
   }
 }
-// ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------
-const wallet_schema = new mongoose.Schema(
-  {
-    tag: {
-      type: String,
-      required: true,
-      default: "SMSolo2022",
-    },
-    genesis: {
-      type: Number,
-      required: true,
-    },
-    public_descriptor: {
-      type: String,
-      required: true,
-      index: true,
-      unique: true,
-    },
-    last_used_index: {
-      type: Number,
-      required: true,
-      unique: true,
-      default: 0,
-    },
-  },
-  {
-    strict: true
-  }
-);
-// ------------------ '(◣ ◢)' ---------------------
-const walletStore = mongoose.model("wallet", wallet_schema);
-// ------------------ '(◣ ◢)' ---------------------
-export class MongoCypherpostWalletStore implements CypherpostWalletStore {
-  update(index: number): Promise<number | Error> {
-    throw new Error("Method not implemented.");
-  }
-  async create(wallet: CypherpostWallet): Promise<boolean | Error> {
-    try {
-      await walletStore.syncIndexes();
-      const doc = await walletStore.create(wallet);
-      if (doc instanceof mongoose.Error) {
-        return handleError(doc);
-      } else {
-        return true;
-      }
-    } catch (e) {
-      if (e['code'] && e['code'] == 11000) {
-        return handleError({
-          code: 409,
-          message: "Duplicate Index."
-        })
-      }
-      return handleError(e);
-    }
-  }
-  async read(): Promise<CypherpostWallet | Error> {
-    try {
-      const docs = await walletStore.find({}).exec();
-      if (docs.length > 0) {
-        if (docs instanceof mongoose.Error) {
-          return handleError(docs);
-        }
+// // ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------
+// const wallet_schema = new mongoose.Schema(
+//   {
+//     tag: {
+//       type: String,
+//       required: true,
+//       default: "SMSolo2022",
+//     },
+//     genesis: {
+//       type: Number,
+//       required: true,
+//     },
+//     public_descriptor: {
+//       type: String,
+//       required: true,
+//       index: true,
+//       unique: true,
+//     },
+//     last_used_index: {
+//       type: Number,
+//       required: true,
+//       unique: true,
+//       default: 0,
+//     },
+//   },
+//   {
+//     strict: true
+//   }
+// );
+// // ------------------ '(◣ ◢)' ---------------------
+// const walletStore = mongoose.model("wallet", wallet_schema);
+// // ------------------ '(◣ ◢)' ---------------------
+// export class MongoCypherpostWalletStore implements CypherpostWalletStore {
+//   update(index: number): Promise<number | Error> {
+//     throw new Error("Method not implemented.");
+//   }
+//   async create(wallet: CypherpostWallet): Promise<boolean | Error> {
+//     try {
+//       await walletStore.syncIndexes();
+//       const doc = await walletStore.create(wallet);
+//       if (doc instanceof mongoose.Error) {
+//         return handleError(doc);
+//       } else {
+//         return true;
+//       }
+//     } catch (e) {
+//       if (e['code'] && e['code'] == 11000) {
+//         return handleError({
+//           code: 409,
+//           message: "Duplicate Index."
+//         })
+//       }
+//       return handleError(e);
+//     }
+//   }
+//   async read(): Promise<CypherpostWallet | Error> {
+//     try {
+//       const docs = await walletStore.find({}).exec();
+//       if (docs.length > 0) {
+//         if (docs instanceof mongoose.Error) {
+//           return handleError(docs);
+//         }
 
-        const wallet = docs.map(doc => {
-          return {
-            genesis: doc["genesis"],
-            public_descriptor: doc["public_descriptor"],
-            last_used_index: doc["last_used_index"],
-          }
-        })[0];
-        return wallet;
-      } else {
-        return handleError({
-          code: 500,
-          message: "Server wallet not initialized."
-        });
-      }
-    } catch (e) {
-      return handleError(e);
-    }
-  }
-  async rotateIndex(): Promise<number | Error> {
-    try{
-      const doc = walletStore.findOneAndUpdate(
-        {tag :"SMSolo2022"}, 
-        {$inc : {last_used_index : 1}}, 
-        {new: true}
-      ).exec();
-      if (doc instanceof mongoose.Error) {
-        return handleError(doc);
-      }
-      return doc["last_used_index"];
-    }catch(e){
-      return handleError(e);
-    }
-  }
-  async removeAll(): Promise<boolean | Error> {
-    try {
-      let status = await walletStore.deleteMany({});
-      if (status instanceof mongoose.Error) {
-        return handleError(status);
-      };
-      return true;
-    } catch (e) {
-      return handleError(e);
-    }
-  }
+//         const wallet = docs.map(doc => {
+//           return {
+//             genesis: doc["genesis"],
+//             public_descriptor: doc["public_descriptor"],
+//             last_used_index: doc["last_used_index"],
+//           }
+//         })[0];
+//         return wallet;
+//       } else {
+//         return handleError({
+//           code: 500,
+//           message: "Server wallet not initialized."
+//         });
+//       }
+//     } catch (e) {
+//       return handleError(e);
+//     }
+//   }
+//   async rotateIndex(): Promise<number | Error> {
+//     try{
+//       const doc = walletStore.findOneAndUpdate(
+//         {tag :"SMSolo2022"}, 
+//         {$inc : {last_used_index : 1}}, 
+//         {new: true}
+//       ).exec();
+//       if (doc instanceof mongoose.Error) {
+//         return handleError(doc);
+//       }
+//       return doc["last_used_index"];
+//     }catch(e){
+//       return handleError(e);
+//     }
+//   }
+//   async removeAll(): Promise<boolean | Error> {
+//     try {
+//       let status = await walletStore.deleteMany({});
+//       if (status instanceof mongoose.Error) {
+//         return handleError(status);
+//       };
+//       return true;
+//     } catch (e) {
+//       return handleError(e);
+//     }
+//   }
 
-}
-// ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------
+// }
+// // ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------

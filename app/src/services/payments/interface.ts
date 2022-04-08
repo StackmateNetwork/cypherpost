@@ -1,10 +1,10 @@
 export interface PaymentInterface {
   getAddress(pubkey: string): Promise<string | Error>;
   getHistory(pubkey: string): Promise<UserPayment[] | Error>;
-  getPaymentDetail(txid: string): Promise<PaymentUpdate | Error>;
+  getTransactionDetail(txid: string): Promise<Transaction | Error>;
   getUnconfirmed(): Promise<UserPayment[] | Error>;
-  singleUpdate(update: PaymentUpdate): Promise<boolean | Error>;
-  batchUpdate(updates: PaymentUpdate[]): Promise<boolean | Error>;
+  singleUpdate(update: Transaction): Promise<boolean | Error>;
+  batchUpdate(updates: Transaction[]): Promise<boolean | Error>;
   // spend(address: string, spent: number): Promise<boolean | Error>;
 }
 
@@ -12,8 +12,8 @@ export interface PaymentStore {
   create(payment: UserPayment): Promise<boolean | Error>;
   readAll(genesis_filter: Number): Promise<UserPayment[] | Error>;
   readByPubkey(pubkey: string): Promise<UserPayment[] | Error>;  
-  updateOne(update: PaymentUpdate): Promise<boolean | Error>;
-  bulkUpdate(updates:PaymentUpdate[]): Promise<boolean | Error>;
+  updateOne(update: Transaction): Promise<boolean | Error>;
+  bulkUpdate(updates:Transaction[]): Promise<boolean | Error>;
   removeAll(): Promise<boolean | Error>;
 }
 export interface CypherpostWalletStore{
@@ -27,18 +27,18 @@ export interface UserPayment {
   genesis: number;
   pubkey: string;
   address: string;
-  index: number;
   amount: number;
   txid: string;
   timestamp: number;
   confirmed: boolean;
 };
 
-export interface PaymentUpdate{
+export interface Transaction{
   address?: string;
   txid?: string,
   timestamp?: string,
   confirmed?: boolean,
+  amount?: number
 };
 
 export enum PaymentIndex {
