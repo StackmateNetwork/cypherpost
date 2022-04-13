@@ -30,13 +30,8 @@ apt-get update
 apt-get install -y docker-ce docker-ce-cli containerd.io
 
 curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
-ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-
-newgrp docker
-chgrp docker /usr/bin/docker 
-chgrp docker /usr/bin/docker
-usermod -aG docker $ADMIN
+#chmod +x /usr/local/bin/docker-compose
+#ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 echo "[*] Installed docker."
 # test docker
 docker run hello-world
@@ -44,13 +39,20 @@ echo "[*] Tested docker,"
 # Pull repos
 git clone https://github.com/StackmateNetwork/cypherpost.git
 git clone https://github.com/SatoshiPortal/cyphernode.git
+echo "[*] Cloned cypherpost and cyphernode from github."
 
 chmod -R 700 cypherpost
 chmod -R 700 cyphernode
 chown -R $ADMIN cypherpost 
 chown -R $ADMIN cypherpost 
 
-echo "[*] Cloned cypherpost and cyphernode from github."
+newgrp docker
+chgrp docker /usr/bin/docker 
+chgrp docker /usr/bin/docker
+usermod -aG docker $ADMIN
+
+echo "[*] Set Permissions."
+
 echo "[*] Server initialization complete!"
 
 exit 0
