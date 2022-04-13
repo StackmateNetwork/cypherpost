@@ -79,9 +79,9 @@ function segregateMyPlainPosts(plain_json_posts) {
   }
 }
 
-async function createRootKeyChain(mnemonic) {
+async function createRootKeyChain(access_code) {
   try {
-    const seed_root = await bitcoin.seed_root(mnemonic);
+    const seed_root = await bitcoin.seed_root_alt(access_code);
     console.log({ seed_root })
     const cypherpost_parent = bitcoin.derive_parent_128(seed_root);
     const keys = {

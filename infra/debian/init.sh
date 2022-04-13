@@ -35,9 +35,7 @@ sudo usermod -aG docker $(whoami)
 sudo chgrp docker /usr/bin/docker 
 sudo chgrp docker /usr/bin/docker-compose
 echo "[*] Installed docker."
-# test docker
-docker run hello-world
-echo "[*] Tested docker,"
+
 # Pull repos
 git clone https://github.com/StackmateNetwork/cypherpost.git
 git clone https://github.com/SatoshiPortal/cyphernode.git
@@ -52,6 +50,5 @@ echo "[*] Permissions Set."
 
 echo "[*] Server initialization complete!"
 echo "[*] Logout of ssh and log back in for group permissions to be loaded!"
-
 
 exit 0
