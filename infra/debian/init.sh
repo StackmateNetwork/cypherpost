@@ -1,11 +1,8 @@
 #!/bin/bash -e
 # A few essential tools to get a fresh debian system equipped to download new software over secure channels
-echo "Provide the admin username to set permissions in their home directory: "
-read -r ADMIN
-printf "\n"
 
-apt-get update
-apt-get install -y \
+sudo apt-get update
+sudo apt-get install -y \
     apt-transport-https \
     ca-certificates \
     curl \
@@ -16,7 +13,7 @@ apt-get install -y \
     git \
     expect \
     jq \
-    lsb-release
+    lsb-release 
 
 echo "[*] Installed basic tools"
 
@@ -26,12 +23,17 @@ echo \
   "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-apt-get update
-apt-get install -y docker-ce docker-ce-cli containerd.io
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
-curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-#chmod +x /usr/local/bin/docker-compose
-#ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+sudo groupadd -f docker
+sudo usermod -aG docker $(whoami)
+sudo chgrp docker /usr/bin/docker 
+sudo chgrp docker /usr/bin/docker-compose
 echo "[*] Installed docker."
 # test docker
 docker run hello-world
@@ -41,18 +43,15 @@ git clone https://github.com/StackmateNetwork/cypherpost.git
 git clone https://github.com/SatoshiPortal/cyphernode.git
 echo "[*] Cloned cypherpost and cyphernode from github."
 
-chmod -R 700 cypherpost
-chmod -R 700 cyphernode
-chown -R $ADMIN cypherpost 
-chown -R $ADMIN cypherpost 
+sudo chmod -R 700 cypherpost
+sudo chmod -R 700 cyphernode
+sudo chown -R $(whoami) cypherpost 
+sudo chown -R $(whoami) cypherpost 
 
-newgrp docker
-chgrp docker /usr/bin/docker 
-chgrp docker /usr/bin/docker
-usermod -aG docker $ADMIN
-
-echo "[*] Set Permissions."
+echo "[*] Permissions Set."
 
 echo "[*] Server initialization complete!"
+echo "[*] Logout of ssh and log back in for group permissions to be loaded!"
+
 
 exit 0

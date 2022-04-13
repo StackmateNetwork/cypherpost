@@ -112,4 +112,5 @@ echo "CERTBOT_RUNMODE=--force-renewal" >> .env
 
 echo "[*] SETUP COMPLETE! VERIFY YOUR .ENV"
 cat .env
+echo "[!] Make sure your domain name points to this server's IP."
 echo "[!] Run issue_ssl.sh OR start.sh directly if you have ssl certs issued."
