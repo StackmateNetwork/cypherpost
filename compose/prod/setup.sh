@@ -62,8 +62,6 @@ else
   echo "[*] DHParam setup for nginx server."
 fi
 
-
-
 if [[ $TYPE == *"priv"* ]] || [[ $TYPE == *"PRIV"* ]] ; then
   if [[ $(uname) == "Darwin" ]]; then
     SECRET=$(echo $RANDOM | md5 );
@@ -78,15 +76,17 @@ else
   echo "[*] Setting up as public server."
 fi
 
-mkdir -p ~/.keys 2> /dev/null
-openssl genrsa -out ~/.keys/sats_sig.pem 4096 2> /dev/null
-openssl rsa -in ~/.keys/sats_sig.pem -outform PEM -pubout -out ~/.keys/sats_sig.pub 2> /dev/null
+sudo openssl genrsa -out $NODE_VOLUME/.keys/sats_sig.pem 4096
+sudo openssl rsa -in $NODE_VOLUME/.keys/sats_sig.pem -outform PEM -pubout -out $NODE_VOLUME/.keys/sats_sig.pub
+echo "[!] Giving node container GUI 1300 permission to use response signing keys."
+sudo chown -R $(whoami):1300 $NODE_VOLUME
+sudo chmod -R 770 $NODE_VOLUME
 echo "[*] Generated new server signing keys."
 
 ## NGINX CONFIG
 REPO="$(dirname $(dirname $(pwd)))"
 REPO_NGINX_CONF="$REPO/infra/nginx/prod/nginx-conf"
-rm -rf "$REPO_NGINX_CONF/default.conf"
+
 rm -rf "$REPO_NGINX_CONF/pre" "$REPO_NGINX_CONF/post"
 
 cp "$REPO_NGINX_CONF/pre_template" "$REPO_NGINX_CONF/pre" 

@@ -4,6 +4,7 @@ const {
 } = require("./keys");
 const {
   registerIdentity,
+  getServerIdentity
 } = require("./api");
 const store = require("./store");
 const util = require("./util");
@@ -20,6 +21,10 @@ function displayRegistration() {
   document.getElementById("registration").classList.remove("hidden");
   return true;
 }
+function displayInvitation(){
+  document.getElementById("invite_code").classList.remove("hidden");
+  return true;
+}
 
 // Final Action Button Handlers
 async function completeRegistration() {
@@ -32,7 +37,10 @@ async function completeRegistration() {
   });
   if (username_availability.length > 0) return false;
   const keys = store.getMyKeyChain();
-  const response = await registerIdentity(keys.identity, username.toLowerCase());
+  const server_identity = store.getServerIdentity();
+  const invite_code = (server_identity.type==="priv")?document.getElementById('invite_code').value:null;
+  console.log({invite_code})
+  const response = await registerIdentity(keys.identity, username.toLowerCase(),invite_code);
   if (response instanceof Error) {
     console.error(response.message);
     return false;
@@ -181,12 +189,19 @@ async function loadAuthEvents() {
           return false;
         }
         else {
+          const server = await getServerIdentity(keys.identity);
+          console.log(server)
+          store.setServerIdentity(server);
+          console.log(store.getServerIdentity());
+
           const status = await comps.downloadAllIdentities(keys.identity);
           if (status instanceof Error) {
             alert("Error getting identities!")
             return false;
           };
           displayRegistration();
+          if (server.type==="priv") displayInvitation();
+
         }
       });
 

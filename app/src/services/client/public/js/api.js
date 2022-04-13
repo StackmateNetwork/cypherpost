@@ -32,8 +32,25 @@ async function createBadgeSignature(identity_parent, reciever_pubkey, type, nonc
   console.log({ badge_message })
   return await bitcoin.sign(badge_message, identity_parent.privkey);
 }
+async function getServerIdentity(identity_parent) {
 
-async function registerIdentity(identity_parent, username) {
+  const nonce = Date.now();
+  const resource = "/identity/server";
+  const url = api_url + resource;
+  const method = "GET";
+  const body = {};
+
+  const signature = await createRequestSignature(method, resource, body, identity_parent, nonce);
+  const headers = createRequestHeaders(identity_parent, nonce, signature);
+
+  const response = await request(method, url, headers, body);
+  if (response instanceof Error) return response;
+
+  return response;
+
+}
+
+async function registerIdentity(identity_parent, username, invite_code) {
   const nonce = Date.now();
   const resource = "/identity";
   const url = api_url + resource;
@@ -43,7 +60,7 @@ async function registerIdentity(identity_parent, username) {
   };
 
   const signature = await createRequestSignature(method, resource, body, identity_parent, nonce);
-  const headers = createRequestHeaders(identity_parent, nonce, signature);
+  const headers = createRequestHeaders(identity_parent, nonce, signature, invite_code);
 
   console.log({ headers, body, signature });
   const response = await request(method, url, headers, body);
@@ -272,6 +289,7 @@ async function deletePost(identity_parent, post_id) {
 
 
 module.exports = {
+  getServerIdentity,
   registerIdentity,
   getAllIdentities,
   getMyPosts,
@@ -283,5 +301,5 @@ module.exports = {
   setPostVisibility,
   deletePost,
   getMyBadges,
-  revokeBadge
+  revokeBadge,
 }

@@ -69,9 +69,9 @@ export async function handleRegistration(req, res) {
       }
     }
 
-    const registration_type = TYPE.toLowerCase() === "public" ? 
+    const registration_type = TYPE.toLowerCase().includes("pub") ? 
       RegistrationType.Payment : RegistrationType.Invite;
-    
+  
     if (registration_type===RegistrationType.Invite){
       if (request.headers['x-client-invite-code'] != INVITE_CODE){
         throw {

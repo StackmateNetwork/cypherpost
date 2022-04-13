@@ -136,6 +136,20 @@ function getMyProfile() {
   return (profile) ? JSON.parse(profile) : null
 }
 
+function setServerIdentity(id) {
+  sessionStorage.setItem(`server_identity`, JSON.stringify(id));
+  return true;
+}
+function getServerIdentity() {
+  try{
+  const id = sessionStorage.getItem("server_identity");
+  return (id) ? JSON.parse(id) : null
+  }
+  catch(e){
+    return null;
+  }
+}
+
 
 function setMyPreferences(preferences) {
   sessionStorage.setItem(`my_preferences`, JSON.stringify(preferences));
@@ -334,6 +348,8 @@ module.exports = {
   getMyProfile,
   setMyKeyChain,
   getMyKeyChain,
+  setServerIdentity,
+  getServerIdentity,
   // setOthersProfiles,
   // getOthersProfiles,
   setMyTrades,
