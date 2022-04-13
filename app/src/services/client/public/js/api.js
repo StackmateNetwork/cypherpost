@@ -4,7 +4,7 @@
  */
 const crypto = require("crypto");
 const store = require('./store');
-const bitcoin = require("./bitcoin");
+const bitcoin = require("./keys");
 const { request } = require('./request');
 
 const VERSION_PREFIX = "/api/v2";

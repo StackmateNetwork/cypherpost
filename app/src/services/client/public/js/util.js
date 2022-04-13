@@ -3,7 +3,7 @@ const PREFERENCES = "PREFERENCES";
 const TRADE = "BITCOIN-TRADE";
 
 const crypto = require("crypto");
-const bitcoin = require("./bitcoin");
+const bitcoin = require("./keys");
 
 const { encrypt, decrypt } = require("./aes");
 

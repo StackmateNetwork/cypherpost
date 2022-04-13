@@ -13,7 +13,7 @@ function encrypt(text, key_hex) {
     encrypted = Buffer.concat([encrypted, cipher.final()]);
 
     const cipher_text =
-      iv.toString("hex") + ":" + encrypted.toString("hex");
+      iv.toString("hex") + ":" + encrypted.toString("base64");
     return cipher_text;
   }
   catch (e) {
@@ -27,8 +27,8 @@ function decrypt(cipher_text, key_hex) {
     const key = Buffer.from(key_hex, "hex");
     const text_parts = cipher_text.split(":");
     const iv = Buffer.from(text_parts.shift(), "hex");
-
-    const encrypted_text = Buffer.from(text_parts.join(":"), "hex");
+    const encrypted_text = Buffer.from(text_parts.join(":"), "base64");
+    
     const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(key), iv);
 
     let plain_text = decipher.update(encrypted_text);

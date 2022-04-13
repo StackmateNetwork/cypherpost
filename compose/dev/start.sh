@@ -1,5 +1,8 @@
 #!/bin/bash -e
 source .env
+
+#STATUS gracefully checks status of dockerd connection
+STATUS=$(docker ps)
 # echo $SECRET
 # echo "Enter your admin password to decrypt your invitation code for docker:"
 # read -p "Enter password: " -s admin_password

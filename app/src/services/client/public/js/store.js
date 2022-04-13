@@ -19,7 +19,7 @@
 
 const { encrypt, decrypt } = require("./aes");
 const crypto = require("crypto");
-const bitcoin = require("./bitcoin");
+const bitcoin = require("./keys");
 
 
 function getIdentities() {

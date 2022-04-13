@@ -1,7 +1,7 @@
 const INIT_TRADE_DS = "m/3h/0h/0h";
 const {
-  generateMnemonic
-} = require("./bitcoin");
+  generateAccessCode
+} = require("./keys");
 const {
   registerIdentity,
 } = require("./api");
@@ -171,7 +171,7 @@ async function loadAuthEvents() {
     case "registration":
       document.getElementById("show_mnemonic_button").addEventListener("click", async (event) => {
         event.preventDefault();
-        displayMnemonic(generateMnemonic());
+        displayMnemonic(generateAccessCode());
       });
       
       document.getElementById("mnemonic_confirm_button").addEventListener("click", async (event) => {

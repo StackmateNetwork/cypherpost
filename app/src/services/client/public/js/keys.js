@@ -9,12 +9,31 @@ function generateMnemonic() {
   return bip39.generateMnemonic();
 }
 
+function generateAccessCode(){
+  const full =  crypto.createHash('sha256').update(
+    crypto.randomBytes(512)
+  )
+  .digest('hex');
+  
+  const b64 = Buffer.from(full, 'hex').toString('base64').substring(0,16).toUpperCase();
+  
+  return b64.replace(/(.{4})/g, '$1 ').trim(); 
+}
+
 async function seed_root(mnemonic) {
   const seed = await bip39.mnemonicToSeed(mnemonic);
   const master_key = bip32.fromSeed(seed);
   return master_key.toBase58();
 }
 
+async function seed_root_alt(code){
+  const mnemonic = await bip39.entropyToMnemonic(
+    crypto.createHash('sha256').update(code).digest('hex')
+  );
+  const seed = await bip39.mnemonicToSeed(mnemonic);
+  const master_key = bip32.fromSeed(seed);
+  return master_key.toBase58();
+}
 // Store result encrypted in localStorage with sha256(uname:pass)
 function derive_parent_128(root_xprv) {
   const master_key = bip32.fromBase58(root_xprv);
@@ -129,7 +148,9 @@ async function verify(message,signature, pubkey){
 
 module.exports = {
   generateMnemonic,
+  generateAccessCode,
   seed_root,
+  seed_root_alt,
   derive_parent_128,
   derive_identity_parent,
   derive_hardened_str,
