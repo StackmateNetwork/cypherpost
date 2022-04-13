@@ -88,11 +88,11 @@ REPO="$(dirname $(dirname $(pwd)))"
 REPO_NGINX_CONF="$REPO/infra/nginx/prod/nginx-conf"
 rm -rf "$REPO_NGINX_CONF/default.conf"
 
-cp "$REPO_NGINX_CONF/pre_template.conf" "$REPO_NGINX_CONF/pre.conf" 
-perl -i -pe"s/___DOMAIN___/$MY_DOMAIN_NAME/g" "$REPO_NGINX_CONF/pre.conf"
+cp "$REPO_NGINX_CONF/pre_template" "$REPO_NGINX_CONF/pre" 
+perl -i -pe"s/___DOMAIN___/$MY_DOMAIN_NAME/g" "$REPO_NGINX_CONF/pre"
 
-cp "$REPO_NGINX_CONF/post_template.conf" "$REPO_NGINX_CONF/post.conf" 
-perl -i -pe"s/___DOMAIN___/$MY_DOMAIN_NAME/g" "$REPO_NGINX_CONF/post.conf"
+cp "$REPO_NGINX_CONF/post_template" "$REPO_NGINX_CONF/post" 
+perl -i -pe"s/___DOMAIN___/$MY_DOMAIN_NAME/g" "$REPO_NGINX_CONF/post"
 
 echo "[*] Created nginx pre & post conf files with $MY_DOMAIN_NAME as hostname."
 
@@ -102,12 +102,13 @@ echo "REPO=$REPO/app" > .env
 echo "KEYS=$HOME/.keys" >> .env
 echo "TYPE=$TYPE" >> .env
 echo "SECRET=$SECRET" >> .env
-echo "DOMAIN=$DOMAIN" >> .env
+echo "DOMAIN=$MY_DOMAIN_NAME" >> .env
 echo "EMAIL=$EMAIL" >> .env
 echo "NODE_VOLUME=$NODE_VOLUME" >> .env
 echo "MONGO_VOLUME=$MONGO_VOLUME" >> .env
 echo "CERTS_VOLUME=$CERTS_VOLUME" >> .env
 echo "CERTBOT_RUNMODE=--force-renewal" >> .env
 
-echo "[*] SETUP COMPLETE!"
+echo "[*] SETUP COMPLETE! VERIFY YOUR .ENV"
+cat .env
 echo "[!] Run ./start.sh"

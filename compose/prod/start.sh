@@ -5,7 +5,7 @@ echo "CERTBOT_RUNMODE=--dry-run" >> .env
 
 REPO="$(dirname $(dirname $(pwd)))"
 NGINX_CONF="$REPO/infra/nginx/prod/nginx-conf"
-cp $NGINX_CONF/post.conf $NGINX_CONF/default.conf
+cp $NGINX_CONF/post $NGINX_CONF/default.conf
 
 # Re-run docker-compose up
 docker-compose up -d
