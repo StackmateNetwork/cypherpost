@@ -31,10 +31,10 @@ if [[ $server_type == *"priv"* ]] || [[ $server_type == *"PRIV"* ]] ; then
   # fi
 
   if [[ $(uname) == "Darwin" ]]; then
-    SECRET=$(echo test | md5 );
+    SECRET=$(echo -n test | md5 );
     # PHASH=$(echo $admin_password | shasum -a 256)
   else
-    SECRET=$(echo test | md5sum );
+    SECRET=$(echo -n test | md5sum | cut -d' ' -f1 );
   fi
   echo "[!] Use the following code to invite members to your cypherpost server: $SECRET"
   # SECRET=$(echo $SECRET | openssl aes-256-cbc -nopad -a -k $PHASH 2> /dev/null)

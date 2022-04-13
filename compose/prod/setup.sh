@@ -55,14 +55,20 @@ mkdir -p "$CERTS_VOLUME" 2> /dev/null
 echo "[*] Container volume parent directories are setup."
 printf "\n"
 
-openssl dhparam -out "$CERTS_VOLUME/dhparam.pem" 2048
-echo "[*] DHParam setup for nginx server."
+if [[ -f "$CERTS_VOLUME/dhparam.pem" ]]; then
+    echo "[*] DHParam exists for nginx server."
+else
+  openssl dhparam -out "$CERTS_VOLUME/dhparam.pem" 2048
+  echo "[*] DHParam setup for nginx server."
+fi
+
+
 
 if [[ $TYPE == *"priv"* ]] || [[ $TYPE == *"PRIV"* ]] ; then
   if [[ $(uname) == "Darwin" ]]; then
     SECRET=$(echo $RANDOM | md5 );
   else
-    SECRET=$(echo $RANDOM | md5sum );
+    SECRET=$(echo $RANDOM | md5sum |  cut -d' ' -f1);
   fi
   echo "[*] Setting up as a private server."
   echo "[!] Use the following secret to invite members to your cypherpost server: $SECRET"

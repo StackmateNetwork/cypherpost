@@ -1,5 +1,9 @@
 #!/bin/bash -e
 # A few essential tools to get a fresh debian system equipped to download new software over secure channels
+echo "Provide the admin username to set permissions in their home directory: "
+read -r $ADMIN
+printf "\n"
+
 apt-get update
 apt-get install -y \
     apt-transport-https \
@@ -24,6 +28,14 @@ echo \
 
 apt-get update
 apt-get install docker-ce docker-ce-cli containerd.io
+
+curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+newgrp docker
+chgrp docker /usr/bin/docker 
+chgrp docker /usr/bin/docker
+usermod -aG docker $ADMIN
 echo "[*] Installed docker."
 # test docker
 docker run hello-world
@@ -32,6 +44,10 @@ echo "[*] Tested docker,"
 git clone https://github.com/StackmateNetwork/cypherpost.git
 git clone https://github.com/SatoshiPortal/cyphernode.git
 
+chmod -R 700 cypherpost
+chmod -R 700 cyphernode
+chown -R $ADMIN cypherpost 
+chown -R $ADMIN cypherpost 
 
 echo "[*] Cloned cypherpost and cyphernode from github."
 echo "[*] Server initialization complete!"
