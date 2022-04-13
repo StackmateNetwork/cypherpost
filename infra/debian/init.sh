@@ -1,7 +1,7 @@
 #!/bin/bash -e
 # A few essential tools to get a fresh debian system equipped to download new software over secure channels
 echo "Provide the admin username to set permissions in their home directory: "
-read -r $ADMIN
+read -r ADMIN
 printf "\n"
 
 apt-get update
@@ -32,6 +32,7 @@ apt-get install -y docker-ce docker-ce-cli containerd.io
 curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 chmod +x /usr/local/bin/docker-compose
 ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
 newgrp docker
 chgrp docker /usr/bin/docker 
 chgrp docker /usr/bin/docker
