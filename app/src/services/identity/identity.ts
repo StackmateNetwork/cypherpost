@@ -26,6 +26,18 @@ const ONE_HOUR = 60 * 60 * 1000;
 const THIRTY_DAYS = 30 * 24 * ONE_HOUR;
 
 export class CypherpostIdentity implements IdentityInterface {
+
+  async register(username: string, pubkey: string, type: RegistrationType): Promise<boolean | Error> {
+    const new_identity: UserIdentity = {
+      genesis: Date.now(),
+      username,
+      pubkey: pubkey,
+      status: type === RegistrationType.Payment ? VerificationStatus.Pending:VerificationStatus.Verified
+    };
+
+    const status = await store.createOne(new_identity);
+    return status;
+  }
   async authenticate(pubkey: string, message: string, signature: string): Promise<boolean | Error> {
     const identity = await store.readOne(pubkey, IdentityIndex.Pubkey);
     if (identity instanceof Error) return identity;
@@ -48,17 +60,6 @@ export class CypherpostIdentity implements IdentityInterface {
       message: "Invalid Request Signature."
     });
     else return verified;
-  }
-  async register(username: string, pubkey: string, type: RegistrationType): Promise<boolean | Error> {
-    const new_identity: UserIdentity = {
-      genesis: Date.now(),
-      username,
-      pubkey: pubkey,
-      status: type === RegistrationType.Payment ? VerificationStatus.Pending:VerificationStatus.Verified
-    };
-
-    const status = await store.createOne(new_identity);
-    return status;
   }
   async remove(pubkey: string): Promise<boolean | Error> {
     const status = await store.removeOne(pubkey);

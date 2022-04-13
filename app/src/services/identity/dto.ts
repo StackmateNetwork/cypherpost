@@ -174,7 +174,8 @@ export async function handleGetServerIdentity(req, res) {
   try {
  
     const response = {
-      pubkey: SERVER_PUBKEY
+      type: TYPE,
+      pubkey: SERVER_PUBKEY,
     };
 
     respond(200, response, res, request);
