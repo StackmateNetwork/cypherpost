@@ -20,6 +20,7 @@ function verifyBadges(badges) {
   if (bad_badges.length > 0) return { bad_badges };
   return true;
 }
+
 function mergeIdentitiesWithBadges(identities, badges) {
   return identities.map((identity) => {
     const recieved = badges.filter(badge => badge.reciever === identity.pubkey);
@@ -69,6 +70,7 @@ function segregatePlainPostsForMe(plain_json_posts) {
     trades: plain_json_posts.filter(post => post.plain_json.type === TRADE),
   }
 }
+
 function segregateMyPlainPosts(plain_json_posts) {
   return {
     // profile: plain_json_posts.filter(post => post.plain_json.type === PROFILE),

@@ -21,7 +21,6 @@ const { encrypt, decrypt } = require("./aes");
 const crypto = require("crypto");
 const bitcoin = require("./keys");
 
-
 function getIdentities() {
   const identities = sessionStorage.getItem("all_identities");
   return (identities) ? JSON.parse(identities) : [];
@@ -144,8 +143,13 @@ function setMyPreferences(preferences) {
 }
 
 function getMyPreferences() {
+  try{
   const preferences = sessionStorage.getItem("my_preferences");
   return (preferences) ? JSON.parse(preferences) : null;
+  }
+  catch(e){
+    return null;
+  }
 
 }
 

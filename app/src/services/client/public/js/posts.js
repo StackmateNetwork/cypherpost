@@ -24,8 +24,13 @@ const {getLocalPrice} = require("./local");
 
 function populateOthersTrades(others_posts) {
   const localPrice = store.getLocalPrice()?store.getLocalPrice():LOCAL_DEFAULT_PRICE;
-  const preferences = store.getMyPreferences().plain_json;
-  const mute_list = preferences.mute_list?preferences.mute_list:[];
+  let preferences = store.getMyPreferences();
+  let mute_list = [];
+
+  if (preferences){
+    preferences = preferences.plain_json;
+    mute_list  = preferences.mute_list?preferences.mute_list:[];
+  }
 
   document.getElementById('others_posts_list').innerHTML = ``;
   if (others_posts.length > 0) {

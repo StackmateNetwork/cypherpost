@@ -31,8 +31,6 @@ async function createBadgeSignature(identity_parent, reciever_pubkey, type, nonc
   return await bitcoin.sign(badge_message, identity_parent.privkey);
 }
 
-
-
 async function registerIdentity(identity_parent, username) {
   const nonce = Date.now();
   const resource = "/identity";
