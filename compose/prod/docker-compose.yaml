@@ -43,7 +43,7 @@ services:
   nginx:
     build:
       context: ../../infra/nginx
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     image: cypherpost-nginx
     container_name: server
     restart: unless-stopped
@@ -67,9 +67,9 @@ services:
     image: certbot/certbot
     container_name: certificate-authority
     volumes:
+      - web-root:/var/www/html
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
-      - web-root:/var/www/html
     depends_on:
       - nginx
     command: certonly --webroot --webroot-path=/var/www/html --email $EMAIL --agree-tos --no-eff-email $CERTBOT_RUNMODE -d $DOMAIN

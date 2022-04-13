@@ -1,7 +1,5 @@
 #!/bin/bash -e
-# Change CERTBOT_RUNMODE to dry-run
-head -n -1 .env > temp.env ; mv temp.env .env
-echo "CERTBOT_RUNMODE=--dry-run" >> .env
+perl -i -pe"s/--force-renewal/--dry-run/g" docker-compose.yaml
 
 REPO="$(dirname $(dirname $(pwd)))"
 NGINX_CONF="$REPO/infra/nginx/prod/nginx-conf"

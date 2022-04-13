@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
-head -n -1 .env > temp.env ; mv temp.env .env
-echo "CERTBOT_RUNMODE=--force-renewal" >> .env
+perl -i -pe"s/--dry-run/--force-renewal/g" docker-compose.yaml
+
 # Create default.conf nginx using pre.conf
 REPO="$(dirname $(dirname $(pwd)))"
 NGINX_CONF="$REPO/infra/nginx/prod/nginx-conf"
