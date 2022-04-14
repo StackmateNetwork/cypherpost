@@ -167,4 +167,4 @@ cargo install pier
 
 In the root folder run `pier list` to view all possible commands.
 
-The rest is self explanatory. The aliases do most of the tasks described above.
+To use a command run `pier run <command> <args>` eg: `pier run dev-start`

@@ -20,7 +20,7 @@ description = "Check status of compose/dev environment"
 
 [scripts.dev-log]
 alias="devlog"
-command="docker-compose -f ./compose/dev/docker-compose.yaml logs -f"
+command="if [[ $1 == 'all' ]];then docker-compose -f ./compose/dev/docker-compose.yaml logs -f; else docker logs -f $1; fi"
 description = "Log compose/dev environment"
 
 [scripts.dev-stop]
@@ -39,9 +39,13 @@ command="docker restart $1"
 description = "Restarts a container (application/database/server)"
 
 [scripts.compilejs]
-alias="devstop"
+alias="compjs"
 command="cd ./app/src/services/client/public && bash compile.bash; cd -"
-description = "Compiles browser JS for Client. Use while updating client."
+description = "Compiles browser JS for Client. Use while updating client code."
 
+[scripts.compilets]
+alias="compts"
+command="cd ./app/src && tsc; cd -"
+description = "Compiles main TS code. Use while updating server code."
 
 
