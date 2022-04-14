@@ -26,7 +26,7 @@ Private servers generate an `invite code` during server setup. This code is requ
 
 ![cypherpost](design/assets/owl.png)
 
-## Development Environment
+## Manual Development Environment 
 
 You must have npm installed.
 To get the latest version of npm visit: https://nodejs.org/en/
@@ -152,3 +152,19 @@ db.posts.find().pretty()
 db.post_keys.find().pretty()
 # Checkout infra/mongo/scripts for more.
 ```
+
+## Pier Environment
+
+Pier tries to make sure you never have to cd between folders while working to setup test and update the environment.
+
+Always stay in the root directory with pier.toml, for pier to work. If you move to another folder, pier will not work.
+
+Install pier
+
+```
+cargo install pier
+```
+
+In the root folder run `pier list` to view all possible commands.
+
+The rest is self explanatory. The aliases do most of the tasks described above.
