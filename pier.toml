@@ -1,0 +1,47 @@
+[scripts.dev-setup]
+alias="devset"
+command="bash ./compose/dev/setup.sh"
+description = "Setup compose/dev environment"
+
+[scripts.dev-start]
+alias="devstart"
+command="bash ./compose/dev/start.sh"
+description = "Start compose/dev environment"
+
+[scripts.dev-status]
+alias="devstat"
+command="docker-compose -f ./compose/dev/docker-compose.yaml ps"
+description = "Check status of compose/dev environment"
+
+[scripts.dev-test]
+alias="devtest"
+command="bash ./compose/dev/test.sh"
+description = "Check status of compose/dev environment"
+
+[scripts.dev-log]
+alias="devlog"
+command="docker-compose -f ./compose/dev/docker-compose.yaml logs -f"
+description = "Log compose/dev environment"
+
+[scripts.dev-stop]
+alias="devstop"
+command="bash ./compose/dev/stop.sh"
+description = "Stops compose/dev environment"
+
+[scripts.execsh]
+alias="execsh"
+command="docker exec -it $1 bash"
+description = "Execute a shell inside a container (application/database/server)"
+
+[scripts.restart]
+alias="restart"
+command="docker restart $1"
+description = "Restarts a container (application/database/server)"
+
+[scripts.compilejs]
+alias="devstop"
+command="cd ./app/src/services/client/public && bash compile.bash; cd -"
+description = "Compiles browser JS for Client. Use while updating client."
+
+
+

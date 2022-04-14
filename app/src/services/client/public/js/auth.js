@@ -10,10 +10,10 @@ const store = require("./store");
 const util = require("./util");
 const comps = require("./composites");
 
-function displayMnemonic(mnemonic) {
+function displayAccessCode(code) {
   document.getElementById("welcome").classList.add("hidden");
   document.getElementById("seedgen").classList.remove("hidden");
-  document.getElementById('mnemonic').textContent = mnemonic;
+  document.getElementById('mnemonic').textContent = addSpaces(code);
   return true;
 }
 function displayRegistration() {
@@ -109,24 +109,25 @@ async function completeLogin() {
 }
 
 // HELPERS
-async function initKeyChain(mnemonic) {
-  const keys = await util.createRootKeyChain(mnemonic);
+async function initKeyChain(access_code) {
+  const keys = await util.createRootKeyChain(access_code);
   if (keys instanceof Error)
-    alert("Could not initialize Key Chain! Re-enter mnemonic.")
+    alert("Could not initialize Key Chain! Re-enter access_code.")
   else
     store.setMyKeyChain(keys);
   return keys;
 }
-async function confirmAndStoreMnemonic() {
-  const mnemonic = document.getElementById("mnemonic").textContent;
+async function confirmAndStoreAccessCode() {
+  const code = document.getElementById("mnemonic").textContent;
+  const code_nonce = document.getElementById("mnemonic_nonce").textContent;
   const password = document.getElementById("mnemonic_pass").value;
   const confirm = document.getElementById("mnemonic_confirm_pass").value;
-  console.log({ mnemonic, password, confirm });
   document.getElementById("mnemonic_pass").value = "";
   document.getElementById("mnemonic_confirm_pass").value = "";
   if (password === confirm) {
-    const keys = await initKeyChain(mnemonic);
-    store.setMnemonic(mnemonic, password);
+    const nonce_pad =`:${code_nonce}`;
+    const keys = await initKeyChain(removeSpaces(code)+nonce_pad);
+    store.setAccessCode(code, password);
     document.getElementById("mnemonic").textContent = "";
     return keys;
   } else {
@@ -179,12 +180,12 @@ async function loadAuthEvents() {
     case "registration":
       document.getElementById("show_mnemonic_button").addEventListener("click", async (event) => {
         event.preventDefault();
-        displayMnemonic(generateAccessCode());
+        displayAccessCode(generateAccessCode());
       });
       
       document.getElementById("mnemonic_confirm_button").addEventListener("click", async (event) => {
         event.preventDefault();
-        const keys = await confirmAndStoreMnemonic();
+        const keys = await confirmAndStoreAccessCode();
         if (!keys) {
           return false;
         }

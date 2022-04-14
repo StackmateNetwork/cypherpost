@@ -14,12 +14,15 @@ function generateAccessCode(){
     crypto.randomBytes(512)
   )
   .digest('hex');
-  
-  const b64 = Buffer.from(full, 'hex').toString('base64').substring(0,16).toUpperCase();
-  
-  return b64.replace(/(.{4})/g, '$1 ').trim(); 
+  return Buffer.from(full, 'hex').toString('base64').substring(0,16).toUpperCase();
 }
 
+function addSpaces(code){
+  return code.replace(/(.{4})/g, '$1 ').trim(); 
+}
+function removeSpaces(code){
+  return code.replace(" ", "");
+}
 async function seed_root(mnemonic) {
   const seed = await bip39.mnemonicToSeed(mnemonic);
   const master_key = bip32.fromSeed(seed);
@@ -149,6 +152,8 @@ async function verify(message,signature, pubkey){
 module.exports = {
   generateMnemonic,
   generateAccessCode,
+  addSpaces,
+  removeSpaces,
   seed_root,
   seed_root_alt,
   derive_parent_128,

@@ -106,7 +106,7 @@ function setMyBadges(my_badges) {
 
 }
 
-function setMnemonic(mnemonic, password) {
+function setAccessCode(mnemonic, password) {
   const encryption_key = crypto.createHash("sha256")
     .update(password)
     .digest("hex");
@@ -114,7 +114,7 @@ function setMnemonic(mnemonic, password) {
   return true;
 }
 
-function getMnemonic(password) {
+function getAccessCode(password) {
   const encryption_key = crypto.createHash("sha256")
     .update(`${password}`)
     .digest("hex");
@@ -356,8 +356,8 @@ module.exports = {
   getMyTrades,
   setOthersTrades,
   getOthersTrades,
-  setMnemonic,
-  getMnemonic,
+  setAccessCode,
+  getAccessCode,
   setMyPreferences,
   getMyPreferences,
   setMyBadges,

@@ -117,7 +117,7 @@ async function initProfileState() {
 function peekSeed() {
   const pass = document.getElementById("peek_seed_password_input").value;
   document.getElementById("peek_seed_password_input").value = "";
-  const mnemonic = store.getMnemonic(pass);
+  const mnemonic = store.getAccessCode(pass);
   return mnemonic;
 }
 
