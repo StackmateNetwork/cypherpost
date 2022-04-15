@@ -80,24 +80,30 @@
           <!-- Default form login -->
 
           <div class="text-center" action="#!">
-            <h4 class="h4 mb-4">Access Code</h4>
-              <p id="seed_note_1" class="stathead warning-color">Write it down, store it in a password manager or copy into an encrypted storage medium.</p>
-              <p id="seed_note_1" class="stathead warning-color">Try Signal's "Note to self" feature while testing.</p>
-              <p id="mnemonic_l1" class="stat"></p>
-              <p id="mnemonic_l2" class="stat"></p>
+            <h4 class="h4 mb-4">Master Key</h4>
+              <p id="mnemonic_l1" class="stat liquid-color"></p>
+              <p id="mnemonic_l2" class="stat liquid-color"></p>
 
               <br>
-              <p id="seed_note_1" class="stathead warning-color">Add an optional passphrase for a stronger key.</p>
+              <p id="seed_note_1" class="stathead warning-color">Add an OPTIONAL passphrase for a stronger key.</p>
+
               <input type="password" id="mnemonic_nonce" class="" placeholder="Passphrase">
               <input type="password" id="mnemonic_nonce_confirm" class="" placeholder="Confirm Passphrase">
               <br>
+              <p id="seed_note_1" class="stathead warning-color">Write it all down, store it in a password manager or copy into an encrypted storage medium.</p>
+              <p id="seed_note_1" class="stathead warning-color">Recommended not to write down the passphrase. Keep it easy to remember or avoid using it.</p>
 
-              <p id="seed_note_1" class="stathead warning-color">Password is only used to locally encrypt/decrypt your master access code.</p>
-              <p id="seed_note_1" class="stathead warning-color">You can change this at anytime by importing your code and setting a new password.</p>
+              <p id="seed_note_1" class="stathead warning-color">Try Signal's "Note to self" feature while testing.</p>
+
+              <a href="">For more about application master keys.</a>
+            
+              <hr>
+              <p id="seed_note_1" class="stathead cold-color">Password/PIN is only used to locally encrypt/decrypt your master access code.</p>
+              <p id="seed_note_1" class="stathead cold-color">You can change this at anytime by importing your code and setting a new password.</p>
   
-              <input type="password" id="mnemonic_pass" class="" placeholder="Password">
+              <input type="password" id="mnemonic_pass" class="" placeholder="Password/PIN">
               <br>
-              <input type="password" id="mnemonic_confirm_pass" class="" placeholder="Confirm Password">
+              <input type="password" id="mnemonic_confirm_pass" class="" placeholder="Confirm Password/PIN">
               <br>
 
 
