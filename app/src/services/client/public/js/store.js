@@ -194,6 +194,27 @@ function setMyTrades(trades) {
   return true;
 }
 
+function getMyMessages() {
+  const posts = sessionStorage.getItem("my_messages");
+  return (posts) ? JSON.parse(posts) : [];
+}
+
+function setMyMessages(msgs) {
+  sessionStorage.setItem(`my_messages`, JSON.stringify(msgs));
+  return true;
+}
+
+function getOthersMessages() {
+  const posts = sessionStorage.getItem("others_messages");
+  return (posts) ? JSON.parse(posts) : [];
+
+}
+
+function setOthersMessages(msgs) {
+  sessionStorage.setItem(`others_messages`, JSON.stringify(msgs));
+  return true;
+}
+
 function getOthersTrades() {
   const trades = sessionStorage.getItem("others_trades");
   return (trades) ? JSON.parse(trades) : [];
@@ -352,8 +373,8 @@ module.exports = {
   getMyKeyChain,
   setServerIdentity,
   getServerIdentity,
-  // setOthersProfiles,
-  // getOthersProfiles,
+  setOthersMessages,
+  getOthersMessages,
   setMyTrades,
   getMyTrades,
   setOthersTrades,
@@ -362,6 +383,8 @@ module.exports = {
   getAccessCode,
   setMyPreferences,
   getMyPreferences,
+  getMyMessages,
+  setMyMessages,
   setMyBadges,
   checkMnemonic,
   updateSelectedIdentity,
@@ -377,5 +400,5 @@ module.exports = {
   getMyUsername,
   getLocalPrice,
   setLocalPrice,
-  getMyBadges
+  getMyBadges,
 }

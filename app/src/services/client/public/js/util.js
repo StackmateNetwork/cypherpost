@@ -1,12 +1,11 @@
 const PROFILE = "PROFILE";
 const PREFERENCES = "PREFERENCES";
 const TRADE = "BITCOIN-TRADE";
-
+const MESSAGE = "MESSAGE";
 const crypto = require("crypto");
 const keynos = require("./keys");
 
 const { encrypt, decrypt } = require("./aes");
-const { Console } = require("console");
 
 async function verifyBadges(badges) {
   const bad_badges = await badges.filter(async (badge) => {
@@ -66,15 +65,20 @@ function decryptMyCypherPosts(cypherpost_parent, my_posts) {
 }
 
 function segregatePlainPostsForMe(plain_json_posts) {
+  console.log({plain_json_posts})
   return {
     profiles: plain_json_posts.filter(post => post.plain_json.type === PROFILE),
     trades: plain_json_posts.filter(post => post.plain_json.type === TRADE),
+    messages: plain_json_posts.filter(post => post.plain_json.type === MESSAGE)
   }
 }
 
 function segregateMyPlainPosts(plain_json_posts) {
+  console.log({plain_json_posts})
+
   return {
     // profile: plain_json_posts.filter(post => post.plain_json.type === PROFILE),
+    messages: plain_json_posts.filter(post => post.plain_json.type === MESSAGE),
     trades: plain_json_posts.filter(post => post.plain_json.type === TRADE),
     preferences: plain_json_posts.filter(post => post.plain_json.type === PREFERENCES),
   }
