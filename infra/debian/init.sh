@@ -3,6 +3,8 @@
 
 sudo apt-get update
 sudo apt-get install -y \
+    build-essential \
+    cmake \ 
     apt-transport-https \
     ca-certificates \
     curl \
@@ -13,10 +15,14 @@ sudo apt-get install -y \
     git \
     expect \
     jq \
-    lsb-release 
+    lsb-release \
+    librust-proc-macro-crate-dev
 
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+export PATH="$HOME/.cargo/bin:$PATH"
+source $HOME/.cargo/env
+cargo install pier
 echo "[*] Installed basic tools"
-
 # Install docker
 curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 echo \

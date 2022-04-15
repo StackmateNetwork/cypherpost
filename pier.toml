@@ -72,7 +72,7 @@ description = "Start compose/prod environment"
 
 [scripts.prod-appsync]
 alias="prodsync"
-command="git stash ; git pull && ./compose/prod/ && docker-compose up -d --force-recreate --build node; cd -"
+command="git stash ; git pull && cd ./compose/prod/ && docker-compose up -d --force-recreate --build node; cd -"
 description = "Sync cypherpost with github repo and update app container."
 
 [scripts.prod-stop]
