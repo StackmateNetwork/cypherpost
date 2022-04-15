@@ -28,7 +28,6 @@ function formatKeyAndPassphrase(key, passphrase){
 async function generateSeed(key, passphrase){
   const sauce = (passphrase)?`-${passphrase}`:``;
   const final_entropy_in = removeSpaces(key)+sauce;
-  console.log({final_entropy_in})
   
   const mnemonic = await bip39.entropyToMnemonic(
     crypto.createHash('sha256').update(final_entropy_in).digest('hex')

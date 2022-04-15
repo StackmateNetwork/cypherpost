@@ -16,6 +16,7 @@ async function loadInitialState() {
   // IDENTITIES
   try {
     const keys = store.getMyKeyChain();
+  
     const ids_badges = await comps.downloadAllIdentitiesAndBadges(keys.identity);
     if(ids_badges instanceof Error){
       console.error({ids_badges});

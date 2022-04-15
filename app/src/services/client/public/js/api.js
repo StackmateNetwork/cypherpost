@@ -10,15 +10,15 @@ const { request } = require('./request');
 const VERSION_PREFIX = "/api/v2";
 const api_url = ((document.domain === 'localhost') ? "http://localhost" : `https://cypherpost.io`) + VERSION_PREFIX;
 
-const TEST_INVITE_CODE="098f6bcd4621d373cade4e832627b4f6";
+const TEST_INVITE_CODE="";
 
 function createRequestHeaders(identity_parent, nonce, signature, invite_code) {
-  console.log({
-    "x-client-pubkey": identity_parent['pubkey'],
-    "x-nonce": nonce,
-    "x-client-signature": signature,
-    "x-client-invite-code": invite_code? invite_code : TEST_INVITE_CODE
-  })
+  // console.log({
+  //   "x-client-pubkey": identity_parent['pubkey'],
+  //   "x-nonce": nonce,
+  //   "x-client-signature": signature,
+  //   "x-client-invite-code": invite_code? invite_code : TEST_INVITE_CODE
+  // })
   return {
     "x-client-pubkey": identity_parent['pubkey'],
     "x-nonce": nonce,

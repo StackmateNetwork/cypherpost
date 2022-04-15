@@ -94,7 +94,7 @@ async function completeReset() {
 async function completeLogin() {
   const password = document.getElementById("login_pass").value;
   document.getElementById("login_pass").value = "";
-  const mnemonic = store.getMnemonic(password);
+  const mnemonic = store.getAccessCode(password);
   if (mnemonic instanceof Error) {
     console.error({status: mnemonic});
     return false;
@@ -116,6 +116,7 @@ async function completeLogin() {
 // HELPERS
 async function initKeyChain(access_code, passphrase) {
   const keys = await util.createRootKeyChain(access_code,passphrase);
+  
   if (keys instanceof Error)
     alert("Could not initialize Key Chain! Re-enter access_code.")
   else
@@ -126,7 +127,6 @@ async function confirmAndStoreAccessCode() {
   const access_key = document.getElementById("mnemonic_l1").textContent + document.getElementById("mnemonic_l2").textContent;
   const key_nonce = document.getElementById("mnemonic_nonce").value || "";
   const key_nonce_confirm = document.getElementById("mnemonic_nonce_confirm").value || "";
-
   const password = document.getElementById("mnemonic_pass").value;
   const confirm = document.getElementById("mnemonic_confirm_pass").value;
   document.getElementById("mnemonic_pass").value = "";
@@ -137,7 +137,7 @@ async function confirmAndStoreAccessCode() {
       // window.location.href = "registration";
       return false;
     }
-    const full = access_key + key_nonce?`-${key_nonce}`:``;
+    const full = removeSpaces(access_key) + (key_nonce.length>0?`-${key_nonce}`:"");
     const keys = await initKeyChain(access_key,key_nonce);
     store.setAccessCode(full, password);
     document.getElementById("mnemonic_l1").textContent = "";

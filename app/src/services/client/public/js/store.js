@@ -110,15 +110,17 @@ function setAccessCode(mnemonic, password) {
   const encryption_key = crypto.createHash("sha256")
     .update(password)
     .digest("hex");
-  localStorage.setItem(`my_mnemonic`, encrypt(mnemonic, encryption_key));
+  localStorage.setItem(`master_key`, encrypt(mnemonic, encryption_key));
   return true;
 }
 
 function getAccessCode(password) {
+
   const encryption_key = crypto.createHash("sha256")
     .update(`${password}`)
     .digest("hex");
-  const mnemonic_crypt = localStorage.getItem(`my_mnemonic`);
+  const mnemonic_crypt = localStorage.getItem(`master_key`);
+  console.log({mnemonic_crypt})
   try {
     return mnemonic_crypt ? decrypt(mnemonic_crypt, encryption_key) : null;
   }
