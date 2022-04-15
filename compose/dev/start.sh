@@ -16,4 +16,4 @@ STATUS=$(docker ps)
 
 # printf $INVITE_CODE | docker secret create invite_code -
 docker-compose -p "cypherpost-development" up -d
-echo "[!] Run ./stop.sh to gracefully stop containers"
+echo "[*] Cypherpost rocks!"

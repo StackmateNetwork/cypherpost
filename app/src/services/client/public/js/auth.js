@@ -1,6 +1,8 @@
 const INIT_TRADE_DS = "m/3h/0h/0h";
 const {
-  generateAccessCode
+  generateAccessKey,
+  addSpaces,
+  removeSpaces,
 } = require("./keys");
 const {
   registerIdentity,
@@ -9,11 +11,14 @@ const {
 const store = require("./store");
 const util = require("./util");
 const comps = require("./composites");
+const crypto = require("crypto");
 
 function displayAccessCode(code) {
   document.getElementById("welcome").classList.add("hidden");
   document.getElementById("seedgen").classList.remove("hidden");
-  document.getElementById('mnemonic').textContent = addSpaces(code);
+  document.getElementById('mnemonic_l1').textContent = addSpaces(code.substring(0,16));
+  document.getElementById('mnemonic_l2').textContent = addSpaces(code.substring(16,32));
+
   return true;
 }
 function displayRegistration() {
@@ -109,8 +114,8 @@ async function completeLogin() {
 }
 
 // HELPERS
-async function initKeyChain(access_code) {
-  const keys = await util.createRootKeyChain(access_code);
+async function initKeyChain(access_code, passphrase) {
+  const keys = await util.createRootKeyChain(access_code,passphrase);
   if (keys instanceof Error)
     alert("Could not initialize Key Chain! Re-enter access_code.")
   else
@@ -118,17 +123,25 @@ async function initKeyChain(access_code) {
   return keys;
 }
 async function confirmAndStoreAccessCode() {
-  const code = document.getElementById("mnemonic").textContent;
-  const code_nonce = document.getElementById("mnemonic_nonce").textContent;
+  const access_key = document.getElementById("mnemonic_l1").textContent + document.getElementById("mnemonic_l2").textContent;
+  const key_nonce = document.getElementById("mnemonic_nonce").value || "";
+  const key_nonce_confirm = document.getElementById("mnemonic_nonce_confirm").value || "";
+
   const password = document.getElementById("mnemonic_pass").value;
   const confirm = document.getElementById("mnemonic_confirm_pass").value;
   document.getElementById("mnemonic_pass").value = "";
   document.getElementById("mnemonic_confirm_pass").value = "";
   if (password === confirm) {
-    const nonce_pad =`:${code_nonce}`;
-    const keys = await initKeyChain(removeSpaces(code)+nonce_pad);
-    store.setAccessCode(code, password);
-    document.getElementById("mnemonic").textContent = "";
+    if(key_nonce!==key_nonce_confirm){
+      alert("Passphrases do not match!")
+      // window.location.href = "registration";
+      return false;
+    }
+    const full = access_key + key_nonce?`-${key_nonce}`:``;
+    const keys = await initKeyChain(access_key,key_nonce);
+    store.setAccessCode(full, password);
+    document.getElementById("mnemonic_l1").textContent = "";
+    document.getElementById("mnemonic_l2").textContent = "";
     return keys;
   } else {
     alert("Passwords do not match!");
@@ -180,7 +193,7 @@ async function loadAuthEvents() {
     case "registration":
       document.getElementById("show_mnemonic_button").addEventListener("click", async (event) => {
         event.preventDefault();
-        displayAccessCode(generateAccessCode());
+        displayAccessCode(generateAccessKey(crypto.randomBytes(512)));
       });
       
       document.getElementById("mnemonic_confirm_button").addEventListener("click", async (event) => {

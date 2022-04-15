@@ -29,7 +29,7 @@ const badges = new CypherpostBadges();
 const posts = new CypherpostPosts();
 const post_keys = new CypherpostPostKeys();
 const db = new MongoDatabase();
-const invite_code = "d8e8fca2dc0f896fd7cb4cb0031ba249";
+const invite_code = "098f6bcd4621d373cade4e832627b4f6";
 
 let server;
 const should = chai.should();

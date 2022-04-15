@@ -1,32 +1,33 @@
 [scripts.dev-setup]
 alias="devset"
-command="bash ./compose/dev/setup.sh"
+command="cd ./compose/dev/ && ./setup.sh; cd -"
 description = "Setup compose/dev environment"
 
 [scripts.dev-start]
 alias="devstart"
-command="bash ./compose/dev/start.sh"
+command="cd ./compose/dev/ && ./start.sh; cd -"
 description = "Start compose/dev environment"
+
+[scripts.dev-test]
+alias="devtest"
+command="cd ./compose/dev/ && ./test.sh; cd -"
+description = "Check status of compose/dev environment"
+
+[scripts.dev-stop]
+alias="devstop"
+command="cd ./compose/dev/ && ./stop.sh; cd -"
+description = "Stops compose/dev environment"
 
 [scripts.dev-status]
 alias="devstat"
 command="docker-compose -f ./compose/dev/docker-compose.yaml ps"
 description = "Check status of compose/dev environment"
 
-[scripts.dev-test]
-alias="devtest"
-command="bash ./compose/dev/test.sh"
-description = "Check status of compose/dev environment"
 
 [scripts.dev-log]
 alias="devlog"
 command="if [[ $1 == 'all' ]];then docker-compose -f ./compose/dev/docker-compose.yaml logs -f; else docker logs -f $1; fi"
 description = "Log compose/dev environment"
-
-[scripts.dev-stop]
-alias="devstop"
-command="bash ./compose/dev/stop.sh"
-description = "Stops compose/dev environment"
 
 [scripts.execsh]
 alias="execsh"
@@ -51,4 +52,4 @@ description = "Compiles main TS code. Use while updating server code."
 [scripts.delvols]
 alias="delvols"
 command="bash ./compose/delete_volumes.sh"
-description = "Deletes docker volumes."
+description = "Deletes docker volume mappings (not any mounted volume data). "

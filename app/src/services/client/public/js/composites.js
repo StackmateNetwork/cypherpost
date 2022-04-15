@@ -11,8 +11,6 @@ const PREFERENCES_DS = "m/2h/0h/0h";
 const api = require("./api");
 const util = require("./util");
 const store = require("./store");
-const { stat } = require("fs");
-
 
 async function downloadAllIdentities(identity_parent) {
   const response = await api.getAllIdentities(identity_parent);

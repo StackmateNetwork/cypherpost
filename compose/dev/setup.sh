@@ -75,4 +75,3 @@ echo "KEYS=$HOME/.keys" >> .env
 echo "TYPE=$TYPE" >> .env
 
 echo "[*] SETUP COMPLETE!"
-echo "[!] Run ./start.sh"
