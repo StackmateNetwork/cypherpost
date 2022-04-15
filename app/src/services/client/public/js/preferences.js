@@ -54,7 +54,7 @@ function displayProfile() {
 
   document.getElementById("profile_trust_intersection").innerHTML = `Trust Intersection: <span class="contact_info">${populate_trust_intersection}</span>`;
 
-  const mute_list = store.getMyPreferences()['plain_json']['mute_list'];
+  const mute_list = store.getMyPreferences()?store.getMyPreferences()['plain_json']['mute_list']:[];
   document.getElementById("profile_mute_list").innerHTML = "";
 
   if(!mute_list || mute_list.length===0){
