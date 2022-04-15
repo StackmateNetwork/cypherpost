@@ -20,14 +20,14 @@ description = "Stops compose/dev environment"
 
 [scripts.dev-status]
 alias="devstat"
-command="docker-compose -f ./compose/dev/docker-compose.yaml ps"
+command="cd ./compose/dev && docker-compose -f ./compose/dev/docker-compose.yaml ps; cd -"
 description = "Check status of compose/dev environment"
-
 
 [scripts.dev-log]
 alias="devlog"
 command="if [[ $1 == 'all' ]];then docker-compose -f ./compose/dev/docker-compose.yaml logs -f; else docker logs -f $1; fi"
 description = "Log compose/dev environment"
+
 
 [scripts.execsh]
 alias="execsh"
@@ -53,3 +53,35 @@ description = "Compiles main TS code. Use while updating server code."
 alias="delvols"
 command="bash ./compose/delete_volumes.sh"
 description = "Deletes docker volume mappings (not any mounted volume data). "
+
+
+[scripts.prod-setup]
+alias="prodset"
+command="cd ./compose/prod/ && ./setup.sh; cd -"
+description = "Setup compose/prod environment"
+
+[scripts.prod-ssl]
+alias="prodssl"
+command="cd ./compose/prod/ && ./issue_ssl.sh; cd -"
+description = "Issue SSL cerrificate for compose/prod environment. Run setup.sh first to ensure the right domain is used."
+
+[scripts.prod-start]
+alias="prodstart"
+command="cd ./compose/prod/ && ./start.sh; cd -"
+description = "Start compose/prod environment"
+
+[scripts.prod-appsync]
+alias="prodsync"
+command="git stash ; git pull && ./compose/prod/ && docker-compose up -d --force-recreate --build node; cd -"
+description = "Sync cypherpost with github repo and update app container."
+
+[scripts.prod-stop]
+alias="prodstop"
+command="cd ./compose/prod/ && ./stop.sh; cd -"
+description = "Stops compose/prod environment"
+
+[scripts.prod-status]
+alias="prodstat"
+command="cd ./compose/prod/ && docker-compose -f ./compose/prod/docker-compose.yaml ps; cd -"
+description = "Check status of compose/prod environment"
+
