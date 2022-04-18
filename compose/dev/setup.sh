@@ -43,6 +43,12 @@ if [[ $server_type == *"priv"* ]] || [[ $server_type == *"PRIV"* ]] ; then
 else
   server_type="public"
   SECRET="public"
+  echo "Path to your cyphernode gatekeeper:"
+  read -r CN_GATEKEEPER
+  printf "\n"
+  echo "[x] Copying gatekeeper certs for application."
+  cp -r $CN_GATEKEEPER/certs ~/.keys
+  cp -r $CN_GATEKEEPER/keys.properties ~/.keys
   echo "[*] Setting up as public server."
 fi
 
@@ -73,5 +79,10 @@ echo $S > .env
 echo "REPO=$REPO_APP" >> .env
 echo "KEYS=$HOME/.keys" >> .env
 echo "TYPE=$TYPE" >> .env
+  
+echo "[!] Adjuisting permissions! Requires sudo."
+
+sudo chown -R $(whoami):1000 ~/.keys
+sudo chmod -R 770 ~/.keys
 
 echo "[*] SETUP COMPLETE!"

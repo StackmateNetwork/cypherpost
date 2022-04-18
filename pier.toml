@@ -18,33 +18,39 @@ alias="devstop"
 command="cd ./compose/dev/ && ./stop.sh; cd -"
 description = "Stops compose/dev environment"
 
+
 [scripts.dev-status]
 alias="devstat"
-command="cd ./compose/dev && docker-compose -f ./compose/dev/docker-compose.yaml ps; cd -"
+command="cd ./compose/dev && docker-compose -p cypherpost-development ps; cd -"
 description = "Check status of compose/dev environment"
 
 [scripts.dev-log]
 alias="devlog"
-command="if [[ $1 == 'all' ]];then docker-compose -f ./compose/dev/docker-compose.yaml logs -f; else docker logs -f $1; fi"
+command="if [[ $1 == 'all' ]];then docker-compose -p cypherpost-development logs ; else docker-compose -p cypherpost-development logs -f $1; fi"
 description = "Log compose/dev environment"
 
 
-[scripts.execsh]
+[scripts.bash]
 alias="execsh"
 command="docker exec -it $1 bash"
-description = "Execute a shell inside a container (application/database/server)"
+description = "Execute bash inside a container (application/database/server)"
 
 [scripts.restart]
 alias="restart"
 command="docker restart $1"
 description = "Restarts a container (application/database/server)"
 
-[scripts.compilejs]
+[scripts.dev-rebuild]
+alias="devreb"
+command="cd ./compose/dev/ && docker-compose -p cypherpost-development up --force-recreate --build node ; docker-compose -p cypherpost-development down; docker-compose -p cypherpost-development up -d; cd -"
+description = "Restart application container in compose"
+
+[scripts.browserify]
 alias="compjs"
 command="cd ./app/src/services/client/public && bash compile.bash; cd -"
 description = "Compiles browser JS for Client. Use while updating client code."
 
-[scripts.compilets]
+[scripts.tsc]
 alias="compts"
 command="cd ./app/src && tsc; cd -"
 description = "Compiles main TS code. Use while updating server code."

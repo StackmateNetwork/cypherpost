@@ -1,8 +1,7 @@
 export interface PaymentInterface {
-  getAddress(pubkey: string): Promise<string | Error>;
+  getPaymentInvoice(pubkey: string): Promise<string | Error>;
   getHistory(pubkey: string): Promise<UserPayment[] | Error>;
   getTransactionDetail(txid: string): Promise<Transaction | Error>;
-  getUnconfirmed(): Promise<UserPayment[] | Error>;
   singleUpdate(update: Transaction): Promise<boolean | Error>;
   batchUpdate(updates: Transaction[]): Promise<boolean | Error>;
   // spend(address: string, spent: number): Promise<boolean | Error>;

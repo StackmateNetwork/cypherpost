@@ -128,7 +128,6 @@ async function getUpdatedIdsAndBadges() {
 
 
 function savePostContents() {
-  
   const plain_post = {
     message: document.getElementById("post_message_input").value,
   };
@@ -245,7 +244,7 @@ async function loadPostsEvents() {
     populateOthersMessages(store.getOthersMessages());
     document.getElementById("others_posts_list").classList.remove("hidden");
     document.getElementById("my_posts_list").classList.add("hidden");
-    const preferences = store.getMyPreferences().plain_json;
+    const preferences = store.getMyPreferences()?store.getMyPreferences().plain_json:{};
     const mute_list = preferences.mute_list?preferences.mute_list:[];
   
     store.getOthersMessages().map((post) => {

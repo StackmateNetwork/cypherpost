@@ -110,6 +110,8 @@ export async function handlePostPaymentNotification(req, res) {
       message: "Cyphernode Rocks!"
     };
 
+    console.log({response})
+
     respond(200, response, res, request);
   }
   catch (e) {
