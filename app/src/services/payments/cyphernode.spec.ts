@@ -8,10 +8,13 @@ import "mocha";
 import { CypherpostBitcoinOps } from "../../lib/bitcoin/bitcoin";
 import { DbConnection } from "../../lib/storage/interface";
 import { MongoDatabase } from "../../lib/storage/mongo";
-import { CypherpostNodePayments } from "./cyphernode";
+import { CyphernodePayments } from "./cyphernode";
+import { MongoPaymentStore } from "./mongo";
 
 const bitcoin = new CypherpostBitcoinOps();
-const payments = new CypherpostNodePayments();
+const cyphernode = new CyphernodePayments();
+const store = new MongoPaymentStore();
+
 const db = new MongoDatabase();
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 
@@ -43,49 +46,23 @@ describe("Initalizing Test: Payment Service", function () {
     if (ecdsa_keys instanceof Error) throw ecdsa_keys;
     signature = await bitcoin.sign(message, ecdsa_keys.privkey);
   });
-  describe("Roots", async function () {
-    it.only("should test cyphernode-sdk-js", async function () {
-      const invoice = await payments.getPaymentInvoice(xpub) as string;
-      console.log({invoice});
-      expect(invoice.startsWith('lntb1')).to.equal(true);
-    });
-    it("should get SAME ADDRESS for an already used identity", async function () {
-      const response = false;
-      expect(response).to.equal(true);
-    });
-    it("should MAKE A PAYMENT TO given ADDRESS", async function () {
-      const response = false;
-      expect(response).to.equal(true);
-    });
-    it("should GET UNCONFIRMED PAYMENT", async function () {
-      const response = false;
-      expect(response).to.equal(true);
-    });
-    it("should GET HISTORY BY PUBKEY", async function () {
-      const response = false;
-      expect(response).to.equal(true);
-    });
-    it("should UPDATE CONFIRMED TRANSACTION", async function () {
-      const response = false;
-      expect(response).to.equal(true);
-    });
+  after(async function () {
+  //  await store.removeAll();
   });
-  describe("BATCH PAYMENT AND UPDATE:", async function () {
-    it("should create 5 NEW ADDRESSES FOR 5 USERS", async function () {
-      const response = false;
-      expect(response).to.equal(true);
+  describe("Roots", async function () {
+    it("test get invoice", async function () {
+      const result = await cyphernode.createInvoice(xpub,128) as string;
+      console.log({invoice: result});
+      expect(result.startsWith('lntb1')).to.equal(true);
     });
-    it("should create 5 NEW ADDRESSES FOR 5 USERS", async function () {
-      const response = false;
-      expect(response).to.equal(true);
+    it("test status of node", async function () {
+      const result = await cyphernode.getInfo();
+      console.log({result});
+      expect(result).to.have.property("info");
     });
-    it("should GET 5 UNCONFIRMED PAYMENTS", async function () {
-      const response = false;
-      expect(response).to.equal(true);
-    });
-    it("should BATCH UPDATE 5 CONFIRMED PAYMENTS", async function () {
-      const response = false;
-      expect(response).to.equal(true);
+    it("sync wallet", async function () {
+      const result = await cyphernode.syncWallet();
+      expect(result).to.equal(true);
     });
   });
 });

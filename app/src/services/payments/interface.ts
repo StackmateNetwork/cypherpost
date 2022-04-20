@@ -1,10 +1,11 @@
 export interface PaymentInterface {
-  getPaymentInvoice(pubkey: string): Promise<string | Error>;
-  getHistory(pubkey: string): Promise<UserPayment[] | Error>;
+  createInvoice(for_pubkey: string, amount: number): Promise<string | Error>;
+  getInfo(): Promise<any | Error>;
+  syncWallet(): Promise<boolean | Error>;
+  getUserTransactions(pubkey: string): Promise<UserPayment[] | Error>;
   getTransactionDetail(txid: string): Promise<Transaction | Error>;
   singleUpdate(update: Transaction): Promise<boolean | Error>;
   batchUpdate(updates: Transaction[]): Promise<boolean | Error>;
-  // spend(address: string, spent: number): Promise<boolean | Error>;
 }
 
 export interface PaymentStore {
@@ -30,6 +31,7 @@ export interface UserPayment {
   txid: string;
   timestamp: number;
   confirmed: boolean;
+  fingerprint?: string;
 };
 
 export interface Transaction{

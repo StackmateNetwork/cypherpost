@@ -27,6 +27,7 @@ ENV KEY_PATH="/home/node/.keys/"
 ENV CYPHERNODE_API_KEY="034aa8fa6b7e85c957c1b5ababef8f30f7b57d592bec125bfa015fc49bbeed34"
 ENV CYPHER_GATEWAY_URL="https://gatekeeper:2009/v0/"
 ENV CYPHERNODE_GATEKEEPER_CERT_CA="$(cat /home/node/.keys/cert.pem)"
+ENV CYPHERNODE_FINGERPRINT="cn-apr2020-m1"
 #------------------------------------------------------------------------------------
 VOLUME ["/home/node/cypherpost/app", "/home/node/.keys"]
 EXPOSE $APP_PORT

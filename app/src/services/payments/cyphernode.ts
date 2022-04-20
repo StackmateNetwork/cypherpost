@@ -10,10 +10,10 @@ const {lnClient} = require("cyphernode-js-sdk");
 
 const paymentStore = new MongoPaymentStore();
 
-export class CypherpostNodePayments implements PaymentInterface {
-  async getPaymentInvoice(pubkey: string): Promise<string | Error> {
+export class CyphernodePayments implements PaymentInterface {
+  async createInvoice(for_pubkey: string, amount: number): Promise<string | Error> {
     try{
-      const records = await paymentStore.readByPubkey(pubkey);
+      const records = await paymentStore.readByPubkey(for_pubkey);
       if(records instanceof Error) return records;
       console.log("USER HAS A HISTORY OF ", records.length, " address(es).");
       const unpaid = records.map((record)=>{
@@ -28,8 +28,8 @@ export class CypherpostNodePayments implements PaymentInterface {
 
       const client = lnClient();
       const makeInvoicePayload = {
-        msatoshi: 100000, // 100 sats?
-        label: pubkey + ":" + Date.now(), // cannot be duplicate
+        msatoshi: amount*1000, // 100 sats?
+        label: for_pubkey + ":" + Date.now(), // cannot be duplicate
         description: "Cypherpost rocks!",
         expiry: 90000,
         callback_url: "https://application/api/v2/payments/notification?key=SomeRandyRandomness"
@@ -39,13 +39,14 @@ export class CypherpostNodePayments implements PaymentInterface {
 
       console.log({response});
       const status = await paymentStore.create({
-        pubkey,
+        pubkey: for_pubkey,
         address: response.bolt11,
         amount: Math.round(response.msatoshi),
         txid: response.payment_hash,
         genesis: Date.now(),
         timestamp: Date.now(),
         confirmed: response.status==="paid"?true:false,
+        fingerprint: process.env.CYPHERNODE_FIGERPRINT
       });
 
       if(status instanceof Error) return status;
@@ -58,9 +59,42 @@ export class CypherpostNodePayments implements PaymentInterface {
       return handleError(e);
     }
   }
-  async getHistory(pubkey: string): Promise<Error | UserPayment[]> {
+  async getInfo():Promise<any | Error>{
+    try{
+      const client = lnClient();
+      const peers = await client.listPeers();
+      const info = await client.getNodeInfo();
+      return {info,peers};
+    }
+    catch(e){
+      return handleError(e);
+    }
+  }
+  async getUserTransactions(pubkey: string): Promise<Error | UserPayment[]> {
     const user_payment_records =  await paymentStore.readByPubkey(pubkey);
     return user_payment_records;
+  }
+  async syncWallet(): Promise<boolean | Error>{
+    // all txs in the currently plugged in payment backend - must exist in the local db
+    // different sources should be noted in the fingerprint field
+    // fingerprint can either be the seed fingerprint, or a reference to a wallet name like cyphernode-may-2020
+    const client = lnClient();
+
+    const incoming = await client.getInvoice();
+
+    const local_wallet = await paymentStore.readAll(0);
+    if (local_wallet instanceof Error) return local_wallet;
+
+    let wallet_updates = [];
+    let wallet_removes = [];
+
+    incoming.map((invoice)=>{
+      // update local model with transaction status updates
+      // remove expired entries from cyphernode and local model
+
+    })
+    console.log({statuses: incoming.map(invoice=>invoice.status)});
+    return false;
   }
   async getUnconfirmed(): Promise<Error | UserPayment[]> {
     const user_payment_records =  await paymentStore.readAll(0);

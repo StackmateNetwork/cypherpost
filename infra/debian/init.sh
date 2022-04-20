@@ -1,7 +1,8 @@
 #!/bin/bash -e
 # A few essential tools to get a fresh debian system equipped to download new software over secure channels
 
-sudo apt-get update
+
+sudo apt-get update --allow-releaseinfo-change
 sudo apt-get install -y \
     build-essential \
     cmake \ 
@@ -15,9 +16,8 @@ sudo apt-get install -y \
     git \
     expect \
     jq \
-    lsb-release \
-    librust-proc-macro-crate-dev
-
+    lsb-release 
+    
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 export PATH="$HOME/.cargo/bin:$PATH"
 source $HOME/.cargo/env

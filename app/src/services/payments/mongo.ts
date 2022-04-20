@@ -24,7 +24,6 @@ const payment_schema = new mongoose.Schema(
       index: true,
       unique: true,
     },
-
     amount: {
       type: Number,
       required: true,
@@ -39,6 +38,10 @@ const payment_schema = new mongoose.Schema(
       required: true,
       default: false
     },
+    fingerprint: {
+      type: String,
+      required: true,
+    }
   },
   {
     strict: true
