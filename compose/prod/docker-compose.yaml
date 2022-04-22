@@ -27,8 +27,6 @@ services:
     image: cypherpost-mongo
     container_name: database
     restart: unless-stopped
-    ports:
-      - "27017:27017"
     volumes:
       - cp-datadb:/data/db
       - cp-configdb:/data/configdb    
