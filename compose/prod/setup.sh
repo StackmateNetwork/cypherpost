@@ -97,6 +97,38 @@ perl -i -pe"s/___DOMAIN___/$MY_DOMAIN_NAME/g" "$REPO_NGINX_CONF/post"
 
 echo "[*] Created nginx pre & post conf files with $MY_DOMAIN_NAME as hostname."
 
+
+# CREATE DB PASSWORD IN A .secrets file
+# If secrets file exists, use it to add DB creds to .env
+# If secrets files !exists, create it and add DB creds to .env
+if [[ -f .secrets.json ]]; then
+    echo "[*] DB secrets are already set."
+    DB_USER=$(cat .secrets.json | jq -r "db_user")
+    DB_PASS=$(cat .secrets.json | jq -r "db_pass")
+    INITDB_NAME=$(cat .secrets.json | jq -r "initdb_name")
+    INITDB_ROOT_USER=$(cat .secrets.json | jq -r "initdb_root_user")
+    INITDB_ROOT_PASS=$(cat .secrets.json | jq -r "initdb_root_pass")
+  else
+    echo "[!] Database secrets are about to be generated in a .secrets.json file"
+    echo "[!] Once set, this can only be changed manually via mongo shell."
+    echo "[!] Store it on a local (at home) encrypted medium for recovery."
+
+    printf "\n"
+    read -p "Got it? (y/N)" -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ ! $REPLY =~ ^[Yy]$ ]]
+    then
+        exit 1
+    fi
+    INITDB_ROOT_PASS=$(echo $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5 )
+    DB_PASS=$(echo $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5 )
+    jq -n --arg DB_PASS "$DB_PASS" --arg INITDB_ROOT_PASS "$INITDB_ROOT_PASS" '{initdb_name: "cypherpost", initdb_root_user: "admin", initdb_root_pass: $INITDB_ROOT_PASS, db_user: "cp", db_pass: $DB_PASS}' > .secrets.json
+    INITDB_NAME="cypherpost"
+    INITDB_ROOT_USER="admin"
+    DB_USER="cp"
+    echo "[*] Created DB secrets"
+fi
+
 touch .env
 echo "COMPOSE_PROJECT_NAME=cypherpost-prod" >> .env
 echo "REPO=$REPO/app" > .env
@@ -108,9 +140,13 @@ echo "EMAIL=$EMAIL" >> .env
 echo "NODE_VOLUME=$NODE_VOLUME" >> .env
 echo "MONGO_VOLUME=$MONGO_VOLUME" >> .env
 echo "CERTS_VOLUME=$CERTS_VOLUME" >> .env
-echo "CERTBOT_RUNMODE=--force-renewal" >> .env
+echo "INITDB_NAME=$INITDB_NAME" >> .env
+echo "INITDB_ROOT_USER=$INITDB_ROOT_USER" >> .env
+echo "INITDB_ROOT_PASS=$INITDB_ROOT_PASS" >> .env
+echo "DB_USER=$DB_USER" >> .env
+echo "DB_PASS=$DB_PASS" >> .env
 
-echo "[*] SETUP COMPLETE! VERIFY YOUR .ENV"
+echo "[*] SETUP COMPLETE! VERIFY YOUR ENVIRONMENT VARIABLES."
 cat .env
 echo "[!] Make sure your domain name points to this server's IP."
 echo "[!] Run issue_ssl.sh OR start.sh directly if you have ssl certs issued."

@@ -12,8 +12,6 @@ services:
       - APP_PORT=3021
       - TYPE=$TYPE
       - SECRET=$SECRET
-    ports:
-      - "3021:3021"
     volumes:
       - cp-server-keys:/home/node/.keys
       - cp-server-logs:/home/node/winston
@@ -31,9 +29,11 @@ services:
       - cp-datadb:/data/db
       - cp-configdb:/data/configdb    
     environment:
-      - MONGO_INITDB_DATABASE=cypherpost
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=admin
+      - MONGO_INITDB_DATABASE=$INITDB_NAME
+      - MONGO_INITDB_ROOT_USERNAME=$INITDB_ROOT_USER
+      - MONGO_INITDB_ROOT_PASSWORD=$INITDB_ROOT_PASS
+      - DB_USER=$DB_USER
+      - DB_PASS=$DB_PASS
     networks:
       - cypherpostnetwork
     command: -f /etc/mongod.conf
