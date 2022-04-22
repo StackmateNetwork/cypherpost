@@ -114,7 +114,7 @@ if [[ -f .secrets.json ]]; then
     echo "[!] Store it on a local (at home) encrypted medium for recovery."
 
     printf "\n"
-    read -p "Got it? (y/N)" -n 1 -r
+    read -p "Continue? (y/N)" -n 1 -r
     echo    # (optional) move to a new line
     if [[ ! $REPLY =~ ^[Yy]$ ]]
     then
@@ -127,7 +127,11 @@ if [[ -f .secrets.json ]]; then
     INITDB_ROOT_USER="admin"
     DB_USER="cp"
     echo "[*] Created DB secrets"
+
 fi
+
+perl -i -pe"s/___USER___/$DB_USER/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
+perl -i -pe"s/___PWD___/$DB_PASS/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
 
 touch .env
 echo "COMPOSE_PROJECT_NAME=cypherpost-prod" >> .env
