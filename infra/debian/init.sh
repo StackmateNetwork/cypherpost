@@ -16,7 +16,8 @@ sudo apt-get install -y \
     git \
     expect \
     jq \
-    lsb-release 
+    lsb-release \
+    ufw
     
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 export PATH="$HOME/.cargo/bin:$PATH"

@@ -47,7 +47,6 @@ function create_vm {
 
 }
 
-
 function add_dns_zone {
     local category="&category=dns"
     local action="&action=zone-add"
@@ -101,6 +100,7 @@ function info_vm {
     local vm_url="$BASE_URL$vm$params"
     curl -X GET $vm_url | jq
 }
+
 function info_billing {
     local billing="&category=billing&action=credit"
     local billing_url="$BASE_URL$billing"
@@ -133,28 +133,32 @@ function delete_vm {
 
 }
 
+function 
+
 function debug {
     echo "debugging..."
 }
 
-# RUN THIS ONCE
-VOLUME_ID=$(create_volume)
-VM_ID=$(create_vm $VOLUME_ID)
-printf "VOLUME_ID: $VOLUME_ID\nVM_ID: $VM_ID\n"
 
-# VOLUME_ID=$(list_volume | jq -r "")
-VM_ID=$(list_vm | jq -r ".vms[0].vm_id")
-IP=$(info_vm $VM_ID | jq -r ".info.addresses[0].addr")
-echo $IP
 
-list_vm
+# # RUN THIS ONCE
+# VOLUME_ID=$(create_volume)
+# VM_ID=$(create_vm $VOLUME_ID)
+# printf "VOLUME_ID: $VOLUME_ID\nVM_ID: $VM_ID\n"
 
-# add_dns_zone
-ZONE_ID=$(list_dns | jq -r ".zones" | jq 'keys[]' | bc)
+# # VOLUME_ID=$(list_volume | jq -r "")
+# VM_ID=$(list_vm | jq -r ".vms[0].vm_id")
+# IP=$(info_vm $VM_ID | jq -r ".info.addresses[0].addr")
+# echo $IP
 
-echo $ZONE_ID
+# list_vm
 
-add_dns_record $ZONE_ID $IP
+# # add_dns_zone
+# ZONE_ID=$(list_dns | jq -r ".zones" | jq 'keys[]' | bc)
+
+# echo $ZONE_ID
+
+# add_dns_record $ZONE_ID $IP
 
 # list_dns
 # # CAREFUL
