@@ -55,7 +55,7 @@ export class MongoBadgeStore implements BadgeStore {
     try {
       await badgeStore.syncIndexes();
       const doc = await badgeStore.create(badge);
-      if (doc instanceof mongoose.Error) {
+      if (doc instanceof Error) {
         return handleError(doc);
       } else {
         return true;
@@ -75,7 +75,7 @@ export class MongoBadgeStore implements BadgeStore {
       const query = { giver, reciever, type };
 
       const status = await badgeStore.deleteOne(query)
-      if (status instanceof mongoose.Error) {
+      if (status instanceof Error) {
         return handleError(status);
       }
 
@@ -90,14 +90,14 @@ export class MongoBadgeStore implements BadgeStore {
       const giver_query = { giver : {$in: pubkey} };
 
       let status = await badgeStore.deleteMany(giver_query)
-      if (status instanceof mongoose.Error) {
+      if (status instanceof Error) {
         return handleError(status);
       }
 
       const reciever_query = { reciever : {$in: pubkey} };
 
       status = await badgeStore.deleteMany(reciever_query)
-      if (status instanceof mongoose.Error) {
+      if (status instanceof Error) {
         return handleError(status);
       }
       return true;
@@ -112,10 +112,11 @@ export class MongoBadgeStore implements BadgeStore {
       const query = { giver: { $in: giver }, genesis: {$gte: genesis_filter} };
 
       const docs = await badgeStore.find(query).sort({ "genesis": -1 }).exec();
+      if (docs instanceof Error) {
+        return handleError(docs);
+      }
+
       if (docs.length > 0) {
-        if (docs instanceof mongoose.Error) {
-          return handleError(docs);
-        }
         const badges = docs.map(doc => {
           return {
             genesis: doc["genesis"],
@@ -139,10 +140,11 @@ export class MongoBadgeStore implements BadgeStore {
   async readAll(genesis_filter: Number): Promise<Badge[] | Error> {
     try {
       const docs = await badgeStore.find({genesis: {$gte: genesis_filter}}).sort({ "genesis": -1 }).exec();
+      if (docs instanceof Error) {
+        return handleError(docs);
+      }
+
       if (docs.length > 0) {
-        if (docs instanceof mongoose.Error) {
-          return handleError(docs);
-        }
         const badges = docs.map(doc => {
           return {
             genesis: doc["genesis"],
@@ -166,12 +168,12 @@ export class MongoBadgeStore implements BadgeStore {
   async readByReciever(reciever: string,  genesis_filter: Number): Promise<Badge[] | Error> {
     try {
       const query = { reciever: { $in: reciever },  genesis: {$gte: genesis_filter} };
-
       const docs = await badgeStore.find(query).sort({ "genesis": -1 }).exec();
+      if (docs instanceof Error) {
+        return handleError(docs);
+      }
+
       if (docs.length > 0) {
-        if (docs instanceof mongoose.Error) {
-          return handleError(docs);
-        }
         const badges = docs.map(doc => {
           return {
             genesis: doc["genesis"],

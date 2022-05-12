@@ -59,7 +59,7 @@ export class MongoPostStore implements PostStore {
     try {
       await postStore.syncIndexes();
       const doc = await postStore.create(post);
-      if (doc instanceof mongoose.Error) {
+      if (doc instanceof Error) {
         return handleError(doc);
       } else {
         return true;
@@ -81,7 +81,7 @@ export class MongoPostStore implements PostStore {
         : { $or: [{ id: { $in: indexes } }, { reference: { $in: indexes } }] };
 
       const status = await postStore.deleteMany(query)
-      if (status instanceof mongoose.Error) {
+      if (status instanceof Error) {
         return handleError(status);
       }
 
@@ -94,11 +94,11 @@ export class MongoPostStore implements PostStore {
   async removeOne(id: string, owner: string): Promise<boolean | Error> {
     try {
       let id_delete_status = await postStore.deleteOne({ id, owner });
-      if (id_delete_status instanceof mongoose.Error) {
+      if (id_delete_status instanceof Error) {
         return handleError(id_delete_status);
       }
       const ref_delete_status = await postStore.deleteMany({ reference: id });
-      if (ref_delete_status instanceof mongoose.Error) {
+      if (ref_delete_status instanceof Error) {
         return handleError(ref_delete_status);
       }
       return true;
@@ -110,13 +110,13 @@ export class MongoPostStore implements PostStore {
     try {
       const query = (index_type == PostStoreIndex.Owner)
         ? { owner: { $in: indexes }, genesis: { "$gte": genesis_filter } }
-        : { id: { $in: indexes } , genesis: { "$gte": genesis_filter } };
+        : { id: { $in: indexes } , reference: { $in: indexes }, genesis: { "$gte": genesis_filter } };
         
       const docs = await postStore.find(query).sort({ "genesis": -1 }).exec();
+      if (docs instanceof Error) {
+        return handleError(docs);
+      }
       if (docs.length > 0) {
-        if (docs instanceof mongoose.Error) {
-          return handleError(docs);
-        }
         const posts = docs.map(doc => {
           return {
             owner: doc["owner"],
@@ -144,11 +144,11 @@ export class MongoPostStore implements PostStore {
       .find({ genesis: { "$gte": genesis_filter } })
       .sort({ "genesis": -1 })
       .exec();
+      if (docs instanceof Error) {
+        return handleError(docs);
+      }
       
       if (docs.length > 0) {
-        if (docs instanceof mongoose.Error) {
-          return handleError(docs);
-        }
         const posts = docs.map(doc => {
           return {
             owner: doc["owner"],
@@ -176,7 +176,7 @@ export class MongoPostStore implements PostStore {
       // console.log({q,u})
 
       const status = await postStore.updateOne(q, u);
-      if (status instanceof mongoose.Error) {
+      if (status instanceof Error) {
         return handleError(status);
       };
       

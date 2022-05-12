@@ -53,7 +53,7 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
       const query = { reciever };
 
       const status = await postKeyStore.deleteMany(query)
-      if (status instanceof mongoose.Error) {
+      if (status instanceof Error) {
         return handleError(status);
       }
       if (status.deletedCount >= 1) return true;
@@ -67,7 +67,7 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
     try {
       await postKeyStore.syncIndexes();
       const doc = await postKeyStore.create(keys);
-      if (doc instanceof mongoose.Error) {
+      if (doc instanceof Error) {
         return handleError(doc);
       } else {
         return true;
@@ -88,10 +88,11 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
       const query = { giver: { $in: giver } , genesis: {$gte: genesis_filter }};
 
       const docs = await postKeyStore.find(query).sort({ "genesis": -1 }).exec();
+      if (docs instanceof Error) {
+        return handleError(docs);
+      }
       if (docs.length > 0) {
-        if (docs instanceof mongoose.Error) {
-          return handleError(docs);
-        }
+   
         const keys = docs.map(doc => {
           return {
             genesis: doc["genesis"],
@@ -116,10 +117,11 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
       const query = { reciever: { $in: reciever } , genesis: {$gte: genesis_filter } };
 
       const docs = await postKeyStore.find(query).sort({ "genesis": -1 }).exec();
+      if (docs instanceof Error) {
+        return handleError(docs);
+      }
       if (docs.length > 0) {
-        if (docs instanceof mongoose.Error) {
-          return handleError(docs);
-        }
+
         const keys = docs.map(doc => {
           return {
             genesis: doc["genesis"],
@@ -145,10 +147,10 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
       const query = { post_id };
 
       const docs = await postKeyStore.find(query).sort({ "genesis": -1 }).exec();
+      if (docs instanceof Error) {
+        return handleError(docs);
+      }
       if (docs.length > 0) {
-        if (docs instanceof mongoose.Error) {
-          return handleError(docs);
-        }
         const keys = docs.map(doc => {
           return {
             genesis: doc["genesis"],
@@ -173,7 +175,7 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
       const query = { giver, post_id };
 
       const status = await postKeyStore.deleteMany(query)
-      if (status instanceof mongoose.Error) {
+      if (status instanceof Error) {
         return handleError(status);
       }
       return true;
@@ -186,7 +188,7 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
       const query = { giver, reciever };
 
       const status = await postKeyStore.deleteMany(query)
-      if (status instanceof mongoose.Error) {
+      if (status instanceof Error) {
         return handleError(status);
       }
       if (status.deletedCount >= 1) return true;
@@ -200,7 +202,7 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
       const query = { giver };
 
       const status = await postKeyStore.deleteMany(query)
-      if (status instanceof mongoose.Error) {
+      if (status instanceof Error) {
         return handleError(status);
       }
       if (status.deletedCount >= 1) return true;
@@ -224,7 +226,7 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
       };
 
       const doc = await postKeyStore.updateOne(query, update);
-      if (doc instanceof mongoose.Error) {
+      if (doc instanceof Error) {
         return handleError(doc);
       } else {
         return true;

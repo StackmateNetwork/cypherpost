@@ -15,7 +15,21 @@ export class CypherpostPosts implements PostInterface {
   editOne(id: string, owner: string, cypher_json: string): Promise<boolean | Error> {
     return store.updateOne(id, owner, cypher_json);
   }
+  async isReference(id: string, owner: string): Promise<boolean | Error>{
+    const post = await store.readMany([id], PostStoreIndex.PostId, 0);
+    if (post instanceof Error) return post;
 
+    if (post.length == 0){
+      handleError({
+        code: 404,
+        message: "Could not find post with this id."
+      });
+    } 
+
+    const is_reference = (post[0].reference != "NONE" )? false: true;
+    return is_reference;
+
+  }
   async findAllByOwner(owner: string, genesis_filter: Number): Promise<UserPost[] | Error> {
     return store.readMany([owner], PostStoreIndex.Owner, genesis_filter);
   }
@@ -45,7 +59,6 @@ export class CypherpostPosts implements PostInterface {
   async findManyById(ids: Array<string>, genesis_filter): Promise<Array<UserPost> | Error> {
     return store.readMany(ids, PostStoreIndex.PostId, genesis_filter);
   }
-
   async removeOneById(id: string, owner: string): Promise<boolean | Error> {
     return store.removeOne(id, owner);
   }

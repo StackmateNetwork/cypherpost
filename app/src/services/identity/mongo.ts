@@ -43,7 +43,7 @@ export class MongoIdentityStore implements IdentityStore {
     try {
       await identityStore.syncIndexes();
       const doc = await identityStore.create(identity);
-      if (doc instanceof mongoose.Error) {
+      if (doc instanceof Error) {
         return handleError(doc);
       } else {
         return true;
@@ -62,7 +62,7 @@ export class MongoIdentityStore implements IdentityStore {
     try {
       const query = { pubkey };
       const status = await identityStore.deleteMany(query)
-      if (status instanceof mongoose.Error) {
+      if (status instanceof Error) {
         return handleError(status);
       }
       // console.log({ status })
@@ -78,7 +78,7 @@ export class MongoIdentityStore implements IdentityStore {
       const doc = await identityStore.findOne(query).exec();
 
       if (doc) {
-        if (doc instanceof mongoose.Error) {
+        if (doc instanceof Error) {
           return handleError(doc);
         }
 
@@ -105,7 +105,7 @@ export class MongoIdentityStore implements IdentityStore {
     try {
       
       const docs = await identityStore.find({ genesis: { $gte: genesis_filter } }).exec();
-      if (docs instanceof mongoose.Error) {
+      if (docs instanceof Error) {
         return handleError(docs);
       }
       const identities = docs.map(doc => {
@@ -128,7 +128,7 @@ export class MongoIdentityStore implements IdentityStore {
       // console.log({q,u})
 
       const result = await identityStore.updateOne(q, u);
-      if (result instanceof mongoose.Error) {
+      if (result instanceof Error) {
         return handleError(result);
       };
       console.log({result})

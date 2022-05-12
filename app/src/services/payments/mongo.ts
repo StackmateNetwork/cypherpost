@@ -55,7 +55,7 @@ export class MongoPaymentStore implements PaymentStore {
     try {
       await paymentStore.syncIndexes();
       const doc = await paymentStore.create(payment);
-      if (doc instanceof mongoose.Error) {
+      if (doc instanceof Error) {
         return handleError(doc);
       } else {
         return true;
@@ -75,11 +75,11 @@ export class MongoPaymentStore implements PaymentStore {
       const query = { genesis: { $gte: genesis_filter } };
 
       const docs = await paymentStore.find(query).sort({ "genesis": -1 }).exec();
-      if (docs.length > 0) {
-        if (docs instanceof mongoose.Error) {
-          return handleError(docs);
-        }
+      if (docs instanceof Error) {
+        return handleError(docs);
+      }
 
+      if (docs.length > 0) {
         const payments = docs.map(doc => {
           return {
             genesis: doc["genesis"],
@@ -104,10 +104,11 @@ export class MongoPaymentStore implements PaymentStore {
       const query = { pubkey: { $in: pubkey } };
 
       const docs = await paymentStore.find(query).sort({ "genesis": -1 }).exec();
+      if (docs instanceof Error) {
+        return handleError(docs);
+      }
+      
       if (docs.length > 0) {
-        if (docs instanceof mongoose.Error) {
-          return handleError(docs);
-        }
         const payments = docs.map(doc => {
           return {
             genesis: doc["genesis"],
@@ -138,7 +139,7 @@ export class MongoPaymentStore implements PaymentStore {
 
       console.log({ u });
       const status = await paymentStore.updateOne(q, u);
-      if (status instanceof mongoose.Error) {
+      if (status instanceof Error) {
         return handleError(status);
       };
       return true;
@@ -160,7 +161,7 @@ export class MongoPaymentStore implements PaymentStore {
           }
         }
       }));
-      if (status instanceof mongoose.Error) {
+      if (status instanceof Error) {
         return handleError(status);
       };
       return true;
@@ -171,7 +172,7 @@ export class MongoPaymentStore implements PaymentStore {
   async removeAll(): Promise<boolean | Error> {
     try {
       let status = await paymentStore.deleteMany({});
-      if (status instanceof mongoose.Error) {
+      if (status instanceof Error) {
         return handleError(status);
       };
       return true;
@@ -220,7 +221,7 @@ export class MongoPaymentStore implements PaymentStore {
 //     try {
 //       await walletStore.syncIndexes();
 //       const doc = await walletStore.create(wallet);
-//       if (doc instanceof mongoose.Error) {
+//       if (doc instanceof Error) {
 //         return handleError(doc);
 //       } else {
 //         return true;
@@ -239,7 +240,7 @@ export class MongoPaymentStore implements PaymentStore {
 //     try {
 //       const docs = await walletStore.find({}).exec();
 //       if (docs.length > 0) {
-//         if (docs instanceof mongoose.Error) {
+//         if (docs instanceof Error) {
 //           return handleError(docs);
 //         }
 
@@ -268,7 +269,7 @@ export class MongoPaymentStore implements PaymentStore {
 //         {$inc : {last_used_index : 1}}, 
 //         {new: true}
 //       ).exec();
-//       if (doc instanceof mongoose.Error) {
+//       if (doc instanceof Error) {
 //         return handleError(doc);
 //       }
 //       return doc["last_used_index"];
@@ -279,7 +280,7 @@ export class MongoPaymentStore implements PaymentStore {
 //   async removeAll(): Promise<boolean | Error> {
 //     try {
 //       let status = await walletStore.deleteMany({});
-//       if (status instanceof mongoose.Error) {
+//       if (status instanceof Error) {
 //         return handleError(status);
 //       };
 //       return true;
