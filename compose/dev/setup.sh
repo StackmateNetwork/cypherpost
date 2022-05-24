@@ -79,7 +79,8 @@ echo $S > .env
 echo "REPO=$REPO_APP" >> .env
 echo "KEYS=$HOME/.keys" >> .env
 echo "TYPE=$TYPE" >> .env
-  
+echo "BADGES=$BADGES" >> .env
+   
 echo "[!] Adjuisting permissions! Requires sudo."
 
 sudo chown -R $(whoami):1000 ~/.keys

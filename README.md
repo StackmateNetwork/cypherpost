@@ -20,7 +20,7 @@ Public servers have no other means of protecting from spam, since neither email 
 
 Private servers generate an `invite code` during server setup. This code is required during client registration to maintain a closed network. Private servers can be run stand-alone without the need of payment facilites.
 
-#### Public Server LIVE at https://cypherpost.io/api/v2
+#### Private Server LIVE at https://cypherpost.io/api/v2
 
 #### Reference client UNDER CONSTRUCTION at https://cypherpost.io.
 
@@ -168,3 +168,18 @@ cargo install pier
 In the root folder run `pier list` to view all possible commands.
 
 To use a command run `pier run <command> <args>` eg: `pier run dev-start`
+
+
+### Extra Notes:
+
+#### Optional Reference Field
+
+Clients can use an optional  `reference` field, when making a post. References require the following:
+
+- reference must be an existing post_id
+- reference posts must be encrypted with the same key as the post it is referencing
+- reference posts do not have keys of their own
+
+References allow users to create group chats.
+
+Note that when the parent post is deleted, all references are also removed.

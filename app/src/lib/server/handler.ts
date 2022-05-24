@@ -266,17 +266,6 @@ export interface S5ResponseHeaders {
   'x-s5-signature'?: string;
 }
 
-export interface S5User {
-  uid?: string;
-  user?: string;
-  firebase_uid?: string;
-  email?: string;
-  expiry?: number;
-  tfa?: boolean;
-  ip?: string;
-  phone?: string;
-}
-
 export interface S5Input {
   username?:string;
   xpub?:string;
@@ -289,7 +278,7 @@ export interface S5Input {
   invite_code?:string;
   cipher_info?: string,
   derivation_scheme?: string,
-  recipient_xpub?:string,
+  recipient?:string,
   decryption_keys?: Array<object>,
   decryption_key?: string,
   trusting?: string,
@@ -303,6 +292,7 @@ export interface S5Input {
   amount?: number;
   filter?:object;
   post_id?:string;
+  badge?: string;
 
 };
 

@@ -202,7 +202,7 @@ export async function handlePutKeys(req, res) {
       }
     }
     // check if giver is TRUSTED, or if reciever is OPEN
-
+    
     let is_reference = await posts.isReference(req.body.post_id,request.headers['x-client-pubkey']);
     if(is_reference instanceof Error) throw is_reference;
     if(is_reference){

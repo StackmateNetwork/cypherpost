@@ -49,13 +49,3 @@ what if cpost home server is down and my team is maintaining a multisig wallet u
 - we wont be down ;) if we are, unavailability will only affect your convenience. only public wallet data should ever be shared with cypherpost. Specifically, one of the three types mentioned earlier - pubkeys and psbt.
 so if our home server is down, someone else can pop up as the new and more reliable public server or your linux buddy can easily run your own for the group.
 
-
-Bitcoin Key UI has always been a mnemonic. 
-
-This worked for single-sigs, but with multi-party scripts we require a L2 solution, where bitcoin keys are used to encrypt public descriptor backups on multiple locations on the internet: 
-- DropBox
-- GDrive
-- iCloud
-
-CPost moves the Bitcoin Key UI to mnemonic2x, where 1 mnemonic is the core key( used in many scripts ), and the second backup key, giving access to the backup of all the script wallet public descriptors.
-Losing either one of these two mnemonics will lead to complete loss of funds.

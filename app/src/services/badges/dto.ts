@@ -97,7 +97,7 @@ export async function handleGetAllBadges(req, res) {
   }
 }
 
-export async function handleTrust(req, res) {
+export async function handleGiveBadge(req, res) {
   const request = parseRequest(req);
   try {
     const errors = validationResult(req)
@@ -113,7 +113,27 @@ export async function handleTrust(req, res) {
         message: "Trust in self implied."
       }
     }
-    let status = await badges.create(request.headers['x-client-pubkey'], request.body.trusting, BadgeType.Trusted, request.body.nonce, request.body.signature);
+    let badge= BadgeType.Trusted;
+
+    switch (request.params.badge.toUpperCase()){
+      case 'TRUST': 
+        badge = BadgeType.Trusted;
+        break;
+      case 'SCAMMER':
+        badge = BadgeType.Scammer;
+        break;
+      case 'BUY':
+        badge= BadgeType.Buy;
+        break;
+        case "SELL":
+          badge= BadgeType.Sell;
+          break;
+      default:
+        badge = BadgeType.Trusted;
+        break;  
+    }
+
+    let status = await badges.create(request.headers['x-client-pubkey'], request.body.recipient, BadgeType.Trusted, request.body.nonce, request.body.signature);
     if (status instanceof Error) throw status;
 
     const response = {

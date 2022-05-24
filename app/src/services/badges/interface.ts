@@ -27,5 +27,7 @@ export interface Badge {
 }
 export enum BadgeType {
   Trusted="TRUST",
-  Scammer="SCAMMER"
+  Scammer="SCAM",
+  Buy="BUY",
+  Sell="SELL",
 }
