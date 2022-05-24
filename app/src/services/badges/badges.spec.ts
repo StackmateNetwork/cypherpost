@@ -78,6 +78,10 @@ const ishi = "ishi";
 const identities = [
   admin,pbz,sushi,bubble,ch2,satoshi,outlier,newuser,ishi,
 ];
+const idObjects = {
+  admin,pbz,sushi,bubble,ch2,satoshi,outlier,newuser,ishi,
+ 
+};
 
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 describe("Initalizing Test: Badge Service", function () {
@@ -171,7 +175,7 @@ describe("Initalizing Test: Badge Service", function () {
 
 
     it("SIMULATE GIVING TRUST BADGES AMONG USERS:", async function () {
-      await simulateGivingBadges();
+      await simulateGivingBadges('nonce', 'signature');
     });
     it("GETS BADGES AS newuser AND TRIES TO FIGURE OUR WHO IS WHO",async function(){
       const all_badges = await badges.getAll(0);
@@ -183,21 +187,23 @@ describe("Initalizing Test: Badge Service", function () {
           id: id,
           given: all_badges.filter((badge)=>
             badge.giver === id
-          ).map((badge)=> `${badge.type}:_to_:${badge.reciever}`),
+          ).map((badge)=> Object({to:badge.reciever,type:badge.type})),
           received: all_badges.filter((badge)=>
           badge.reciever === id
-          ).map((badge)=> `${badge.type}:_from_:${badge.giver}`),
+          ).map((badge)=>  Object({from: badge.giver, type:badge.type})),
       })});
-      ids_with_badges = ids_with_badges.map((object)=>{
-        return{
-          id: object.id,
-          given: object.given, 
-          givenCount: object.given.length,
-          received: object.received,
-          receivedCount: object.received.length,
-        } 
+        ids_with_badges.map((object)=>{
+        idObjects[object.id] = {
+            id: object.id,
+            given: object.given, 
+            givenCount: object.given.length,
+            received: object.received,
+            receivedCount: object.received.length,
+          } ;
+        
+  
       });
-      console.log(JSON.stringify(ids_with_badges,null,2));
+      console.log(JSON.stringify(idObjects,null,2));
     });
     it("CLEAN UP AFTER SIMULATION",async function(){
       let response = await store.removeAllTest();
@@ -208,7 +214,7 @@ describe("Initalizing Test: Badge Service", function () {
 });
 
 
-async function simulateGivingBadges(){
+async function simulateGivingBadges(nonce: string,signature: string){
   let response = await badges.create(admin, ishi, BadgeType.Trusted,nonce, signature);
       expect(response).to.equal(true);
       response = await badges.create(admin, pbz, BadgeType.Trusted,nonce, signature);
