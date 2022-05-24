@@ -203,14 +203,14 @@ export async function handlePutKeys(req, res) {
     }
     // check if giver is TRUSTED, or if reciever is OPEN
     
-    let is_reference = await posts.isReference(req.body.post_id,request.headers['x-client-pubkey']);
-    if(is_reference instanceof Error) throw is_reference;
-    if(is_reference){
-      throw {
-        code: 400,
-        message: "This post is a reference. You cannot post keys for it. Use the reference primary_key to encrypt it."
-      }
-    }
+    // let is_reference = await posts.isReference(req.body.post_id,request.headers['x-client-pubkey']);
+    // if(is_reference instanceof Error) throw is_reference;
+    // if(is_reference){
+    //   throw {
+    //     code: 400,
+    //     message: "This post is a reference. You cannot post keys for it. Use the reference primary_key to encrypt it."
+    //   }
+    // }
 
     const decryption_keys: PostKeyStoreUpdate[] = request.body.decryption_keys.map((key) => {
       return {

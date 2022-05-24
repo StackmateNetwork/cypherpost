@@ -276,7 +276,7 @@ async function createBadgeIssueRequest(badge: BadgeType, to_pubkey: string, key_
   const badge_signature = await bitcoin.sign(`${key_set.identity_pubkey}:${to_pubkey}:${badge.toString()}:${nonce}`, key_set.identity_private) as string;
 
   const body = {
-    trusting: to_pubkey,
+    recipient: to_pubkey,
     nonce,
     signature: badge_signature
   };

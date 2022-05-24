@@ -78,7 +78,7 @@ export class MongoPostStore implements PostStore {
     try {
       const query = (index_type == PostStoreIndex.Owner)
         ? { owner: { $in: indexes } }
-        : { $or: [{ id: { $in: indexes } }, { reference: { $in: indexes } }] };
+        : { $or: [{ id: { $in: indexes } }] };
 
       const status = await postStore.deleteMany(query)
       if (status instanceof Error) {
@@ -110,12 +110,13 @@ export class MongoPostStore implements PostStore {
     try {
       const query = (index_type == PostStoreIndex.Owner)
         ? { owner: { $in: indexes }, genesis: { "$gte": genesis_filter } }
-        : { id: { $in: indexes } , reference: { $in: indexes }, genesis: { "$gte": genesis_filter } };
+        : { id: { $in: indexes } , genesis: { "$gte": genesis_filter } };
         
       const docs = await postStore.find(query).sort({ "genesis": -1 }).exec();
       if (docs instanceof Error) {
         return handleError(docs);
       }
+      console.log(docs);
       if (docs.length > 0) {
         const posts = docs.map(doc => {
           return {
