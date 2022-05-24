@@ -162,7 +162,7 @@ async function giveBadge(identity_parent, reciever, badge_type) {
   const method = "POST";
 
   const body = {
-    trusting: reciever,
+    recipient: reciever,
     nonce,
     signature: badge_signature
   };

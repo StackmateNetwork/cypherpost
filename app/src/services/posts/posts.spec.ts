@@ -103,11 +103,9 @@ describe("Initalizing Test: Profile Service", function () {
       const response = await posts.create(xpub,user_post.expiry + 100000,cypher_json,derivation_scheme, reference);
       expect(response).to.be.a("string");
       post3_id = response;
-      console.log(post3_id)
     });
 
     it("FIND ONE new post BY ID (un-edited)", async function () {
-      console.log(post3_id);
       const response = await posts.findManyById([post3_id], genesis_filter);
       if(response instanceof Error) throw response;
       expect(response[0]['edited']).to.equal(false);

@@ -116,7 +116,6 @@ export class MongoPostStore implements PostStore {
       if (docs instanceof Error) {
         return handleError(docs);
       }
-      console.log(docs);
       if (docs.length > 0) {
         const posts = docs.map(doc => {
           return {

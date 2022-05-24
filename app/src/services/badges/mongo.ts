@@ -87,6 +87,8 @@ export class MongoBadgeStore implements BadgeStore {
   }
   async removeAll(pubkey: string): Promise<boolean | Error> {
     try {
+      
+      
       const giver_query = { giver : {$in: pubkey} };
 
       let status = await badgeStore.deleteMany(giver_query)
@@ -106,7 +108,20 @@ export class MongoBadgeStore implements BadgeStore {
       return handleError(e);
     }
   }
+  async removeAllTest(): Promise<boolean | Error> {
+    try {
+      
+      let status = await badgeStore.deleteMany();
+      if (status instanceof Error) {
+        return handleError(status);
+      }
 
+      return true;
+      
+    } catch (e) {
+      return handleError(e);
+    }
+  }
   async readByGiver(giver: string, genesis_filter: Number): Promise<Badge[] | Error> {
     try {
       const query = { giver: { $in: giver }, genesis: {$gte: genesis_filter} };

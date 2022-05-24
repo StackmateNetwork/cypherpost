@@ -9,13 +9,16 @@ import { CypherpostBitcoinOps } from "../../lib/bitcoin/bitcoin";
 import { S5Crypto } from "../../lib/crypto/crypto";
 import { DbConnection } from "../../lib/storage/interface";
 import { MongoDatabase } from "../../lib/storage/mongo";
+import { CypherpostIdentity } from "../identity/identity";
 import { CypherpostBadges } from "./badges";
 import { Badge, BadgeType } from "./interface";
+import { MongoBadgeStore } from "./mongo";
 const sinon = require("sinon");
 
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 const bitcoin = new CypherpostBitcoinOps();
 const badges = new CypherpostBadges();
+const store = new MongoBadgeStore();
 const s5crypto = new S5Crypto();
 const db = new MongoDatabase();
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
@@ -57,9 +60,32 @@ let ecdsa_keys;
 let ecdsa_keys1;
 let signature;
 let genesis_filter = 0;
+
+// ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
+
+// SIMULATION CONSTANTS
+
+const admin = "admin";
+const pbz = "pbz";
+const sushi = "sushi";
+const bubble = "bubble";
+const ch2 = "ch2";
+const satoshi = "satoshi";
+const outlier = "outlier";
+const newuser = "newuser";
+const ishi = "ishi";
+
+const identities = [
+  admin,pbz,sushi,bubble,ch2,satoshi,outlier,newuser,ishi,
+];
+
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 describe("Initalizing Test: Badge Service", function () {
+  const sandbox = sinon.createSandbox();
+
   before(async function () {
+    sandbox.stub(CypherpostBitcoinOps.prototype, "verify").resolves(true);
+    
     const connection: DbConnection = {
       port: process.env.DB_PORT,
       ip: process.env.DB_IP,
@@ -78,10 +104,16 @@ describe("Initalizing Test: Badge Service", function () {
     console.log({ecdsa_keys1})
     
     const message = `${ecdsa_keys.pubkey}:${ecdsa_keys1.pubkey}:${BadgeType.Trusted.toString()}:${nonce}`;
+ 
     signature = await bitcoin.sign(message,ecdsa_keys.privkey);
-  });
 
-  describe("BADGE SERVICE OPERATIONS:", async function () {
+  });
+  after(async () =>{
+  sandbox.restore();
+
+  })
+
+  describe("BADGE SERVICE UNIT TESTS:", async function () {
     it("CREATE new TRUST from xpub to xpub1", async function () {
       const response = await badges.create(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, BadgeType.Trusted,nonce, signature);
       expect(response).to.equal(true);
@@ -134,4 +166,93 @@ describe("Initalizing Test: Badge Service", function () {
       expect(response.length === 0).to.equal(true);
     });
   });
+
+  describe("BADGE SIMULATION: USER PERSPECTIVES", async function(){
+
+
+    it("SIMULATE GIVING TRUST BADGES AMONG USERS:", async function () {
+      await simulateGivingBadges();
+    });
+    it("GETS BADGES AS newuser AND TRIES TO FIGURE OUR WHO IS WHO",async function(){
+      const all_badges = await badges.getAll(0);
+      if(all_badges instanceof Error) throw all_badges;
+      // OPERATE ON BADGES
+      let ids_with_badges = [];
+      identities.map((id)=>{
+        ids_with_badges.push({
+          id: id,
+          given: all_badges.filter((badge)=>
+            badge.giver === id
+          ).map((badge)=> `${badge.type}:_to_:${badge.reciever}`),
+          received: all_badges.filter((badge)=>
+          badge.reciever === id
+          ).map((badge)=> `${badge.type}:_from_:${badge.giver}`),
+      })});
+      ids_with_badges = ids_with_badges.map((object)=>{
+        return{
+          id: object.id,
+          given: object.given, 
+          givenCount: object.given.length,
+          received: object.received,
+          receivedCount: object.received.length,
+        } 
+      });
+      console.log(JSON.stringify(ids_with_badges,null,2));
+    });
+    it("CLEAN UP AFTER SIMULATION",async function(){
+      let response = await store.removeAllTest();
+      expect(response).to.equal(true);
+    })
+  });
+
 });
+
+
+async function simulateGivingBadges(){
+  let response = await badges.create(admin, ishi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(admin, pbz, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(pbz, ishi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(ishi, pbz, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(sushi, ishi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(bubble, ishi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(ishi, sushi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(ishi, bubble, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(satoshi, pbz, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(pbz, satoshi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(ishi, satoshi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(sushi, satoshi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(bubble, satoshi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(newuser, satoshi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(newuser, admin, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(outlier, satoshi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(ishi, ch2, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(bubble, ch2, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(sushi, ch2, BadgeType.Scammer,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(ch2, ishi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);    
+      response = await badges.create(ch2, bubble, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(ch2, sushi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+      response = await badges.create(ch2, satoshi, BadgeType.Trusted,nonce, signature);
+      expect(response).to.equal(true);
+}
