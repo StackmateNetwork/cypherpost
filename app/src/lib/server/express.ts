@@ -8,7 +8,7 @@ import helmet from "helmet";
 import { router as announcement } from "../../services/announcement/router";
 // import { router as client } from "../../services/client/router";
 import { router as identity } from "../../services/identity/router";
-import { router as post } from "../../services/posts/router";
+import {router as post} from "../../services/posts/router";
 import { logger } from "../logger/winston";
 import { respond } from "./handler";
 
@@ -19,6 +19,7 @@ export async function start(port: string) {
   return new Promise(async (resolve, reject) => {
     try {
       const server = express();
+      // const expressWs = require('express-ws')(server);
 
       server.set("etag", false);
       server.disable("x-powered-by");
@@ -33,21 +34,19 @@ export async function start(port: string) {
           next()
         }
       });
-      
-      // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+      // ROUTES >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
       server.use("/api/v2/identity", identity);
       server.use("/api/v2/announcement", announcement);
       server.use("/api/v2/post", post);
-      // server.use("/", client);
-      // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
+      // ROUTES <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
       server.use(express.static(base_path));
-      
+
       const app = server.listen(port, async () => {
         logger.verbose("Server listening...")
         resolve(app)
       });
-      
+
 
       // Gracefully terminate server on SIGINT AND SIGTERM
       process.on("SIGINT", () => {
@@ -83,13 +82,6 @@ export async function start(port: string) {
         });
       });
 
-      // server._router.stack.forEach(print.bind(null, []))
-      
-      // console.log(JSON.stringify(availableRoutes(server), null, 2));
-      // console.log(availableRoutesString(server));
-
-
-      // listRoutes();
     } catch (e) {
       logger.error({EXPRESS_ERROR:e})
       reject(e);

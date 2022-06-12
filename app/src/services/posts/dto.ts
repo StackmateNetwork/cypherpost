@@ -258,3 +258,9 @@ export async function handleEditPost(req, res) {
     respond(result.code, result.message, res, request);
   }
 }
+
+export async function handlePostStream(ws, req){
+  // ws.on('message', function(msg) {
+  //   ws.send(msg);
+  // });
+}

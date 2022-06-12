@@ -503,7 +503,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     c_post_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Sell, "Contact me on Signal.", false), c_key_set.cypherpost_parent, init_posts_ds);
     c_post_edit_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Sell, "Contact me on Threema.", false), c_key_set.cypherpost_parent, init_posts_ds);
 
-    // ------------------ (◣_◢) ------------------    
+    // ------------------ (◣_◢) ------------------
   });
 
   after(async function () {
@@ -698,7 +698,8 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
       all_announcements.map(async (announcement) => {
         const message = `${announcement.by}:${announcement.to}:${announcement.type}:${announcement.nonce}`;
         const verify = await bitcoin.verify(message, announcement.signature, announcement.giver);
-        if (!verify) throw "Announcement Signature failed.";
+        const failedSig = "Announcement Signature failed.";
+        if (!verify) throw failedSig;
         if (announcement.by === a_key_set.identity_pubkey) a_trust.push(announcement.to);
         if (announcement.by === b_key_set.identity_pubkey) b_trust.push(announcement.to);
         if (announcement.by === c_key_set.identity_pubkey) c_trust.push(announcement.to);
@@ -1151,6 +1152,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
   });
 
   describe("GLOBAL", function () {
+    // tslint:disable-next-line: one-variable-per-declaration
     let request_a,
       request_b,
       request_c;

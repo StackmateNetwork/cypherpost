@@ -33,9 +33,9 @@ PARENT e2ee'/cypherpost'
   "xpub": "[fcf5c473/128'/0']xpub6BGW7x5qXVvKubVBvXKiHN2dDxwVU9aLfn6riBvcnhNA9g4wkPBMuugFxDtCYLu51gFKabc49y6Ssvv3axE57pDk4hem63LjCa4Qq2eAFpZ/*"
 }
 */
-let message = "GET /posts";
-let xpub = "xpub6BGW7x5qXVvKubVBvXKiHN2dDxwVU9aLfn6riBvcnhNA9g4wkPBMuugFxDtCYLu51gFKabc49y6Ssvv3axE57pDk4hem63LjCa4Qq2eAFpZ";
-let xprv = "xprv9xH9iSYwh8N2h7QipVnhvE5tfw714grVJZBFuoX1EMqBGsjoCqs7N7Mn6whrJtTTpGyXVX2KSzZ5uWPfCax9J6Lp9oKAteavTp9aA5VGTGW";
+const message = "GET /posts";
+const xpub = "xpub6BGW7x5qXVvKubVBvXKiHN2dDxwVU9aLfn6riBvcnhNA9g4wkPBMuugFxDtCYLu51gFKabc49y6Ssvv3axE57pDk4hem63LjCa4Qq2eAFpZ";
+const xprv = "xprv9xH9iSYwh8N2h7QipVnhvE5tfw714grVJZBFuoX1EMqBGsjoCqs7N7Mn6whrJtTTpGyXVX2KSzZ5uWPfCax9J6Lp9oKAteavTp9aA5VGTGW";
 let encryption_key;
 const derivation_scheme = "m/0'/0'/0'";
 let cypher_json;
@@ -120,7 +120,7 @@ describe("Initalizing Test: Profile Service", function () {
       // console.log({response})
       expect(response[0]['edited']).to.equal(true);
     });
-    
+
     it("FIND new posts BY ID", async function () {
       const response = await posts.findManyById([post1_id,post2_id,post3_id], genesis_filter);
       if(response instanceof Error) throw response;

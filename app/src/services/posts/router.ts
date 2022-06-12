@@ -3,12 +3,17 @@ cypherpost.io
 Developed @ Stackmate India
 */
 // ------------------ '(◣ ◢)' ---------------------
-import { Router } from "express";
+// import express from "express";
+
 import * as val from "express-validator";
-import { handleCreatePost, handleDeletePostAndReferenceKeys, handleEditPost, handleGetMyPosts, handleGetOthersPosts, handlePutKeys, postMiddleware } from "./dto";
+import { handleCreatePost, handleDeletePostAndReferenceKeys, handleEditPost, handleGetMyPosts, handleGetOthersPosts, handlePutKeys, postMiddleware,handlePostStream } from "./dto";
 
 // ------------------ '(◣ ◢)' ---------------------
-export const router = Router();
+const express = require("express")
+const app = express();
+const expressWs = require('express-ws')(app);
+
+export const router = express.Router();
 // ------------------ '(◣ ◢)' ---------------------
 const checkCreatePost = [
   val.check('expiry').exists(),
@@ -34,11 +39,11 @@ const checkEditPost = [
 // ------------------ '(◣ ◢)' ---------------------
 router.use(postMiddleware);
 router.put("/", checkCreatePost, handleCreatePost);
-router.get("/self",checkGetPosts, handleGetMyPosts); 
+router.get("/self",checkGetPosts, handleGetMyPosts);
 router.get("/others", checkGetPosts, handleGetOthersPosts);
 router.put("/keys",checkUpdatePutKeys, handlePutKeys);
 router.delete("/:id", handleDeletePostAndReferenceKeys);
 router.post("/edit", checkEditPost, handleEditPost);
-
+router.ws('/stream', handlePostStream);
 // ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------
 
