@@ -6,7 +6,7 @@ Developed @ Stackmate India
 import express from "express";
 import helmet from "helmet";
 import { router as announcement } from "../../services/announcement/router";
-import { router as client } from "../../services/client/router";
+// import { router as client } from "../../services/client/router";
 import { router as identity } from "../../services/identity/router";
 import { router as post } from "../../services/posts/router";
 import { logger } from "../logger/winston";
@@ -38,7 +38,7 @@ export async function start(port: string) {
       server.use("/api/v2/identity", identity);
       server.use("/api/v2/announcement", announcement);
       server.use("/api/v2/post", post);
-      server.use("/", client);
+      // server.use("/", client);
       // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
       server.use(express.static(base_path));
