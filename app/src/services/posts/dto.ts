@@ -120,10 +120,10 @@ export async function handleGetOthersPosts(req, res) {
 
     const genesis_filter = request.query['genesis_filter'] ? request.query['genesis_filter'] : 0;
 
-    const reciever_keys = await postKeys.findPostDecryptionKeyByReciever(req.headers['x-client-pubkey'], genesis_filter);
-    if (reciever_keys instanceof Error) throw reciever_keys;
+    const receiver_keys = await postKeys.findPostDecryptionKeyByReceiver(req.headers['x-client-pubkey'], genesis_filter);
+    if (receiver_keys instanceof Error) throw receiver_keys;
 
-    const posts_recieved = await posts.findManyById(reciever_keys.map(key => key.post_id), genesis_filter);
+    const posts_recieved = await posts.findManyById(receiver_keys.map(key => key.post_id), genesis_filter);
     if (posts_recieved instanceof Error) throw posts_recieved;
     let expired_ids = [];
 
@@ -147,7 +147,7 @@ export async function handleGetOthersPosts(req, res) {
     const posts_and_keys = [];
 
     posts_recieved.filter(function (post) {
-      const key = reciever_keys.find(key => key.post_id === post.id);
+      const key = receiver_keys.find(key => key.post_id === post.id);
       key ? posts_and_keys.push({ ...post, decryption_key: key.decryption_key }) : null;
     });
 
@@ -201,7 +201,7 @@ export async function handlePutKeys(req, res) {
         message: errors.array()
       }
     }
-    // check if giver is TRUSTED, or if reciever is OPEN
+    // check if giver is TRUSTED, or if receiver is OPEN
     
     // let is_reference = await posts.isReference(req.body.post_id,request.headers['x-client-pubkey']);
     // if(is_reference instanceof Error) throw is_reference;
@@ -215,7 +215,7 @@ export async function handlePutKeys(req, res) {
     const decryption_keys: PostKeyStoreUpdate[] = request.body.decryption_keys.map((key) => {
       return {
         decryption_key: key['decryption_key'],
-        reciever: key['reciever']
+        receiver: key['receiver']
       }
     });
 

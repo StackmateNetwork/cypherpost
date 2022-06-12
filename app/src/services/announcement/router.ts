@@ -5,12 +5,12 @@ Developed @ Stackmate India
 // ------------------ '(◣ ◢)' ---------------------
 import { Router } from "express";
 import * as val from "express-validator";
-import { badgesMiddleware, handleGetAllBadges, handleGetMyBadges, handleRevokeTrust, handleGiveBadge } from "./dto";
+import { announcementsMiddleware, handleGetAllAnnouncements, handleGetMyAnnouncements, handleRevokeTrust, handleMakeAnnouncement } from "./dto";
 
 // ------------------ '(◣ ◢)' ---------------------
 export const router = Router();
 // ------------------ '(◣ ◢)' ---------------------
-const createBadgeCheck = [
+const createAnnouncementCheck = [
   val.check('recipient').exists(),
   val.check('nonce').exists(), 
   val.check('signature').exists(),
@@ -20,14 +20,14 @@ const revokeTrustBadgeCheck = [
   val.check('revoking').exists()
 ];
 
-const checkGetBadges = [
+const checkGetAnnouncements = [
   val.check('genesis_filter').optional()
 ]
 // ------------------ '(◣ ◢)' ---------------------
-router.use(badgesMiddleware);
-router.post("/:badge",createBadgeCheck, handleGiveBadge);
-router.get("/all",checkGetBadges,handleGetAllBadges);
-router.get("/self",handleGetMyBadges);
-router.post("/:badge/revoke",revokeTrustBadgeCheck, handleRevokeTrust);
+router.use(announcementsMiddleware);
+router.post("/:announcement",createAnnouncementCheck, handleMakeAnnouncement);
+router.get("/all",checkGetAnnouncements,handleGetAllAnnouncements);
+router.get("/self",handleGetMyAnnouncements);
+router.post("/:announcement/revoke",revokeTrustBadgeCheck, handleRevokeTrust);
 // ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------
 

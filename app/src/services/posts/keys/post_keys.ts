@@ -17,7 +17,7 @@ export class CypherpostPostKeys implements PostKeyInterface {
     try {
       let status = await store.removeAllGiver(pubkey);
       if (status instanceof Error) return status;
-      status = await store.removeAllReciever(pubkey);
+      status = await store.removeAllReceiver(pubkey);
       return status;
     }
     catch (e) {
@@ -32,8 +32,8 @@ export class CypherpostPostKeys implements PostKeyInterface {
           genesis: Date.now(),
           giver: giver,
           post_id,
-          reciever: key.reciever,
-          hash: crypto.createHash("sha256").update(`${giver}:${key.reciever}:${post_id}`).digest('hex'),
+          receiver: key.receiver,
+          hash: crypto.createHash("sha256").update(`${giver}:${key.receiver}:${post_id}`).digest('hex'),
           decryption_key: key.decryption_key
         })
       });
@@ -47,7 +47,7 @@ export class CypherpostPostKeys implements PostKeyInterface {
     try {
       let keys = [];
       let updates = await key_update.map(async key => {
-        const status = await store.updateOne(giver, post_id, key.reciever, key.decryption_key);
+        const status = await store.updateOne(giver, post_id, key.receiver, key.decryption_key);
         if (status instanceof Error) throw status;
       });
 
@@ -58,8 +58,8 @@ export class CypherpostPostKeys implements PostKeyInterface {
       handleError(e);
     }
   }
-  async findPostDecryptionKeyByReciever(receiver: string, genesis_filter: Number): Promise<Error | PostDecryptionKey[]> {
-    return store.readByReciever(receiver, genesis_filter);
+  async findPostDecryptionKeyByReceiver(receiver: string, genesis_filter: Number): Promise<Error | PostDecryptionKey[]> {
+    return store.readByReceiver(receiver, genesis_filter);
   }
   
   async findPostDecryptionKeyByGiver(giver: string, genesis_filter: Number): Promise<Error | PostDecryptionKey[]> {
@@ -68,8 +68,8 @@ export class CypherpostPostKeys implements PostKeyInterface {
   async removePostDecryptionKeyById(giver: string, id: string): Promise<boolean | Error> {
     return store.removeManyByPostId(giver, id);
   }
-  async removePostDecryptionKeyByReciever(giver: string, reciever: string): Promise<boolean | Error> {
-    return store.removeManyByReciever(giver, reciever);
+  async removePostDecryptionKeyByReceiver(giver: string, receiver: string): Promise<boolean | Error> {
+    return store.removeManyByReceiver(giver, receiver);
   }
   async removePostDecryptionKeyByGiver(giver: string): Promise<boolean | Error> {
     return store.removeAllGiver(giver);

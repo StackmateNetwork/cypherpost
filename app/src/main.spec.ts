@@ -15,8 +15,8 @@ import { logger } from "./lib/logger/winston";
 import * as express from "./lib/server/express";
 import { DbConnection } from "./lib/storage/interface";
 import { MongoDatabase } from "./lib/storage/mongo";
-import { CypherpostBadges } from "./services/badges/badges";
-import { BadgeType } from "./services/badges/interface";
+import { CypherpostAnnouncements } from "./services/announcement/announcement";
+import { AnnouncementType } from "./services/announcement/interface";
 import { CypherpostIdentity } from "./services/identity/identity";
 import { CypherpostPostKeys } from "./services/posts/keys/post_keys";
 import { CypherpostPosts } from "./services/posts/posts";
@@ -25,7 +25,7 @@ const sinon = require('sinon');
 const bitcoin = new CypherpostBitcoinOps();
 const s5crypto = new S5Crypto();
 const identity = new CypherpostIdentity();
-const badges = new CypherpostBadges();
+const announcements = new CypherpostAnnouncements();
 const posts = new CypherpostPosts();
 const post_keys = new CypherpostPostKeys();
 const db = new MongoDatabase();
@@ -38,7 +38,7 @@ chai.use(chaiHttp);
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 /**
  * Create identities A B C
- * -t> represents trusted badge
+ * -t> represents trusted announcement
  * A -t> B -t> C
  * A allows entire trusted chain (B & C) to view profile and posts
  * A also trusts C
@@ -140,7 +140,7 @@ const init_identity_ds = "m/0h/0h/0h";
 const init_profile_ds = "m/1h/0h/0h";
 const init_preferences_ds = "m/2h/0h/0h"
 const init_posts_ds = "m/3h/0h/0h";
-const trusted_badge = BadgeType.Trusted;
+const trusted_announcement = AnnouncementType.Trusted;
 
 let a_key_set: TestKeySet;
 let b_key_set: TestKeySet;
@@ -161,7 +161,7 @@ let nonce = Date.now();
 let request_signature;
 
 let all_identities;
-let all_badges;
+let all_announcements;
 
 let a_trust = [];
 let b_trust = [];
@@ -269,16 +269,16 @@ async function createIdentityGetRequest(key_set: TestKeySet) {
     pubkey: key_set.identity_pubkey
   }
 }
-async function createBadgeIssueRequest(badge: BadgeType, to_pubkey: string, key_set: TestKeySet) {
-  const endpoint = "/api/v2/badges/trust";
+async function createAnnouncementIssueRequest(announcement: AnnouncementType, to_pubkey: string, key_set: TestKeySet) {
+  const endpoint = "/api/v2/announcement/trust";
   const nonce = Date.now();
 
-  const badge_signature = await bitcoin.sign(`${key_set.identity_pubkey}:${to_pubkey}:${badge.toString()}:${nonce}`, key_set.identity_private) as string;
+  const announcement_signature = await bitcoin.sign(`${key_set.identity_pubkey}:${to_pubkey}:${announcement.toString()}:${nonce}`, key_set.identity_private) as string;
 
   const body = {
     recipient: to_pubkey,
     nonce,
-    signature: badge_signature
+    signature: announcement_signature
   };
 
   const message = `POST ${endpoint} ${JSON.stringify(body)} ${nonce}`;
@@ -293,8 +293,8 @@ async function createBadgeIssueRequest(badge: BadgeType, to_pubkey: string, key_
   }
 }
 
-async function createBadgesGetAllRequest(key_set: TestKeySet) {
-  const endpoint = "/api/v2/badges/all";
+async function createGetAllAnnouncementsRequest(key_set: TestKeySet) {
+  const endpoint = "/api/v2/announcement/all";
   const nonce = Date.now();
   const body = {};
   const message = `GET ${endpoint} ${JSON.stringify(body)} ${nonce}`;
@@ -308,7 +308,7 @@ async function createBadgesGetAllRequest(key_set: TestKeySet) {
   }
 }
 async function createPostRequest(expiry: number, post_set: TestPostSet, key_set: TestKeySet) {
-  const endpoint = "/api/v2/posts";
+  const endpoint = "/api/v2/post";
   const nonce = Date.now();
   const body = {
     expiry,
@@ -329,7 +329,7 @@ async function createPostRequest(expiry: number, post_set: TestPostSet, key_set:
 }
 
 async function editPostRequest(post_set: TestPostSet, key_set: TestKeySet) {
-  const endpoint = "/api/v2/posts/edit";
+  const endpoint = "/api/v2/post/edit";
   const nonce = Date.now();
   const body = {
     post_id: post_set.post_id,
@@ -348,7 +348,7 @@ async function editPostRequest(post_set: TestPostSet, key_set: TestKeySet) {
   }
 }
 async function createPostsGetSelfRequest(key_set: TestKeySet) {
-  const endpoint = "/api/v2/posts/self";
+  const endpoint = "/api/v2/post/self";
   const nonce = Date.now();
   const body = {};
 
@@ -364,7 +364,7 @@ async function createPostsGetSelfRequest(key_set: TestKeySet) {
   }
 }
 async function createPostsGetOthersRequest(key_set: TestKeySet) {
-  const endpoint = "/api/v2/posts/others";
+  const endpoint = "/api/v2/post/others";
   const nonce = Date.now();
   const body = {};
 
@@ -381,7 +381,7 @@ async function createPostsGetOthersRequest(key_set: TestKeySet) {
 }
 
 async function createKeyStoreUpdate(post_set: TestPostSet, trusted_list: string[], key_set: TestKeySet) {
-  const endpoint = "/api/v2/posts/keys";
+  const endpoint = "/api/v2/post/keys";
   const nonce = Date.now();
 
   const body = {
@@ -399,7 +399,7 @@ async function createKeyStoreUpdate(post_set: TestPostSet, trusted_list: string[
     const decryption_key = s5crypto.encryptAESMessageWithIV(post_set.encryption_key, shared_sercret);
     const dk_entry = {
       decryption_key,
-      reciever: trusted_pubkey
+      receiver: trusted_pubkey
     };
     body.decryption_keys.push(dk_entry);
   });
@@ -418,7 +418,7 @@ async function createKeyStoreUpdate(post_set: TestPostSet, trusted_list: string[
 
 
 async function createRevokeTrustRequest(revoke: string, key_set: TestKeySet) {
-  const endpoint = "/api/v2/badges/trust/revoke";
+  const endpoint = "/api/v2/announcement/trust/revoke";
   const body = {
     revoking: revoke,
   };
@@ -467,6 +467,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
       auth: process.env.DB_AUTH,
     };
     sinon.stub(logger, "debug");
+    console.log({connection})
     await db.connect(connection);
     server = await express.start(process.env.TEST_PORT);
     // ------------------ (◣_◢) ------------------
@@ -509,9 +510,9 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     await identity.remove(a_key_set.identity_pubkey);
     await identity.remove(b_key_set.identity_pubkey);
     await identity.remove(c_key_set.identity_pubkey);
-    await badges.removeAllOfUser(a_key_set.identity_pubkey);
-    await badges.removeAllOfUser(b_key_set.identity_pubkey);
-    await badges.removeAllOfUser(c_key_set.identity_pubkey);
+    await announcements.removeAllOfUser(a_key_set.identity_pubkey);
+    await announcements.removeAllOfUser(b_key_set.identity_pubkey);
+    await announcements.removeAllOfUser(c_key_set.identity_pubkey);
     await posts.removeAllByOwner(a_key_set.identity_pubkey);
     await posts.removeAllByOwner(b_key_set.identity_pubkey);
     await posts.removeAllByOwner(c_key_set.identity_pubkey);
@@ -615,7 +616,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     });
   });
 
-  describe("ISSUE TRUST BADGE A->B->C and VERIFY via GET ALL", function () {
+  describe("ISSUE TRUST ANNOUNCEMENT A->B->C and VERIFY via GET ALL", function () {
     let request_a;
     let request_b;
     let request_c;
@@ -623,13 +624,13 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     let request_c_get_all;
 
     it("CREATES REQUEST OBJECTS", async function () {
-      request_a = await createBadgeIssueRequest(BadgeType.Trusted, b_key_set.identity_pubkey, a_key_set);
-      request_b = await createBadgeIssueRequest(BadgeType.Trusted, c_key_set.identity_pubkey, b_key_set);
-      request_c = await createBadgeIssueRequest(BadgeType.Trusted, a_key_set.identity_pubkey, c_key_set);
-      request_c_get_all = await createBadgesGetAllRequest(c_key_set);
+      request_a = await createAnnouncementIssueRequest(AnnouncementType.Trusted, b_key_set.identity_pubkey, a_key_set);
+      request_b = await createAnnouncementIssueRequest(AnnouncementType.Trusted, c_key_set.identity_pubkey, b_key_set);
+      request_c = await createAnnouncementIssueRequest(AnnouncementType.Trusted, a_key_set.identity_pubkey, c_key_set);
+      request_c_get_all = await createGetAllAnnouncementsRequest(c_key_set);
     });
 
-    it("ISSUES TRUST BADGE A->B", function (done) {
+    it("ISSUES TRUST ANNOUNCEMENT A->B", function (done) {
       chai
         .request(server)
         .post(request_a.endpoint)
@@ -645,7 +646,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           done();
         });
     });
-    it("ISSUES TRUST BADGE B->C", function (done) {
+    it("ISSUES TRUST ANNOUNCEMENT B->C", function (done) {
       chai
         .request(server)
         .post(request_b.endpoint)
@@ -661,7 +662,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           done();
         });
     });
-    it("ISSUES TRUST BADGE C->A", function (done) {
+    it("ISSUES TRUST ANNOUNCEMENT C->A", function (done) {
       chai
         .request(server)
         .post(request_c.endpoint)
@@ -677,7 +678,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           done();
         });
     });
-    it("GETS ALL BADGES as C", function (done) {
+    it("GETS ALL ANNOUNCEMENTS as C", function (done) {
       chai
         .request(server)
         .get(request_c_get_all.endpoint)
@@ -688,19 +689,19 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          expect(res.body['badges'].length).to.equal(3);
-          all_badges = res.body['badges'];
+          expect(res.body['announcements'].length).to.equal(3);
+          all_announcements = res.body['announcements'];
           done();
         })
     });
-    it("VERIFIES ALL BADGES ISSUED and POPULATES EACH USER's TRUSTED", function (done) {
-      all_badges.map(async (badge) => {
-        const message = `${badge.giver}:${badge.reciever}:${badge.type}:${badge.nonce}`;
-        const verify = await bitcoin.verify(message, badge.signature, badge.giver);
-        if (!verify) throw "Badge Signature failed.";
-        if (badge.giver === a_key_set.identity_pubkey) a_trust.push(badge.reciever);
-        if (badge.giver === b_key_set.identity_pubkey) b_trust.push(badge.reciever);
-        if (badge.giver === c_key_set.identity_pubkey) c_trust.push(badge.reciever);
+    it("VERIFIES ALL ANNOUNCEMENTS ISSUED and POPULATES EACH USER's TRUSTED", function (done) {
+      all_announcements.map(async (announcement) => {
+        const message = `${announcement.by}:${announcement.to}:${announcement.type}:${announcement.nonce}`;
+        const verify = await bitcoin.verify(message, announcement.signature, announcement.giver);
+        if (!verify) throw "Announcement Signature failed.";
+        if (announcement.by === a_key_set.identity_pubkey) a_trust.push(announcement.to);
+        if (announcement.by === b_key_set.identity_pubkey) b_trust.push(announcement.to);
+        if (announcement.by === c_key_set.identity_pubkey) c_trust.push(announcement.to);
       });
       done();
     });
@@ -884,7 +885,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     });
   });
 
-  describe("UPDATE POST KEYS based on Trust Badges and VERIFY via GET OTHERS", function () {
+  describe("UPDATE POST KEYS based on Trust Announcements and VERIFY via GET OTHERS", function () {
     let request_a;
     let request_b;
     let request_c;
@@ -1097,7 +1098,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     it("CREATES REQUEST OBJECTS", async function () {
       request_a = await createIdentityRegistrationRequest("alivf", a_key_set);
       // console.log({ request_a })
-      request_b = await createBadgeIssueRequest(BadgeType.Trusted, c_key_set.identity_pubkey, b_key_set);
+      request_b = await createAnnouncementIssueRequest(AnnouncementType.Trusted, c_key_set.identity_pubkey, b_key_set);
       request_c = await createKeyStoreUpdate(c_post_set, c_trust, c_key_set);
     });
     it("PREVENTS DUPLICATE IDENTITY", function (done) {
@@ -1117,7 +1118,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           done();
         });
     });
-    it("PREVENTS DUPLICATE TRUST BADGE", function (done) {
+    it("PREVENTS DUPLICATE TRUST ANNOUNCEMENT", function (done) {
       chai
         .request(server)
         .post(request_b.endpoint)

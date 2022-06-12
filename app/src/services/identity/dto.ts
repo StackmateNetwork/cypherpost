@@ -8,7 +8,7 @@ const SERVER_PUBKEY = "ceaf836b3d29dfd686be0a02e3c36ca7f00bc5ed013f92cd176989424
 import { CypherpostBitcoinOps } from "../../lib/bitcoin/bitcoin";
 import { r_500 } from "../../lib/logger/winston";
 import { filterError, parseRequest, respond } from "../../lib/server/handler";
-import { CypherpostBadges } from "../badges/badges";
+import { CypherpostAnnouncements } from "../announcement/announcement";
 import { CypherpostPostKeys } from "../posts/keys/post_keys";
 import { CypherpostPosts } from "../posts/posts";
 import { CypherpostIdentity } from "./identity";
@@ -21,7 +21,7 @@ const TYPE = process.env.TYPE;
 const INVITE_CODE = process.env.SECRET;
 
 const identity = new CypherpostIdentity();
-const badges = new CypherpostBadges();
+const badges = new CypherpostAnnouncements();
 const posts = new CypherpostPosts();
 const posts_keys = new CypherpostPostKeys();
 const bitcoin = new CypherpostBitcoinOps();

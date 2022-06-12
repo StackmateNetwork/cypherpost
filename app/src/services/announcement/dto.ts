@@ -6,16 +6,16 @@ import { r_500 } from "../../lib/logger/winston";
 import { filterError, parseRequest, respond } from "../../lib/server/handler";
 import { CypherpostIdentity } from "../identity/identity";
 import { CypherpostPostKeys } from "../posts/keys/post_keys";
-import { CypherpostBadges } from "./badges";
-import { BadgeType } from "./interface";
+import { CypherpostAnnouncements } from "./announcement";
+import { AnnouncementType } from "./interface";
 
 const { validationResult } = require('express-validator');
 
 const identity = new CypherpostIdentity();
-const badges = new CypherpostBadges();
+const announcements = new CypherpostAnnouncements();
 const postKeys = new CypherpostPostKeys();
 
-export async function badgesMiddleware(req, res, next) {
+export async function announcementsMiddleware(req, res, next) {
   const request = parseRequest(req);
   try {
     const signature = request.headers['x-client-signature'];
@@ -38,7 +38,7 @@ export async function badgesMiddleware(req, res, next) {
   }
 }
 
-export async function handleGetMyBadges(req, res) {
+export async function handleGetMyAnnouncements(req, res) {
   const request = parseRequest(req);
   try {
     const errors = validationResult(req)
@@ -51,14 +51,14 @@ export async function handleGetMyBadges(req, res) {
 
     const genesis_filter = request.query['genesis_filter']?request.query['genesis_filter']:0;
 
-    const given = await badges.findByGiver(request.headers['x-client-pubkey'], genesis_filter);
-    if (given instanceof Error) throw given;
-    const recieved = await badges.findByReciever(request.headers['x-client-pubkey'], genesis_filter);
-    if (recieved instanceof Error) throw recieved;
+    const made = await announcements.findByMaker(request.headers['x-client-pubkey'], genesis_filter);
+    if (made instanceof Error) throw made;
+    const received = await announcements.findByReceiver(request.headers['x-client-pubkey'], genesis_filter);
+    if (received instanceof Error) throw received;
 
     const response = {
-      given,
-      recieved
+      made,
+      received
     };
 
     respond(200, response, res, request);
@@ -69,7 +69,7 @@ export async function handleGetMyBadges(req, res) {
   }
 }
 
-export async function handleGetAllBadges(req, res) {
+export async function handleGetAllAnnouncements(req, res) {
   const request = parseRequest(req);
   try {
     const errors = validationResult(req)
@@ -82,11 +82,11 @@ export async function handleGetAllBadges(req, res) {
 
     const genesis_filter = request.query['genesis_filter']?request.query['genesis_filter']:0;
 
-    const result = await badges.getAll(genesis_filter);
+    const result = await announcements.getAll(genesis_filter);
     if (result instanceof Error) throw result;
 
     const response = {
-      badges: result,
+      announcements: result,
     };
 
     respond(200, response, res, request);
@@ -97,7 +97,7 @@ export async function handleGetAllBadges(req, res) {
   }
 }
 
-export async function handleGiveBadge(req, res) {
+export async function handleMakeAnnouncement(req, res) {
   const request = parseRequest(req);
   try {
     const errors = validationResult(req)
@@ -113,27 +113,27 @@ export async function handleGiveBadge(req, res) {
         message: "Trust in self implied."
       }
     }
-    let badge= BadgeType.Trusted;
+    let announcement= AnnouncementType.Trusted;
 
-    switch (request.params.badge.toUpperCase()){
+    switch (request.params.announcement.toUpperCase()){
       case 'TRUST': 
-        badge = BadgeType.Trusted;
+        announcement = AnnouncementType.Trusted;
         break;
       case 'SCAMMER':
-        badge = BadgeType.Scammer;
+        announcement = AnnouncementType.Scammer;
         break;
       case 'BUY':
-        badge= BadgeType.Buy;
+        announcement= AnnouncementType.Buy;
         break;
         case "SELL":
-          badge= BadgeType.Sell;
+          announcement= AnnouncementType.Sell;
           break;
       default:
-        badge = BadgeType.Trusted;
+        announcement = AnnouncementType.Trusted;
         break;  
     }
 
-    let status = await badges.create(request.headers['x-client-pubkey'], request.body.recipient, BadgeType.Trusted, request.body.nonce, request.body.signature);
+    let status = await announcements.create(request.headers['x-client-pubkey'], request.body.recipient, AnnouncementType.Trusted, request.body.nonce, request.body.signature);
     if (status instanceof Error) throw status;
 
     const response = {
@@ -160,10 +160,10 @@ export async function handleRevokeTrust(req, res) {
       }
     }
 
-    let status = await badges.revoke(request.headers['x-client-pubkey'], request.body.revoking, BadgeType.Trusted);
+    let status = await announcements.revoke(request.headers['x-client-pubkey'], request.body.revoking, AnnouncementType.Trusted);
     if (status instanceof Error) throw status;
     // REMOVE ALL RELATED KEYS
-    status = await postKeys.removePostDecryptionKeyByReciever(request.headers['x-client-pubkey'],request.body.revoking);
+    status = await postKeys.removePostDecryptionKeyByReceiver(request.headers['x-client-pubkey'],request.body.revoking);
     if (status instanceof Error) throw status;
     
     const response = {

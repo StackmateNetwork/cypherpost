@@ -3,8 +3,8 @@
 cd src/services/identity
 mocha -r ts-node/register identity.spec.ts --exit
 
-cd ../badges
-mocha -r ts-node/register badges.spec.ts --exit
+cd ../announcement
+mocha -r ts-node/register announcement.spec.ts --exit
 
 cd ../posts
 mocha -r ts-node/register posts.spec.ts --exit
