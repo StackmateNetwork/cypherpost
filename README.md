@@ -1,6 +1,6 @@
 # cypherpost
 
-## A centralized, encrypted data store, enabling client-side applications that require end-to-end encryption and selective visibility of content.
+## A centralized, encrypted data store, enabling client-side applications that require end-to-end encryption, selective visibility of content and building a network of trust.
 
 - Your identity on the platform is a `username:pubkey`
 - All your posts are encrypted custom json strings.
