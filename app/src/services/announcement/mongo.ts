@@ -132,7 +132,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
       }
 
       if (docs.length > 0) {
-        const badges = docs.map(doc => {
+        const announcements = docs.map(doc => {
           return {
             genesis: doc["genesis"],
             hash: doc["hash"],
@@ -143,7 +143,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
             nonce: doc["nonce"],
           }
         });
-        return badges;
+        return announcements;
       } else {
         return [];
       }
@@ -159,7 +159,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
       }
 
       if (docs.length > 0) {
-        const badges = docs.map(doc => {
+        const announcements = docs.map(doc => {
           return {
             genesis: doc["genesis"],
             hash: doc["hash"],
@@ -171,7 +171,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
 
           }
         });
-        return badges;
+        return announcements;
       } else {
         return [];
       }
@@ -188,7 +188,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
       }
 
       if (docs.length > 0) {
-        const badges = docs.map(doc => {
+        const announcements = docs.map(doc => {
           return {
             genesis: doc["genesis"],
             hash: doc["hash"],
@@ -199,7 +199,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
             nonce: doc["nonce"],
           }
         });
-        return badges;
+        return announcements;
       } else
         return [];
 

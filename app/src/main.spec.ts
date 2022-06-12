@@ -695,12 +695,12 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     });
     it("VERIFIES ALL ANNOUNCEMENTS ISSUED and POPULATES EACH USER's TRUSTED", function (done) {
       all_announcements.map(async (announcement) => {
-        const message = `${announcement.giver}:${announcement.reciever}:${announcement.type}:${announcement.nonce}`;
+        const message = `${announcement.by}:${announcement.to}:${announcement.type}:${announcement.nonce}`;
         const verify = await bitcoin.verify(message, announcement.signature, announcement.giver);
         if (!verify) throw "Announcement Signature failed.";
-        if (announcement.giver === a_key_set.identity_pubkey) a_trust.push(announcement.reciever);
-        if (announcement.giver === b_key_set.identity_pubkey) b_trust.push(announcement.reciever);
-        if (announcement.giver === c_key_set.identity_pubkey) c_trust.push(announcement.reciever);
+        if (announcement.by === a_key_set.identity_pubkey) a_trust.push(announcement.to);
+        if (announcement.by === b_key_set.identity_pubkey) b_trust.push(announcement.to);
+        if (announcement.by === c_key_set.identity_pubkey) c_trust.push(announcement.to);
       });
       done();
     });

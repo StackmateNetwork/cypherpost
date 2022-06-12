@@ -86,7 +86,7 @@ export async function handleGetAllAnnouncements(req, res) {
     if (result instanceof Error) throw result;
 
     const response = {
-      badges: result,
+      announcements: result,
     };
 
     respond(200, response, res, request);
@@ -113,23 +113,23 @@ export async function handleMakeAnnouncement(req, res) {
         message: "Trust in self implied."
       }
     }
-    let badge= AnnouncementType.Trusted;
+    let announcement= AnnouncementType.Trusted;
 
-    switch (request.params.badge.toUpperCase()){
+    switch (request.params.announcement.toUpperCase()){
       case 'TRUST': 
-        badge = AnnouncementType.Trusted;
+        announcement = AnnouncementType.Trusted;
         break;
       case 'SCAMMER':
-        badge = AnnouncementType.Scammer;
+        announcement = AnnouncementType.Scammer;
         break;
       case 'BUY':
-        badge= AnnouncementType.Buy;
+        announcement= AnnouncementType.Buy;
         break;
         case "SELL":
-          badge= AnnouncementType.Sell;
+          announcement= AnnouncementType.Sell;
           break;
       default:
-        badge = AnnouncementType.Trusted;
+        announcement = AnnouncementType.Trusted;
         break;  
     }
 

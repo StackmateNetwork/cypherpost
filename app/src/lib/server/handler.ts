@@ -292,7 +292,7 @@ export interface S5Input {
   amount?: number;
   filter?:object;
   post_id?:string;
-  badge?: string;
+  announcement?: string;
 
 };
 
