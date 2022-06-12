@@ -23,7 +23,7 @@ async function downloadAllIdentities(identity_parent) {
   }
 }
 
-async function downloadAllIdentitiesAndBadges(identity_parent) {
+async function downloadAllIdentitiesAndAnnouncements(identity_parent) {
 
   const identities = await api.getAllIdentities(identity_parent)
   if (identities instanceof Error) return identities;
@@ -35,15 +35,15 @@ async function downloadAllIdentitiesAndBadges(identity_parent) {
   const my_identity = local_ids.find((identity) => identity.pubkey == identity_parent.pubkey);
   store.setMyUsername(my_identity.username);
 
-  const all_badges = await api.getAllBadges(identity_parent);
-  if (all_badges instanceof Error) return all_badges;
-  const all_badges_store = store.setAllBadges(all_badges);
+  const all_announcements = await api.getAllAnnouncements(identity_parent);
+  if (all_announcements instanceof Error) return all_announcements;
+  const all_announcements_store = store.setAllAnnouncements(all_announcements);
 
-  const my_badges = await api.getMyBadges(identity_parent);
-  if (my_badges instanceof Error) return my_badges;
-  const my_badges_store = store.setMyBadges(my_badges);
+  const my_announcements = await api.getMyAnnouncements(identity_parent);
+  if (my_announcements instanceof Error) return my_announcements;
+  const my_announcements_store = store.setMyAnnouncements(my_announcements);
 
-  return my_badges_store && all_badges_store && id_store;
+  return my_announcements_store && all_announcements_store && id_store;
 }
 
 async function downloadAllMyPosts(identity_parent) {
@@ -267,14 +267,14 @@ async function createCypherMessagePost(
   return trade_id;
 };
 function getMyTrustedIdentities() {
-  const trusted_badges = store
-    .getMyBadges()['given']
-    .filter((badge_given) => {
-      if (badge_given.type === TRUST) {
-        return badge_given;
+  const trusted_announcements = store
+    .getMyAnnouncements()['made']
+    .filter((announcements_made) => {
+      if (announcements_made.type === TRUST) {
+        return announcements_made;
       }
     });
-  const trusted_pubkeys = trusted_badges.map((badge) => badge.reciever);
+  const trusted_pubkeys = trusted_announcements.map((announcement) => announcement.to);
 
   const trusted_identities = [];
   trusted_pubkeys.map((pubkey) => {
@@ -289,9 +289,9 @@ function getMyTrustByOneDegree() {
   const trusted_identities = getMyTrustedIdentities();
   let one_degree_trusted = [];
   trusted_identities.map((identity) => {
-    const pubkeys_one_degree = store.getAllBadges.filter((badge) => {
-      if (badge.giver === identity.pubkey && badge.type === TRUST) {
-        return badge.reciever
+    const pubkeys_one_degree = store.getAllAnnouncements.filter((announcement) => {
+      if (announcement.by === identity.pubkey && announcement.type === TRUST) {
+        return announcement.to
       };
     });
     one_degree_trusted.push({ ...identity, trusting: pubkeys_one_degree });
@@ -303,41 +303,41 @@ function getMyTrustByOneDegree() {
 
 function getAllScammers() {
   return store
-    .getAllBadges()
-    .filter((badge) => badge.type === SCAMMER);
+    .getAllAnnouncements()
+    .filter((announcement) => announcement.type === SCAMMER);
 };
 
-function getBadgesByPubkey(pubkey) {
-  let given = [];
-  let recieved = [];
-  store.getAllBadges().filter((badge) => {
-    if (badge.giver === pubkey) given.push(badge);
-    if (badge.reciever === pubkey) recieved.push(badge);
+function getAnnouncementsByPubkey(pubkey) {
+  let made = [];
+  let received = [];
+  store.getAllAnnouncements().filter((announcement) => {
+    if (announcement.giver === pubkey) made.push(announcement);
+    if (announcement.reciever === pubkey) received.push(announcement);
   });
   return {
     given,
-    recieved
+    received
   }
 }
 
 async function trustPubkey(identity_parent, pubkey) {
-  const response = await api.giveBadge(identity_parent, pubkey, TRUST);
+  const response = await api.makeAnnouncement(identity_parent, pubkey, TRUST);
   return response;
 }
 async function revokeTrustPubkey(identity_parent, pubkey) {
-  const response = await api.revokeBadge(identity_parent, pubkey, TRUST);
+  const response = await api.revokeAnnouncement(identity_parent, pubkey, TRUST);
   return response;
 }
 
 module.exports = {
   downloadAllIdentities,
-  downloadAllIdentitiesAndBadges,
+  downloadAllIdentitiesAndAnnouncements,
   downloadAllMyPosts,
   downloadAllPostsForMe,
   createCypherProfilePost,
   createCypherPreferencePost,
   createCypherTradePost,
-  getBadgesByPubkey,
+  getAnnouncementsByPubkey,
   trustPubkey,
   revokeTrustPubkey,
   createCypherMessagePost

@@ -399,7 +399,7 @@ async function createKeyStoreUpdate(post_set: TestPostSet, trusted_list: string[
     const decryption_key = s5crypto.encryptAESMessageWithIV(post_set.encryption_key, shared_sercret);
     const dk_entry = {
       decryption_key,
-      reciever: trusted_pubkey
+      receiver: trusted_pubkey
     };
     body.decryption_keys.push(dk_entry);
   });
@@ -467,6 +467,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
       auth: process.env.DB_AUTH,
     };
     sinon.stub(logger, "debug");
+    console.log({connection})
     await db.connect(connection);
     server = await express.start(process.env.TEST_PORT);
     // ------------------ (◣_◢) ------------------

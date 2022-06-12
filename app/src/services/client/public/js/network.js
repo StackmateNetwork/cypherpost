@@ -8,10 +8,10 @@ const util = require("./util");
 // console.log({ existing_usernames });
 // console.log({ trusting_usernames });
 // console.log({ search_usernames });
-async function getUpdatedIdsAndBadges() {
+async function getUpdatedIdsAndAnnouncements() {
   const keys = store.getMyKeyChain();
-  const status = await comps.downloadAllIdentitiesAndBadges(keys.identity);
-  const merged = util.mergeIdentitiesWithBadges(store.getIdentities(), store.getAllBadges());
+  const status = await comps.downloadAllIdentitiesAndAnnouncements(keys.identity);
+  const merged = util.mergeIdentitiesWithBadges(store.getIdentities(), store.getAllAnnouncements());
   return merged;
 }
 
@@ -22,32 +22,32 @@ async function displayIdentity(identity) {
   document.getElementById("network_profile_username").textContent = identity.username;
   document.getElementById("network_profile_pubkey").textContent = identity.pubkey;
 
-  const my_badges = comps.getBadgesByPubkey(store.getMyKeyChain().identity.pubkey);
+  const my_announcements = comps.getAnnouncementsByPubkey(store.getMyKeyChain().identity.pubkey);
 
-  const my_given_pubkeys = my_badges.given.map((badge)=>badge.reciever);
-  const my_recieved_pubkeys = my_badges.recieved.map((badge)=>badge.giver);
+  const my_given_pubkeys = my_announcements.made.map((announcement)=>announcement.to);
+  const my_recieved_pubkeys = my_announcements.received.map((announcement)=>announcement.by);
 
-  const selected_id_badges = comps.getBadgesByPubkey(identity.pubkey);
-  console.log({badges: selected_id_badges});
+  const selected_id_announcements = comps.getAnnouncementsByPubkey(identity.pubkey);
+  console.log({badges: selected_id_announcements});
 
-  const given_pubkeys = selected_id_badges.given.map((badge)=>badge.reciever);// ensure  only trusted badge
+  const given_pubkeys = selected_id_announcements.given.map((announcement)=>announcement.to);// ensure  only trusted badge
   const given_identities = store.getIdentities(identity).filter(id=>given_pubkeys.includes(id.pubkey));
 
-  const recieved_pubkeys = selected_id_badges.recieved.map((badge)=>badge.giver);// ensure  only trusted badge
+  const recieved_pubkeys = selected_id_announcements.recieved.map((announcement)=>announcement.by);// ensure  only trusted badge
   const recieved_identities = store.getIdentities(identity).filter(id=>recieved_pubkeys.includes(id.pubkey));
   
   console.log({given_identities,recieved_identities})
-  document.getElementById("network_badges_given").textContent = selected_id_badges.given.length;
+  document.getElementById("network_badges_given").textContent = selected_id_announcements.given.length;
   
-  const hover_given = selected_id_badges.given.length===0
+  const hover_given = selected_id_announcements.given.length===0
     ?"None"
     :`${given_identities.map((id)=>id.username).toString()}`;
   document.getElementById("list_of_trusting").innerHTML = `Trusting: <span class="contact_info">${hover_given}</span>`
 
 
-  document.getElementById("network_badges_recieved").textContent = selected_id_badges.recieved.length;
+  document.getElementById("network_badges_recieved").textContent = selected_id_announcements.recieved.length;
 
-  const hover_recieved = selected_id_badges.recieved.length===0
+  const hover_recieved = selected_id_announcements.recieved.length===0
     ?"None"
     :`${recieved_identities.map((id)=>id.username).toString()}`;
 
@@ -65,17 +65,17 @@ async function displayIdentity(identity) {
 
 function displaySearchIdBs(idbs) {
   document.getElementById('search_userlist').innerHTML = "";
-  idbs.map((id_and_badges) => {
-    let trusted_badges = [];
+  idbs.map((id_and_announcements) => {
+    let trust_announcements = [];
     let in_person_badges = [];
-    let scammer_badges = [];
-    id_and_badges.badges.recieved.map((badge) => {
-      if (badge.type === TRUST)
-        trusted_badges.push(badge);
-      if (badge.type === SCAMMER)
-        scammer_badges.push(badge);
+    let scam_announcements = [];
+    id_and_announcements.announcements.recieved.map((announcement) => {
+      if (announcement.type === TRUST)
+        trust_announcements.push(announcement);
+      if (announcement.type === SCAMMER)
+        scam_announcements.push(announcement);
     });
-    document.getElementById('search_userlist').innerHTML += `<div id="search_item_${id_and_badges.pubkey}" class="row"><div class="col-6 outline leftme">${id_and_badges.username}</div><div id="trust_${id_and_badges.pubkey}" class="col-3 outline"><i class="fas fa-shield-alt n_badges" aria-hidden="true"></i>${trusted_badges.length}</div><div class="col-3 outline"><i class="fas fa-ban n_badges" aria-hidden="true"></i>${scammer_badges.length}</div></div><hr>`
+    document.getElementById('search_userlist').innerHTML += `<div id="search_item_${id_and_announcements.pubkey}" class="row"><div class="col-6 outline leftme">${id_and_announcements.username}</div><div id="trust_${id_and_announcements.pubkey}" class="col-3 outline"><i class="fas fa-shield-alt n_badges" aria-hidden="true"></i>${trust_announcements.length}</div><div class="col-3 outline"><i class="fas fa-ban n_badges" aria-hidden="true"></i>${scam_announcements.length}</div></div><hr>`
   });
   return;
 }
@@ -84,7 +84,7 @@ function displaySearchIdBs(idbs) {
 async function loadNetworkEvents() {
 
 
-  const all_idbs = await getUpdatedIdsAndBadges();
+  const all_idbs = await getUpdatedIdsAndAnnouncements();
   console.log({ merged_idbs: all_idbs });
   if (all_idbs instanceof Error) {
     alert("Error initializing Network.");

@@ -18,7 +18,7 @@ const post_key_schema = new mongoose.Schema(
       required: true,
       index: true
     },
-    reciever: {
+    receiver: {
       type: String,
       required: true,
       index: true,
@@ -48,9 +48,9 @@ const post_key_schema = new mongoose.Schema(
 const postKeyStore = mongoose.model("post_key", post_key_schema);
 // ------------------ '(◣ ◢)' ---------------------
 export class MongoPostKeyStore implements PostDecryptionKeyStore {
-  async removeAllReciever(reciever: string): Promise<boolean | Error> {
+  async removeAllReceiver(receiver: string): Promise<boolean | Error> {
     try {
-      const query = { reciever };
+      const query = { receiver };
 
       const status = await postKeyStore.deleteMany(query)
       if (status instanceof Error) {
@@ -98,7 +98,7 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
             genesis: doc["genesis"],
             expiry: doc["expiry"],
             giver: doc["giver"],
-            reciever: doc["reciever"],
+            receiver: doc["receiver"],
             post_id: doc["post_id"],
             hash: doc['hash'],
             decryption_key: doc["decryption_key"],
@@ -112,9 +112,9 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
       return handleError(e);
     }
   }
-  async readByReciever(reciever: string, genesis_filter: Number): Promise<PostDecryptionKey[] | Error> {
+  async readByReceiver(receiver: string, genesis_filter: Number): Promise<PostDecryptionKey[] | Error> {
     try {
-      const query = { reciever: { $in: reciever } , genesis: {$gte: genesis_filter } };
+      const query = { receiver: { $in: receiver } , genesis: {$gte: genesis_filter } };
 
       const docs = await postKeyStore.find(query).sort({ "genesis": -1 }).exec();
       if (docs instanceof Error) {
@@ -127,7 +127,7 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
             genesis: doc["genesis"],
             expiry: doc["expiry"],
             giver: doc["giver"],
-            reciever: doc["reciever"],
+            receiver: doc["receiver"],
             post_id: doc["post_id"],
             hash: doc['hash'],
             decryption_key: doc["decryption_key"],
@@ -156,7 +156,7 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
             genesis: doc["genesis"],
             expiry: doc["expiry"],
             giver: doc["giver"],
-            reciever: doc["reciever"],
+            receiver: doc["receiver"],
             post_id: doc["post_id"],
             hash: doc['hash'],
             decryption_key: doc["decryption_key"],
@@ -183,9 +183,9 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
       return handleError(e);
     }
   }
-  async removeManyByReciever(giver: string, reciever: string): Promise<boolean | Error> {
+  async removeManyByReceiver(giver: string, receiver: string): Promise<boolean | Error> {
     try {
-      const query = { giver, reciever };
+      const query = { giver, receiver };
 
       const status = await postKeyStore.deleteMany(query)
       if (status instanceof Error) {
@@ -211,12 +211,12 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
       return handleError(e);
     }
   }
-  async updateOne(giver: string, post_id: string, reciever: string, decryption_key: string): Promise<boolean | Error> {
+  async updateOne(giver: string, post_id: string, receiver: string, decryption_key: string): Promise<boolean | Error> {
     try {
       const query = {
         giver,
         post_id,
-        reciever,
+        receiver,
       };
 
       const update = {

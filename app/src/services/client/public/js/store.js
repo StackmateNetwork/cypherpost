@@ -46,50 +46,50 @@ function setIdentities(identities) {
 }
 
 
-function getAllBadges() {
-  const all_badges = sessionStorage.getItem("all_badges");
-  return (all_badges) ? JSON.parse(all_badges) : []
+function getAllAnnouncements() {
+  const all_announcements = sessionStorage.getItem("all_announcements");
+  return (all_announcements) ? JSON.parse(all_announcements) : []
 }
 
-function setAllBadges(all_badges) {
-  const existing = getAllBadges();
+function setAllAnnouncements(all_announcements) {
+  const existing = getAllAnnouncements();
 
   if (existing.length === 0)
-    sessionStorage.setItem(`all_badges`, JSON.stringify(all_badges));
+    sessionStorage.setItem(`all_announcements`, JSON.stringify(all_announcements));
   else {
-    const updates = all_badges.filter((badge => {
-      const in_existing = existing.find((existing_badge) => existing_badge.hash === badge.hash);
-      if (!in_existing) return badge;
+    const updates = all_announcements.filter((announcement => {
+      const in_existing = existing.find((existing_announcement) => existing_announcement.hash === announcement.hash);
+      if (!in_existing) return announcement;
       else return;
     }));
     updates.map((update) => {
       existing.push(update);
     })
-    sessionStorage.setItem(`all_badges`, JSON.stringify(existing));
+    sessionStorage.setItem(`all_announcements`, JSON.stringify(existing));
   }
   return true;
 }
 
-function getMyBadges(my_badges) {
-  sessionStorage.getItem(`my_badges`, JSON.stringify(my_badges));
-  return (my_badges) ? JSON.parse(my_badges) : {given: [], recieved: []}
+function getMyAnnouncements(my_announcements) {
+  sessionStorage.getItem(`my_announcements`, JSON.stringify(my_announcements));
+  return (my_announcements) ? JSON.parse(my_announcements) : {given: [], recieved: []}
 }
 
-function setMyBadges(my_badges) {
-  const existing = getMyBadges();
+function setMyAnnouncements(my_announcements) {
+  const existing = getMyAnnouncements();
 
   if (existing.given.length===0 && existing.recieved.length === 0)
-    sessionStorage.setItem(`my_badges`, JSON.stringify(my_badges));
+    sessionStorage.setItem(`my_announcements`, JSON.stringify(my_announcements));
   else {
-    const given_updates = my_badges.given.filter((badge => {
-      const in_existing = existing.given.find((existing_badge) => existing_badge.hash === badge.hash);
-      if (!in_existing) return badge;
+    const given_updates = my_announcements.given.filter((announcement => {
+      const in_existing = existing.given.find((existing_announcement) => existing_announcement.hash === announcement.hash);
+      if (!in_existing) return announcement;
       else return;
     }));
 
-    const recieved_updates = my_badges.recieved.filter((badge => {
-      const in_existing = existing.recieved.find((existing_badge) => existing_badge.hash === badge.hash);
-      if (!in_existing) return badge;
+    const recieved_updates = my_announcements.recieved.filter((announcement => {
+      const in_existing = existing.recieved.find((existing_announcement) => existing_announcement.hash === announcement.hash);
+      if (!in_existing) return announcement;
       else return;
     }));
 
@@ -100,7 +100,7 @@ function setMyBadges(my_badges) {
     recieved_updates.map((update) => {
       existing.recieved.push(update);
     });
-    sessionStorage.setItem(`my_badges`, JSON.stringify(existing));
+    sessionStorage.setItem(`my_announcements`, JSON.stringify(existing));
   }
   return true;
 
@@ -365,8 +365,8 @@ function getLocalPrice() {
 module.exports = {
   setIdentities,
   getIdentities,
-  setAllBadges,
-  getAllBadges,
+  setAllAnnouncements,
+  getAllAnnouncements,
   setMyProfile,
   getMyProfile,
   setMyKeyChain,
@@ -385,7 +385,7 @@ module.exports = {
   getMyPreferences,
   getMyMessages,
   setMyMessages,
-  setMyBadges,
+  setMyAnnouncements,
   checkMnemonic,
   updateSelectedIdentity,
   getSelectedIdentity,
@@ -400,5 +400,5 @@ module.exports = {
   getMyUsername,
   getLocalPrice,
   setLocalPrice,
-  getMyBadges,
+  getMyAnnouncements,
 }

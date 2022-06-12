@@ -34,10 +34,10 @@ async function createRequestSignature(method, resource, body, identity_parent, n
   return await keynos.schnorrSign(request_message, identity_parent.privkey);
 };
 
-async function createBadgeSignature(identity_parent, reciever_pubkey, type, nonce) {
-  const badge_message = `${identity_parent.pubkey}:${reciever_pubkey}:${type}:${nonce}`;
-  console.log({ badge_message })
-  return await keynos.schnorrSign(badge_message, identity_parent.privkey);
+async function createAnnouncementSignature(identity_parent, reciever_pubkey, type, nonce) {
+  const announcement_message = `${identity_parent.pubkey}:${reciever_pubkey}:${type}:${nonce}`;
+  console.log({ announcement_message })
+  return await keynos.schnorrSign(announcement_message, identity_parent.privkey);
 }
 async function getServerIdentity(identity_parent) {
 
@@ -114,13 +114,13 @@ async function deleteMyIdentity(identity_parent) {
   return response.status;
 
 }
-async function getAllBadges(identity_parent) {
-  const existing = store.getAllBadges();
+async function getAllAnnouncements(identity_parent) {
+  const existing = store.getAllAnnouncements();
   const genesis_filter =  (existing.length>0)
   ?existing.pop().genesis
   :0;
   const nonce = Date.now();
-  const resource = "/badges/all?genesis_filter=" + genesis_filter;
+  const resource = "/announcement/all?genesis_filter=" + genesis_filter;
   const url = api_url + resource;
   const method = "GET";
   const body = {};
@@ -131,16 +131,16 @@ async function getAllBadges(identity_parent) {
   const response = await request(method, url, headers, body);
   if (response instanceof Error) return response;
 
-  return response.badges;
+  return response.announcements;
 }
-async function getMyBadges(identity_parent){
+async function getMyAnnouncements(identity_parent){
   
-  const existing = store.getMyBadges();
+  const existing = store.getMyAnnouncements();
   const genesis_filter =  (existing.length>0)
   ?existing.pop().genesis
   :0;
   const nonce = Date.now();
-  const resource = "/badges/self?genesis_filter="+genesis_filter;
+  const resource = "/announcement/self?genesis_filter="+genesis_filter;
   const url = api_url + resource;
   const method = "GET";
   const body = {};
@@ -154,17 +154,17 @@ async function getMyBadges(identity_parent){
   return response;
 }
 
-async function giveBadge(identity_parent, reciever, badge_type) {
+async function makeAnnouncement(identity_parent, reciever, announcement_type) {
   let nonce = Date.now();
-  const badge_signature = await createBadgeSignature(identity_parent, reciever, badge_type.toUpperCase(), nonce);
-  const resource = "/badges/" + badge_type.toLowerCase();
+  const announcement_signature = await createAnnouncementSignature(identity_parent, reciever, announcement_type.toUpperCase(), nonce);
+  const resource = "/announcement/" + announcement_type.toLowerCase();
   const url = api_url + resource;
   const method = "POST";
 
   const body = {
     recipient: reciever,
     nonce,
-    signature: badge_signature
+    signature: announcement_signature
   };
 
   console.log({body});
@@ -178,9 +178,9 @@ async function giveBadge(identity_parent, reciever, badge_type) {
   return response.status;
 }
 
-async function revokeBadge(identity_parent, reciever, badge_type) {
+async function revokeAnnouncement(identity_parent, reciever, announcement_type) {
   let nonce = Date.now();
-  const resource = "/badges/" + badge_type.toLowerCase() + "/revoke";
+  const resource = "/announcement/" + announcement_type.toLowerCase() + "/revoke";
   const url = api_url + resource;
   const method = "POST";
 
@@ -301,12 +301,12 @@ module.exports = {
   getAllIdentities,
   getMyPosts,
   getPostsForMe,
-  getAllBadges,
-  giveBadge,
+  getAllAnnouncements,
+  makeAnnouncement,
   deleteMyIdentity,
   createPost,
   setPostVisibility,
   deletePost,
-  getMyBadges,
-  revokeBadge,
+  getMyAnnouncements,
+  revokeAnnouncement,
 }

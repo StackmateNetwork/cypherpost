@@ -130,16 +130,16 @@ describe("Initalizing Test: Badge Service", function () {
       const response = await announcement.findByMaker(ecdsa_keys.pubkey,genesis_filter);
       expect(response[0]['by']===ecdsa_keys.pubkey).to.equal(true);
     });
-    it("FIND announcements by reciever", async function () {
-      const response = await announcement.findByReciever(ecdsa_keys1.pubkey,genesis_filter);
+    it("FIND announcements by receiver", async function () {
+      const response = await announcement.findByReceiver(ecdsa_keys1.pubkey,genesis_filter);
       expect(response[0]['to']===ecdsa_keys1.pubkey).to.equal(true);
     });
     it("FIND announcements by maker w/ upto date genesis_filter", async function () {
       const response = await announcement.findByMaker(xpub,Date.now()) as Announcement[];
       expect(response.length).to.equal(0);
     });
-    it("FIND announcements by reciever w/ upto date genesis_filter", async function () {
-      const response = await announcement.findByReciever(ecdsa_keys1.pubkey,Date.now()) as Announcement[];;
+    it("FIND announcements by receiver w/ upto date genesis_filter", async function () {
+      const response = await announcement.findByReceiver(ecdsa_keys1.pubkey,Date.now()) as Announcement[];;
       expect(response.length).to.equal(0);
     });
     it("FIND 0 announcements w/ upto data genesis_filter", async function () {
@@ -152,7 +152,7 @@ describe("Initalizing Test: Badge Service", function () {
       expect(response).to.equal(true);
     });
     it("FIND 0 announcements post revoke", async function () {
-      const response = await announcement.findByReciever(ecdsa_keys1.pubkey,genesis_filter);
+      const response = await announcement.findByReceiver(ecdsa_keys1.pubkey,genesis_filter);
       if (response instanceof Error) throw response
       expect(response.length === 0).to.equal(true);
     });

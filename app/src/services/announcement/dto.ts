@@ -51,14 +51,14 @@ export async function handleGetMyAnnouncements(req, res) {
 
     const genesis_filter = request.query['genesis_filter']?request.query['genesis_filter']:0;
 
-    const given = await announcements.findByMaker(request.headers['x-client-pubkey'], genesis_filter);
-    if (given instanceof Error) throw given;
-    const recieved = await announcements.findByReciever(request.headers['x-client-pubkey'], genesis_filter);
-    if (recieved instanceof Error) throw recieved;
+    const made = await announcements.findByMaker(request.headers['x-client-pubkey'], genesis_filter);
+    if (made instanceof Error) throw made;
+    const received = await announcements.findByReceiver(request.headers['x-client-pubkey'], genesis_filter);
+    if (received instanceof Error) throw received;
 
     const response = {
-      given,
-      recieved
+      made,
+      received
     };
 
     respond(200, response, res, request);
@@ -163,7 +163,7 @@ export async function handleRevokeTrust(req, res) {
     let status = await announcements.revoke(request.headers['x-client-pubkey'], request.body.revoking, AnnouncementType.Trusted);
     if (status instanceof Error) throw status;
     // REMOVE ALL RELATED KEYS
-    status = await postKeys.removePostDecryptionKeyByReciever(request.headers['x-client-pubkey'],request.body.revoking);
+    status = await postKeys.removePostDecryptionKeyByReceiver(request.headers['x-client-pubkey'],request.body.revoking);
     if (status instanceof Error) throw status;
     
     const response = {

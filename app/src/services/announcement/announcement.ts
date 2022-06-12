@@ -52,11 +52,11 @@ export class CypherpostAnnouncements implements AnnouncementInterface {
   findByMaker(by: string, genesis_filter: Number): Promise<Error | Announcement[]> {
     return store.readByMaker(by,genesis_filter);
   }
-  findByReciever(to: string,genesis_filter: Number): Promise<Error | Announcement[]> {
-    return store.readByReciever(to,genesis_filter);
+  findByReceiver(to: string,genesis_filter: Number): Promise<Error | Announcement[]> {
+    return store.readByReceiver(to,genesis_filter);
   }
   revoke(by: string, to: string, type: AnnouncementType): Promise<boolean | Error> {
-    return store.removeByReciever(by,to, type);
+    return store.removeByReceiver(by,to, type);
   }
 
 }

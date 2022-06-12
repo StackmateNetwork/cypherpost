@@ -70,7 +70,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
       return handleError(e);
     }
   }
-  async removeByReciever(by: string, to: string, type: AnnouncementType): Promise<boolean | Error> {
+  async removeByReceiver(by: string, to: string, type: AnnouncementType): Promise<boolean | Error> {
     try {
       const query = { by: by, to: to, type };
 
@@ -179,7 +179,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
       return handleError(e);
     }
   }
-  async readByReciever(to: string,  genesis_filter: Number): Promise<Announcement[] | Error> {
+  async readByReceiver(to: string,  genesis_filter: Number): Promise<Announcement[] | Error> {
     try {
       const query = { to: { $in: to },  genesis: {$gte: genesis_filter} };
       const docs = await announcementStore.find(query).sort({ "genesis": -1 }).exec();
