@@ -9,10 +9,14 @@ import { PostKeyStoreUpdate } from "./keys/interface";
 import { CypherpostPostKeys } from "./keys/post_keys";
 import { CypherpostPosts } from "./posts";
 const { validationResult } = require('express-validator');
+import * as WebSocket from 'ws';
 
 const posts = new CypherpostPosts();
 const identity = new CypherpostIdentity();
 const postKeys = new CypherpostPostKeys();
+
+// expressWs(express)
+
 
 export async function postMiddleware(req, res, next) {
   const request = parseRequest(req);
@@ -25,12 +29,15 @@ export async function postMiddleware(req, res, next) {
     const resource = request.resource;
     const body = JSON.stringify(request.body);
     const message = `${method} ${resource} ${body} ${nonce}`;
-
-    const status = await identity.authenticate(pubkey, message, signature);
-    // console.log({pubkey,signature,message,status})
-
-    if (status instanceof Error) throw status;
-    else next();
+    console.log({resource});
+    if(resource === '/api/v2/post/key/stream') next();
+    else{
+      const status = await identity.authenticate(pubkey, message, signature);
+      if (status instanceof Error) {
+        throw status;
+      }
+      else next();
+    }
   }
   catch (e) {
     const result = filterError(e, r_500, request);
@@ -259,8 +266,16 @@ export async function handleEditPost(req, res) {
   }
 }
 
-export async function handlePostStream(ws, req){
-  // ws.on('message', function(msg) {
-  //   ws.send(msg);
-  // });
+export async function handlePostKeyStream(req, res){
+  req.wss.on('connection', (ws: WebSocket) => {
+    // connection is up, let's add a simple simple event
+    req.wss.on('message', (message: string) => {
+        // log the received message and send it back to the client
+        console.log('received: %s', message);
+        ws.send(`Hello, you sent -> ${message}`);
+    });
+    // send immediatly a feedback to the incoming connection
+    ws.send('Hi there, I am a WebSocket server');
+  });
 }
+
