@@ -4,7 +4,7 @@ Developed @ Stackmate India
 */
 // -----° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °-----------
 import { logger } from "./lib/logger/winston";
-import { start as startServer } from "./lib/server/express";
+import { start as startServer } from "./server";
 import { MongoDatabase } from "./lib/storage/mongo";
 
 

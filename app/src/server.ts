@@ -5,11 +5,11 @@ Developed @ Stackmate India
 // ------------------ '(◣ ◢)' ---------------------
 import express from "express";
 import helmet from "helmet";
-import { router as announcement } from "../../services/announcement/router";
-import { router as identity } from "../../services/identity/router";
-import { router as post} from "../../services/posts/router";
-import { logger } from "../logger/winston";
-import { respond } from "./handler";
+import { router as announcement } from "./services/announcement/router";
+import { router as identity } from "./services/identity/router";
+import { router as post} from "./services/posts/router";
+import { logger } from "./lib/logger/winston";
+import { respond } from "./lib/http/handler";
 import * as http from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 interface ExtWebSocket extends WebSocket {
@@ -26,7 +26,6 @@ export async function start(port: string) {
       const wss = new WebSocketServer({ server , path: "/notifications"});
       wss.on('connection', (ws, req) => {
         ws.send('Connected to Cypherpost Notification Stream.');
-
         const extWs = ws as ExtWebSocket;
         extWs.isAlive = true;
         ws.on('pong',function(){

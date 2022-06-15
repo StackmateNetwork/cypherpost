@@ -12,7 +12,7 @@ import { ExtendedKeys } from "./lib/bitcoin/interface";
 import { S5Crypto } from "./lib/crypto/crypto";
 import { handleError } from "./lib/errors/e";
 import { logger } from "./lib/logger/winston";
-import * as express from "./lib/server/express";
+import * as express from "./server";
 import { DbConnection } from "./lib/storage/interface";
 import { MongoDatabase } from "./lib/storage/mongo";
 import { CypherpostAnnouncements } from "./services/announcement/announcement";

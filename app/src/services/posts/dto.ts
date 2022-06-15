@@ -3,7 +3,7 @@ cypherpost.io
 Developed @ Stackmate India
 */
 import { r_500 } from "../../lib/logger/winston";
-import { filterError, parseRequest, respond } from "../../lib/server/handler";
+import { filterError, parseRequest, respond } from "../../lib/http/handler";
 import { CypherpostIdentity } from "../identity/identity";
 import { PostKeyStoreUpdate } from "./keys/interface";
 import { CypherpostPostKeys } from "./keys/post_keys";
