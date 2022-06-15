@@ -5,12 +5,14 @@ interface ExtWebSocket extends WebSocket {
   isAlive: boolean;
 }
 
-export async function setupNotificationSocket(rootPath: string,server: http.Server){
-  const wss = new WebSocketServer({ server , path: rootPath + "/notifications"});
+export async function setupNotificationSocket(path: string,server: http.Server){
+  const wss = new WebSocketServer({ server , path });
       wss.on('connection', async (ws, req) => {
         const authStatus = await notifyAuthMiddleware(req,ws);
-
-        if(!authStatus) ws.terminate();
+        if(!authStatus) {
+          ws.send('401 Bad Auth');
+          ws.terminate()
+        }
         else
         ws.send('Securely connected to cypherpost notification stream.');
 
@@ -19,8 +21,6 @@ export async function setupNotificationSocket(rootPath: string,server: http.Serv
         ws.on('pong',function(){
           extWs.isAlive = true;
         });
-        // perform auth using req data
-        console.log(req.headers);
         // connection is up, let's add a simple simple event
         ws.on('message', function message(data, isBinary) {
           // add post keys by giver or create announcement by maker

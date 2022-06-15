@@ -13,17 +13,13 @@ import { setupNotificationSocket } from "./services/notifications/router";
 import { logger } from "./lib/logger/winston";
 import { respond } from "./lib/http/handler";
 import * as http from 'http';
-import { WebSocketServer, WebSocket } from 'ws';
-interface ExtWebSocket extends WebSocket {
-  isAlive: boolean;
-}
 const base_path = `/home/node/cypherpost/app/src/services/client/public`;
 
 enum ServicePathRoot {
   Identity = "/api/v2/identity",
   Announcement = "/api/v2/announcement",
   Post = "/api/v2/post",
-  Notifications = "/api/v3/stream",
+  Notifications = "/api/v3/notifications",
 }
 // ------------------ '(◣ ◢)' ---------------------
 export async function start(port: string) {
