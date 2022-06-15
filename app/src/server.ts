@@ -8,6 +8,8 @@ import helmet from "helmet";
 import { router as announcement } from "./services/announcement/router";
 import { router as identity } from "./services/identity/router";
 import { router as post} from "./services/posts/router";
+import { setupNotificationSocket } from "./services/notifications/router";
+
 import { logger } from "./lib/logger/winston";
 import { respond } from "./lib/http/handler";
 import * as http from 'http';
@@ -17,53 +19,17 @@ interface ExtWebSocket extends WebSocket {
 }
 const base_path = `/home/node/cypherpost/app/src/services/client/public`;
 
+enum ServicePathRoot {
+  Identity = "/api/v2/identity",
+  Announcement = "/api/v2/announcement",
+  Post = "/api/v2/post",
+  Notifications = "/api/v3/stream",
+}
 // ------------------ '(◣ ◢)' ---------------------
 export async function start(port: string) {
   return new Promise(async (resolve, reject) => {
     try {
       const app = express();
-      const server = http.createServer(app);
-      const wss = new WebSocketServer({ server , path: "/notifications"});
-      wss.on('connection', (ws, req) => {
-        ws.send('Connected to Cypherpost Notification Stream.');
-        const extWs = ws as ExtWebSocket;
-        extWs.isAlive = true;
-        ws.on('pong',function(){
-          extWs.isAlive = true;
-        });
-        // perform auth using req data
-        console.log(req.headers);
-        // connection is up, let's add a simple simple event
-        ws.on('message', function message(data, isBinary) {
-          // add post keys by giver or create announcement by maker
-          wss.clients.forEach(function each(client) {
-            // only if receiver of keys or announcement, forward message
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
-              client.send(data, { binary: isBinary });
-            }
-          });
-        });
-        // send immediatly a feedback to the incoming connection
-        ws.on('close', function close() {
-          console.log("Closing connection...");
-          clearInterval(interval);
-        });
-      });
-
-      const interval = setInterval(function ping() {
-        wss.clients.forEach(function each(ws) {
-          const extWs = ws as ExtWebSocket;
-          if (extWs.isAlive === false) {
-            console.log("Terminating connection...");
-            return ws.terminate();
-          }
-          extWs.isAlive = false;
-          ws.ping();
-        });
-      }, 30000);
-
- 
-
       app.set("etag", false);
       app.disable("x-powered-by");
       app.use(helmet());
@@ -78,52 +44,16 @@ export async function start(port: string) {
           next()
         }
       });
-      // ROUTES >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-      app.use("/api/v2/identity", identity);
-      app.use("/api/v2/announcement", announcement);
-      app.use("/api/v2/post", post);
-      // ROUTES <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      const server = http.createServer(app);
+      setupNotificationSocket(ServicePathRoot.Notifications,server);
+      app.use(ServicePathRoot.Identity, identity);
+      app.use(ServicePathRoot.Announcement, announcement);
+      app.use(ServicePathRoot.Post, post);
 
-
-      const expressApp = server.listen(port, async () => {
+      handleGracefulShutdown(server.listen(port, async () => {
         logger.verbose("Server listening...")
         resolve(app)
-      });
-
-
-      // Gracefully terminate server on SIGINT AND SIGTERM
-      process.on("SIGINT", () => {
-        logger.info({
-          SIGINT: "Got SIGINT. Gracefully shutting down Http server"
-        });
-        expressApp.close(() => {
-          logger.info("Http server closed.");
-        });
-      });
-
-      // quit properly on docker stop
-      process.on("SIGTERM", () => {
-        logger.info({
-          SIGTERM: "Got SIGTERM. Gracefully shutting down Http server."
-        });
-
-        expressApp.close(() => {
-          logger.info("Http server closed.");
-        });
-      });
-
-      const sockets = {};
-
-      let nextSocketId = 0;
-
-      expressApp.on("connection", socket => {
-        const socketId = nextSocketId++;
-        sockets[socketId] = socket;
-
-        socket.once("close", function () {
-          delete sockets[socketId];
-        });
-      });
+      }));
 
     } catch (e) {
       logger.error({EXPRESS_ERROR:e})
@@ -131,6 +61,39 @@ export async function start(port: string) {
     }
   });
 };
-
 // ------------------ '(◣ ◢)' ---------------------
+function handleGracefulShutdown(server: http.Server){
+  process.on("SIGINT", () => {
+    logger.info({
+      SIGINT: "Got SIGINT. Gracefully shutting down Http server"
+    });
+    server.close(() => {
+      logger.info("Http server closed.");
+    });
+  });
 
+  // quit properly on docker stop
+  process.on("SIGTERM", () => {
+    logger.info({
+      SIGTERM: "Got SIGTERM. Gracefully shutting down Http server."
+    });
+
+    server.close(() => {
+      logger.info("Http server closed.");
+    });
+  });
+
+  const sockets = {};
+
+  let nextSocketId = 0;
+
+  server.on("connection", socket => {
+    const socketId = nextSocketId++;
+    sockets[socketId] = socket;
+
+    socket.once("close", function () {
+      delete sockets[socketId];
+    });
+  });
+}
+// ------------------ '(◣ ◢)' ---------------------
