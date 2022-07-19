@@ -6,7 +6,7 @@ import { r_500 } from "../../lib/logger/winston";
 import { filterError, parseRequest, respond } from "../../lib/http/handler";
 import { CypherpostIdentity } from "../identity/identity";
 import { CypherpostPostKeys } from "../posts/keys/post_keys";
-import { CypherpostAnnouncements } from "./announcement";
+import { CypherpostAnnouncements } from "./announcements";
 import { AnnouncementType } from "./interface";
 
 const { validationResult } = require('express-validator');

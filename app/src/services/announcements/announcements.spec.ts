@@ -10,7 +10,7 @@ import { S5Crypto } from "../../lib/crypto/crypto";
 import { DbConnection } from "../../lib/storage/interface";
 import { MongoDatabase } from "../../lib/storage/mongo";
 import { CypherpostIdentity } from "../identity/identity";
-import { CypherpostAnnouncements } from "./announcement";
+import { CypherpostAnnouncements } from "./announcements";
 import { Announcement, AnnouncementType } from "./interface";
 import { MongoAnnouncementStore } from "./mongo";
 const sinon = require("sinon");

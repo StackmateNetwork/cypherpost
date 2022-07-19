@@ -8,7 +8,7 @@ const SERVER_PUBKEY = "ceaf836b3d29dfd686be0a02e3c36ca7f00bc5ed013f92cd176989424
 import { CypherpostBitcoinOps } from "../../lib/bitcoin/bitcoin";
 import { r_500 } from "../../lib/logger/winston";
 import { filterError, parseRequest, respond } from "../../lib/http/handler";
-import { CypherpostAnnouncements } from "../announcement/announcement";
+import { CypherpostAnnouncements } from "../announcements/announcements";
 import { CypherpostPostKeys } from "../posts/keys/post_keys";
 import { CypherpostPosts } from "../posts/posts";
 import { CypherpostIdentity } from "./identity";

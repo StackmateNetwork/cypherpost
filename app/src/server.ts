@@ -5,7 +5,7 @@ Developed @ Stackmate India
 // ------------------ '(◣ ◢)' ---------------------
 import express from "express";
 import helmet from "helmet";
-import { router as announcement } from "./services/announcement/router";
+import { router as announcement } from "./services/announcements/router";
 import { router as identity } from "./services/identity/router";
 import { router as post} from "./services/posts/router";
 import { setupNotificationSocket } from "./services/notifications/router";
