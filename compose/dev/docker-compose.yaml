@@ -18,7 +18,7 @@ services:
       - cp-server-code:/home/node/cypherpost/app
       - cp-server-keys:/home/node/.keys
     networks:
-      - default
+      - cypherpostnetwork
 
   mongo:
     build:
@@ -37,7 +37,7 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin
     networks:
-      - default
+      - cypherpostnetwork
     command: -f /etc/mongod.conf
 
   nginx:
@@ -56,7 +56,7 @@ services:
     depends_on:
       - node
     networks:
-      - default
+      - cypherpostnetwork
 
 volumes:
   cp-server-code:
@@ -77,6 +77,5 @@ volumes:
   cp-web-root:
 
 networks:
-  default:
-    external:
-      name: cyphernodeappsnet
+  cypherpostnetwork:
+    driver: bridge
