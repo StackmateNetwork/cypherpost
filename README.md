@@ -22,8 +22,6 @@ Private servers generate an `invite code` during server setup. This code is requ
 
 #### Private Server LIVE at https://cypherpost.io/api/v2
 
-#### Reference client UNDER CONSTRUCTION at https://cypherpost.io.
-
 ![cypherpost](design/assets/owl.png)
 
 ## Manual Development Environment 
@@ -49,24 +47,6 @@ tsc
 # If changes are made to any .ts file, run tsc again and restart container
 ```
 
-### Install client dependencies and compile browser JS code
-```bash
-cd src/services/client/public/js
-npm i
-cd ..
-./compile.bash
-
-# compile.bash compiles each client side js module into  *_bundle.js files containing all dependency code
-# If changes are made to any files in public/js, run compile.bash again
-```
-
-### Add localhost to /etc/hosts to access client on the browser as localhost
-```bash
-echo "::1     localhost" | sudo tee -a /etc/hosts
-```
-
-#### NOTE: MAC users will need to use Docker Desktop <= v4.5 and disable gRPC File Sharing in Preferences for volume mounting to work. Unfortunately you will have to bare with that annoying `!` on your taskbar icon.
-
 #### NOTE: SETUP DEV ENVIRONMENT AS PRIVATE SERVER (PUBLIC SERVER WILL FAIL TESTS WITH 402:Payment Required). Tests for public server with payment is still under development.
 
 ## Development Scripts
@@ -84,10 +64,6 @@ cd ../../../../../compose
 ./start.sh
 ./test.sh
 ```
-
-#### You can now access the reference client on `localhost` in your browser.
-
-#### NOTE: The development client does not work on Safari. Use Firefox or Chromium.
 
 ### STOP
 ```
@@ -183,3 +159,39 @@ Clients can use an optional  `reference` field, when making a post. References r
 References allow users to create group chats.
 
 Note that when the parent post is deleted, all references are also removed.
+
+
+### Bleeding Edge Development:
+
+Cypherpost is currently adding a notification stream to allow clients to have a more fluid and realtime chat like experience.
+
+To test the notification stream, you will require `wscat`
+
+```bash
+sudo npm install -g wscat
+```
+
+Monitor the output of the application service on one terminal 
+
+AND 
+
+on 2 other terminal windows open a socket
+
+```
+wscat -c localhost:3021/api/v3/notifications
+```
+
+You will see messages directly going from one client to another.
+
+This is the current state of sockets in cypherpost:
+
+- Sockets are being securely opened
+- Socket lifetimes are being managed (ping intervals to ensure connections dont stay open unecessarily)
+- Sockets are being closed securely
+
+
+#### PENDING SOCKET IMPLEMENTATION TASKS
+
+- Authentication
+- Message format enforcement
+- Selective message passing

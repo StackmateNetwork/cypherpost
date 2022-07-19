@@ -8,7 +8,8 @@ interface ExtWebSocket extends WebSocket {
 export async function setupNotificationSocket(path: string,server: http.Server){
   const wss = new WebSocketServer({ server , path });
       wss.on('connection', async (ws, req) => {
-        const authStatus = await notifyAuthMiddleware(req,ws);
+        const authStatus = true;
+        // await notifyAuthMiddleware(req,ws);
         if(!authStatus) {
           ws.send('401 Bad Auth');
           ws.terminate()

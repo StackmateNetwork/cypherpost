@@ -9,10 +9,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/i5hi/cypherpost.git"
+    "url": "git+ssh://git@github.com/StackmateNetwork/cypherpost.git"
   },
   "keywords": [
-    "traders",
+    "private",
     "network",
     "bitcoin"
   ],
