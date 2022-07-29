@@ -170,37 +170,3 @@ References allow users to create group chats.
 Note that when the parent post is deleted, all references are also removed.
 
 
-### Bleeding Edge Development:
-
-Cypherpost is currently adding a notification stream to allow clients to have a more fluid and realtime chat like experience.
-
-To test the notification stream, you will require `wscat`
-
-```bash
-sudo npm install -g wscat
-```
-
-Monitor the output of the application service on one terminal 
-
-AND 
-
-on 2 other terminal windows open a socket
-
-```
-wscat -c localhost:3021/api/v3/notifications
-```
-
-You will see messages directly going from one client to another.
-
-This is the current state of sockets in cypherpost:
-
-- Sockets are being securely opened
-- Socket lifetimes are being managed (ping intervals to ensure connections dont stay open unecessarily)
-- Sockets are being closed securely
-
-
-#### PENDING SOCKET IMPLEMENTATION TASKS
-
-- Authentication
-- Message format enforcement
-- Selective message passing
