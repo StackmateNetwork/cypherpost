@@ -176,6 +176,8 @@ let a_preferences = {
   muted: [],
 };
 let cypher_preference;
+
+let b_post_to_notify_a;
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 // ------------------ INITIALIZERS ------------------
 async function createTestKeySet(): Promise<TestKeySet | Error> {
@@ -466,8 +468,9 @@ async function createSocketConnectionRequest(key_set: TestKeySet){
   const endpoint = "/api/v3/notifications";
   const nonce = Date.now();
   const body = {};
-  const signature = "works";
-  // await bitcoin.sign(`OPEN ${endpoint} ${JSON.stringify(body)} ${nonce}`, key_set.identity_private) as string;
+  const message = `GET ${endpoint} {} ${nonce}`;
+  console.log({message})
+  const signature = await bitcoin.sign(message, key_set.identity_private) as string;
   return {
     nonce,
     endpoint,
@@ -1109,37 +1112,49 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
 
   
   describe("TEST NOTIFICATION SOCKETS", function(){
-    let a_sock_req,b_sock_req,c_sock_req;
-    let a_sock,b_sock,c_sock;
+    let b_sock_req,c_sock_req;
+    let b_sock,c_sock;
     const options = {  
       headers: {},
     };
     const socketUrl = `ws://localhost:${TEST_PORT}/api/v3/notifications`;
     it("CREATE SOCKET OPEN REQUESTS", async function(){
-      a_sock_req = await createSocketConnectionRequest(a_key_set);
-      // b_sock_req = await createSocketConnectionRequest(b_key_set);
+      c_sock_req = await createSocketConnectionRequest(c_key_set);
+      b_sock_req = await createSocketConnectionRequest(b_key_set);
       // c_sock_req = await createSocketConnectionRequest(c_key_set);
     });
-    it("OPENS SOCKET CONNECTIONS", function(done){
-      options.headers['x-nonce'] = a_sock_req.nonce;
-      options.headers['x-client-pubkey'] = a_sock_req.pubkey;
-      options.headers['x-client-signature'] = a_sock_req.signature;
-      a_sock = new WebSocket(socketUrl,options);
-      a_sock.on('open', function(){
-        a_sock.on('message', function(msg){
-          console.log(msg.toString());
-          expect(msg.toString()).to.be.equal('Securely connected to cypherpost notification stream.');
-          done();
-        })
-        
+    it("TEST SOCKET CONNECTIONS", function(done){
+      options.headers['x-nonce'] =  c_sock_req.nonce;
+      options.headers['x-client-pubkey'] =  c_sock_req.pubkey;
+      options.headers['x-client-signature'] =  c_sock_req.signature;
+      c_sock = new WebSocket(socketUrl,options);
+      c_sock.on('message', function(msg){
+        console.log('C (inbox): ' + msg.toString());
+        // expect(msg.toString()).to.be.equal('Securely connected to cypherpost notification stream.');
       });
-      a_sock.on('connect_error', function(msg){
+      c_sock.on('connect_error', function(msg){
+       console.log(msg);
+      });
+      options.headers['x-nonce'] = b_sock_req.nonce;
+      options.headers['x-client-pubkey'] = b_sock_req.pubkey;
+      options.headers['x-client-signature'] = b_sock_req.signature;
+      b_sock = new WebSocket(socketUrl,options);
+      b_sock.on('message', function(msg){
+        console.log('B (inbox): ' + msg.toString());
+        // expect(msg.toString()).to.be.equal('Securely connected to cypherpost notification stream.');
+      });
+      b_sock.on('connect_error', function(msg){
         console.log(msg);
       });
-   
+
+
+      setTimeout(()=>{
+        b_sock.send(b_post_set.post_id); // C will get this in her inbox
+        c_sock.send("This message will not be accepted by cypherpost stream.");
+
+        done();
+      }, 5000);
     });
-
-
   });
 
   describe("E: 409's", function () {

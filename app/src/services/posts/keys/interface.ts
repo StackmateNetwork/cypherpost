@@ -8,6 +8,7 @@ export interface PostKeyInterface {
   updatePostDecryptionKeys(giver: string, post_id: string, key_update: PostKeyStoreUpdate[]): Promise<boolean | Error>;
   findPostDecryptionKeyByReceiver(receiver: string, genesis_filter: Number): Promise<PostDecryptionKey[] | Error>;
   findPostDecryptionKeyByGiver(giver: string, genesis_filter: Number): Promise<PostDecryptionKey[] | Error>;
+  findPostDecryptionKeyById(post_id: string): Promise<PostDecryptionKey[] | Error>;
   removePostDecryptionKeyById(giver: string, post_id: string): Promise<boolean | Error>;
   removePostDecryptionKeyByReceiver(giver: string, receiver: string): Promise<boolean | Error>;
   removePostDecryptionKeyByGiver(giver: string): Promise<boolean | Error>;

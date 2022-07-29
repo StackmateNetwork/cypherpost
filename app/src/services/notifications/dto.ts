@@ -2,16 +2,18 @@
 cypherpost.io
 Developed @ Stackmate India
 */
-import { r_500 } from "../../lib/logger/winston";
-import { filterError, parseRequest, respond } from "../../lib/http/handler";
+import {  parseRequest } from "../../lib/http/handler";
 import { CypherpostIdentity } from "../identity/identity";
-import { WebSocketServer, WebSocket } from 'ws';
+import {  WebSocket } from 'ws';
 import * as http from 'http';
 import { handleError } from "../../lib/errors/e";
+import { CypherpostPosts } from "../posts/posts";
+import { CypherpostPostKeys } from "../posts/keys/post_keys";
 
-const { validationResult } = require('express-validator');
 
 const identity = new CypherpostIdentity();
+const posts = new CypherpostPosts();
+const postKeys = new CypherpostPostKeys();
 
 export async function notifyAuthMiddleware(req: http.IncomingMessage,ws: WebSocket): Promise<boolean | Error> {
   const request = parseRequest(req);
@@ -21,15 +23,29 @@ export async function notifyAuthMiddleware(req: http.IncomingMessage,ws: WebSock
     // CHECK SIG AND PUBKEY FORMAT - RETURNS 500 IF NOT VALID
     const nonce = request.headers['x-nonce'];
     const method = request.method;
-    const resource = request.resource;
-    const body = JSON.stringify(request.body);
+    const resource = "/api/v3/notifications";
+    const body = "{}";
     const message = `${method} ${resource} ${body} ${nonce}`;
-    if (signature == 'works')
-    // const status = await identity.authenticate(pubkey, message, signature);
-    return true;
-    else return false;
+    console.log(message);
+    const status = await identity.authenticate(pubkey, message, signature);
+    // console.log(status)
+    return status;
   }
   catch (e) {
     ws.terminate();
+  }
+}
+
+export async function getPostIdRecipients(post_id: string): Promise<string[] | Error>{
+  try{
+    const decryption_keys = await postKeys.findPostDecryptionKeyById(post_id);
+    if(decryption_keys instanceof Error) return decryption_keys;
+    const pubkeys = decryption_keys.map(keys=>{
+      return keys.receiver;
+    });
+    return pubkeys;
+  }
+  catch(e){
+    return handleError(e);
   }
 }

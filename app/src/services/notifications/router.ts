@@ -1,6 +1,6 @@
 import * as http from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
-import { notifyAuthMiddleware } from "./dto";
+import { notifyAuthMiddleware, getPostIdRecipients } from "./dto";
 interface ExtWebSocket extends WebSocket {
   isAlive: boolean;
 }
@@ -12,10 +12,16 @@ export async function setupNotificationSocket(path: string, server: http.Server)
     const authStatus = await notifyAuthMiddleware(req,ws);
     if(!authStatus) {
       ws.send('401 Bad Auth');
-      ws.terminate()
+      ws.terminate();
+      return 1;
     }
-    else
+    else if(authStatus instanceof Error){
+      ws.send(authStatus.message);
+      ws.terminate();
+      return 1;
+    }
     ws.send('Securely connected to cypherpost notification stream.');
+    ws['id'] = req.headers['x-client-pubkey'];
 
     const extWs = ws as ExtWebSocket;
     extWs.isAlive = true;
@@ -23,12 +29,27 @@ export async function setupNotificationSocket(path: string, server: http.Server)
       extWs.isAlive = true;
     });
     // connection is up, let's add a simple simple event
-    ws.on('message', function message(data, isBinary) {
-      // add post keys by giver or create announcement by maker
-      // parse message
+    ws.on('message', async function message(data, isBinary) {
+      const postId = data.toString();
+      if(!postId.startsWith('s5')) {
+        ws.send("Invalid Post Id.");
+        return 1;
+      }
+      console.log({postId});
+      const recipients = await getPostIdRecipients(postId);
+      if(recipients instanceof Error) {
+        ws.send(recipients.message);
+        return 1;
+      }
+    
+      console.log({recipients});
       wss.clients.forEach(function each(client) {
-        // only if receiver of keys or announcement, forward message
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
+        console.log(client['id']);
+        if (
+          client !== ws && // is not sender
+          client.readyState === WebSocket.OPEN && // has open connection
+          recipients.includes(client['id']) // is included in recipients to this post_id
+        ) {
           client.send(data, { binary: isBinary });
         }
       });

@@ -65,6 +65,9 @@ export class CypherpostPostKeys implements PostKeyInterface {
   async findPostDecryptionKeyByGiver(giver: string, genesis_filter: Number): Promise<Error | PostDecryptionKey[]> {
     return store.readByGiver(giver, genesis_filter);
   }
+  async findPostDecryptionKeyById(post_id: string): Promise<Error | PostDecryptionKey[]> {
+    return store.readByPostId(post_id);
+  }
   async removePostDecryptionKeyById(giver: string, id: string): Promise<boolean | Error> {
     return store.removeManyByPostId(giver, id);
   }
