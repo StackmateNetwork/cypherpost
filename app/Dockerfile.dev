@@ -24,6 +24,9 @@ ENV DB_PORT="27017"
 ENV DB_NAME="cypherpost"
 ENV DB_AUTH="cp:secret"
 ENV KEY_PATH="/home/node/.keys/"
+ENV SERVER_PUBKEY = "ceaf836b3d29dfd686be0a02e3c36ca7f00bc5ed013f92cd176989424eb82574";
+ENV SERVER_NAME = "cypherpost.io";
+
 # ENV CYPHERNODE_API_KEY_ID=3
 ENV CYPHERNODE_API_KEY="034aa8fa6b7e85c957c1b5ababef8f30f7b57d592bec125bfa015fc49bbeed34"
 ENV CYPHER_GATEWAY_URL="https://gatekeeper:2009/v0/"

@@ -33,8 +33,10 @@ const announcements = new CypherpostAnnouncements();
 const posts = new CypherpostPosts();
 const post_keys = new CypherpostPostKeys();
 const db = new MongoDatabase();
-const invite_code = "098f6bcd4621d373cade4e832627b4f6";
-
+const invite_secret = "098f6bcd4621d373cade4e832627b4f6";
+let a_invitation;
+let b_invitation;
+let c_invitation;
 let server;
 const TEST_PORT = process.env.TEST_PORT;
 const should = chai.should();
@@ -243,6 +245,14 @@ function createDefaultTestPost(type: PostType, order: OrderType, message: string
     fixed_rate: (fixed) ? 50000000 : 0,
     reference_exchange: (fixed) ? ReferenceExchange.None : ReferenceExchange.WazirX,
     reference_percent: (fixed) ? 0 : 5
+  }
+}
+function adminGetInvitationRequest() {
+  const endpoint = "/api/v2/identity/admin/invitation";
+
+  return {
+    endpoint,
+    invite_secret,
   }
 }
 async function createIdentityRegistrationRequest(username, key_set: TestKeySet) {
@@ -540,6 +550,63 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     await post_keys.removePostDecryptionKeyByGiver(c_key_set.identity_pubkey);
   });
 
+  describe("ADMIN CREATES INVITE CODES for A B C to register", function () {
+    let request_admin;
+
+    it("CREATES REQUEST OBJECTS", async function () {
+      request_admin = await adminGetInvitationRequest();
+    });
+
+    it("GETS A's INVITATION", function (done) {
+      console.log({ request_admin })
+      chai
+        .request(server)
+        .get(request_admin.endpoint)
+        .set({
+          "x-admin-invite-secret": request_admin.invite_secret
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          console.log(res.body);
+          expect(res.body['invite_code']).to.be.a('string');
+          a_invitation = res.body['invite_code']
+          done();
+        });
+    });
+    it("GETS B's INVITATION", function (done) {
+      // console.log({ request_a })
+      chai
+        .request(server)
+        .get(request_admin.endpoint)
+        .set({
+          "x-admin-invite-secret": request_admin.invite_secret
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          expect(res.body['invite_code']).to.be.a('string');
+          b_invitation = res.body['invite_code']
+          done();
+        });
+    });
+    it("GETS C's INVITATION", function (done) {
+      // console.log({ request_a })
+      chai
+        .request(server)
+        .get(request_admin.endpoint)
+        .set({
+          "x-admin-invite-secret": request_admin.invite_secret
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          expect(res.body['invite_code']).to.be.a('string');
+          c_invitation = res.body['invite_code']
+          done();
+        });
+    });
+
+
+  });
+
   describe("REGISTER IDENTITIES for A B C and VERIFY REGISTRATION via GET ALL", function () {
     let request_a;
     let request_b;
@@ -562,7 +629,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           "x-client-pubkey": request_a.pubkey,
           "x-nonce": request_a.nonce,
           "x-client-signature": request_a.signature,
-          "x-client-invite-code": invite_code
+          "x-client-invite-code": a_invitation
         })
         .send(request_a.body)
         .end((err, res) => {
@@ -581,7 +648,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           "x-client-pubkey": request_b.pubkey,
           "x-nonce": request_b.nonce,
           "x-client-signature": request_b.signature,
-          "x-client-invite-code": invite_code
+          "x-client-invite-code": b_invitation
         })
         .send(request_b.body)
         .end((err, res) => {
@@ -600,7 +667,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           "x-client-pubkey": request_c.pubkey,
           "x-nonce": request_c.nonce,
           "x-client-signature": request_c.signature,
-          "x-client-invite-code": invite_code
+          "x-client-invite-code": c_invitation
         })
         .send(request_c.body)
         .end((err, res) => {
@@ -716,7 +783,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     it("VERIFIES ALL ANNOUNCEMENTS ISSUED and POPULATES EACH USER's TRUSTED", function (done) {
       all_announcements.map(async (announcement) => {
         const message = `${announcement.by}:${announcement.to}:${announcement.type}:${announcement.nonce}`;
-        const verify = await bitcoin.verify(message, announcement.signature, announcement.giver);
+        const verify = await bitcoin.verify(message, announcement.signature, announcement.by);
         const failedSig = "Announcement Signature failed.";
         if (!verify) throw failedSig;
         if (announcement.by === a_key_set.identity_pubkey) a_trust.push(announcement.to);
@@ -1168,7 +1235,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
       request_b = await createAnnouncementIssueRequest(AnnouncementType.Trusted, c_key_set.identity_pubkey, b_key_set);
       request_c = await createKeyStoreUpdate(c_post_set, c_trust, c_key_set);
     });
-    it("PREVENTS DUPLICATE IDENTITY", function (done) {
+    it("PREVENTS REUSING INVITATION", function (done) {
       // console.log({request_a})
       chai
         .request(server)
@@ -1177,11 +1244,11 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           "x-client-pubkey": request_a.pubkey,
           "x-nonce": request_a.nonce,
           "x-client-signature": request_a.signature,
-          "x-client-invite-code": invite_code
+          "x-client-invite-code": a_invitation
         })
         .send(request_a.body)
         .end((err, res) => {
-          res.should.have.status(409);
+          res.should.have.status(400);
           done();
         });
     });

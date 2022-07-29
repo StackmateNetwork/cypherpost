@@ -35,16 +35,13 @@ export async function setupNotificationSocket(path: string, server: http.Server)
         ws.send("Invalid Post Id.");
         return 1;
       }
-      console.log({postId});
       const recipients = await getPostIdRecipients(postId);
       if(recipients instanceof Error) {
         ws.send(recipients.message);
         return 1;
       }
     
-      console.log({recipients});
       wss.clients.forEach(function each(client) {
-        console.log(client['id']);
         if (
           client !== ws && // is not sender
           client.readyState === WebSocket.OPEN && // has open connection

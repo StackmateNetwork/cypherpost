@@ -162,7 +162,11 @@ export class CypherpostBitcoinOps implements BitcoinKeyOperations {
 
   async verify(message: string, signature: string, public_key: string): Promise<boolean | Error> {
     try {
-      const status = await secp256k1.schnorr.verify(signature, crypto.createHash('sha256').update(message).digest('hex'), public_key);
+      const status = await secp256k1.schnorr.verify(
+        signature, 
+        crypto.createHash('sha256').update(message).digest('hex'), 
+        public_key
+      );
       return status;
     }
     catch (e) {

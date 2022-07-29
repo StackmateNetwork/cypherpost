@@ -5,10 +5,9 @@ Developed @ Stackmate India
 // ---------------- ┌∩┐(◣_◢)┌∩┐ -----------------
 import mongoose from "mongoose";
 import { handleError } from "../../lib/errors/e";
-import { IdentityIndex, IdentityStore, UserIdentity, VerificationStatus } from "./interface";
+import { IdentityIndex, IdentityStore, InvitationCodeStatus, InviteStore, UserIdentity, VerificationStatus } from "./interface";
 
 // ---------------- ┌∩┐(◣_◢)┌∩┐ -----------------
-
 const identity_schema = new mongoose.Schema(
   {
     username: {
@@ -131,7 +130,105 @@ export class MongoIdentityStore implements IdentityStore {
       if (result instanceof Error) {
         return handleError(result);
       };
-      console.log({result})
+      return result.modifiedCount > 0 || result.matchedCount >0;
+      // if verified if true the document is not updated and will return modifiedCount = 0 
+      // watchout
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+}
+// ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------
+// ---------------- ┌∩┐(◣_◢)┌∩┐ -----------------
+const invite_schema = new mongoose.Schema(
+  {
+    invite_code: {
+      type: String,
+      unique: true,
+      required: true,
+      index: true,
+    },
+    genesis: {
+      type: Number,
+      required: true,
+    },
+    status: {
+      type: String,
+      required: true,
+      default: "UNCLAIMED"
+    }
+  }
+);
+// ------------------ '(◣ ◢)' ---------------------
+const inviteStore = mongoose.model("invite", invite_schema);
+// ------------------ '(◣ ◢)' ---------------------
+export class MongoInviteStore implements InviteStore {
+
+  async createOne(invite_code: string): Promise<boolean | Error> {
+    try {
+      await identityStore.syncIndexes();
+      const doc = await inviteStore.create({
+        invite_code: invite_code,
+        genesis: Date.now(),
+        status: InvitationCodeStatus.Unclaimed
+      });
+      if (doc instanceof Error) {
+        return handleError(doc);
+      } else {
+        return true;
+      }
+    } catch (e) {
+      if (e['code'] && e['code'] == 11000) {
+        return handleError({
+          code: 409,
+          message: "Duplicate Index."
+        })
+      }
+      return handleError(e);
+    }
+  }
+  async removeOne(invite_code: string): Promise<boolean | Error> {
+    try {
+      const query = { invite_code };
+      const status = await inviteStore.deleteMany(query)
+      if (status instanceof Error) {
+        return handleError(status);
+      }
+      if (status.deletedCount >= 1) return true;
+      else return false;
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+  async checkOne(invite_code: string, status: InvitationCodeStatus): Promise<boolean | Error> {
+    try {
+      const query =  { invite_code, status };
+      const doc = await inviteStore.findOne(query).exec();
+
+      if (doc) {
+        if (doc instanceof Error) {
+          return handleError(doc);
+        }
+        if (invite_code == doc['invite_code']) return true;
+        else false;
+      } else {
+        // no data from findOne
+        return false;
+      }
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+  async updateOne(invite_code: string, status: InvitationCodeStatus): Promise<boolean | Error> {
+    try {
+      const q = { invite_code };
+      const u = { $set: { status: status.toString() } };
+      // console.log({q,u})
+
+      const result = await inviteStore.updateOne(q, u);
+      if (result instanceof Error) {
+        return handleError(result);
+      };
       return result.modifiedCount > 0 || result.matchedCount >0;
       // if verified if true the document is not updated and will return modifiedCount = 0 
       // watchout

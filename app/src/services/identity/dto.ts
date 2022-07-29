@@ -3,7 +3,6 @@ cypherpost.io
 Developed @ Stackmate India
 */
 
-const SERVER_PUBKEY = "ceaf836b3d29dfd686be0a02e3c36ca7f00bc5ed013f92cd176989424eb82574";
 
 import { CypherpostBitcoinOps } from "../../lib/bitcoin/bitcoin";
 import { r_500 } from "../../lib/logger/winston";
@@ -14,18 +13,18 @@ import { CypherpostPosts } from "../posts/posts";
 import { CypherpostIdentity } from "./identity";
 import { RegistrationType } from "./interface";
 
-
+import {S5UID} from "../../lib/uid/uid";
 const { validationResult } = require('express-validator');
 
 const TYPE = process.env.TYPE;
-const INVITE_CODE = process.env.SECRET;
+const INVITE_SECRET = process.env.SECRET;
 
 const identity = new CypherpostIdentity();
 const badges = new CypherpostAnnouncements();
 const posts = new CypherpostPosts();
 const posts_keys = new CypherpostPostKeys();
 const bitcoin = new CypherpostBitcoinOps();
-
+const uid = new S5UID();
 export async function identityMiddleware(req, res, next) {
   const request = parseRequest(req);
   try {
@@ -38,18 +37,18 @@ export async function identityMiddleware(req, res, next) {
     const resource = request.resource;
     const body = JSON.stringify(request.body);
     const message = `${method} ${resource} ${body} ${nonce}`;
-
-    // console.log({message});
-    // console.log({signature});
-    // console.log({pubkey});
     
-    let verified = await bitcoin.verify(message, signature, pubkey);
-    if (verified instanceof Error) throw verified;
-    else if (!verified) throw{
-      code: 401,
-      message: "Invalid Request Signature."
-    };
-    else next();
+    if (resource !== "/api/v2/identity/admin/invitation")
+    {
+      let verified = await bitcoin.verify(message, signature, pubkey);
+      if (verified instanceof Error) throw verified;
+      else if (!verified) throw{
+        code: 401,
+        message: "Invalid Request Signature."
+      };
+    }
+    
+    next();
     
   }
   catch (e) {
@@ -72,15 +71,9 @@ export async function handleRegistration(req, res) {
     const registration_type = TYPE.toLowerCase().includes("pub") ? 
       RegistrationType.Payment : RegistrationType.Invite;
   
-    if (registration_type===RegistrationType.Invite){
-      if (request.headers['x-client-invite-code'] != INVITE_CODE){
-        throw {
-          code: 401,
-          message: "Incorrect Invite Code"
-        }
-      }
-    }
-    let status = await identity.register(request.body.username, request.headers['x-client-pubkey'], registration_type);
+    const pubkey = request.headers['x-client-pubkey'];
+    const invite_code = request.headers['x-client-invite-code']
+    let status = await identity.register(request.body.username, pubkey, registration_type,(registration_type===RegistrationType.Invite)?invite_code:"");
     if (status instanceof Error) throw status;
     
     const response = {
@@ -175,9 +168,34 @@ export async function handleGetServerIdentity(req, res) {
  
     const response = {
       type: TYPE,
-      pubkey: SERVER_PUBKEY,
+      name: process.env.SERVER_NAME,
+      pubkey: process.env.SERVER_PUBKEY,
     };
 
+    respond(200, response, res, request);
+  }
+  catch (e) {
+    const result = filterError(e, r_500, request);
+    respond(result.code, result.message, res, request);
+  }
+}
+
+export async function handleAdminGetInvite(req,res){
+  const request = parseRequest(req);
+  try {
+    console.log("IN")
+    if (request.headers['x-admin-invite-secret'] != INVITE_SECRET){
+      throw {
+        code: 401,
+        message: "Incorrect Invite Secret"
+      }
+    }
+    const invite_code = await identity.createInvite();
+    if(invite_code instanceof Error) throw invite_code;
+
+    const response = {
+      invite_code
+    }
     respond(200, response, res, request);
   }
   catch (e) {
