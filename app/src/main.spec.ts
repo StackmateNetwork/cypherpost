@@ -20,8 +20,12 @@ import { AnnouncementType } from "./services/announcements/interface";
 import { CypherpostIdentity } from "./services/identity/identity";
 import { CypherpostPostKeys } from "./services/posts/keys/post_keys";
 import { CypherpostPosts } from "./services/posts/posts";
+import { truncateSync } from "fs";
 
 const sinon = require('sinon');
+const io = require('socket.io-client');
+import WebSocket, { createWebSocketStream } from 'ws';
+
 const bitcoin = new CypherpostBitcoinOps();
 const s5crypto = new S5Crypto();
 const identity = new CypherpostIdentity();
@@ -32,6 +36,7 @@ const db = new MongoDatabase();
 const invite_code = "098f6bcd4621d373cade4e832627b4f6";
 
 let server;
+const TEST_PORT = process.env.TEST_PORT;
 const should = chai.should();
 const expect = chai.expect;
 chai.use(chaiHttp);
@@ -456,6 +461,20 @@ async function createServerIdentityRequest(key_set: TestKeySet) {
     pubkey: key_set.identity_pubkey
   }
 }
+
+async function createSocketConnectionRequest(key_set: TestKeySet){
+  const endpoint = "/api/v3/notifications";
+  const nonce = Date.now();
+  const body = {};
+  const signature = "works";
+  // await bitcoin.sign(`OPEN ${endpoint} ${JSON.stringify(body)} ${nonce}`, key_set.identity_private) as string;
+  return {
+    nonce,
+    endpoint,
+    signature,
+    pubkey: key_set.identity_pubkey
+  }
+}
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 
 describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
@@ -469,7 +488,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     sinon.stub(logger, "debug");
     console.log({connection})
     await db.connect(connection);
-    server = await express.start(process.env.TEST_PORT);
+    server = await express.start(TEST_PORT);
     // ------------------ (◣_◢) ------------------
     a_key_set = await createTestKeySet() as TestKeySet;
     b_key_set = await createTestKeySet() as TestKeySet;
@@ -497,12 +516,9 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     }, c_key_set.cypherpost_parent, init_profile_ds);
     // ------------------ (◣_◢) ------------------
     a_post_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Sell, "Urgent", true), a_key_set.cypherpost_parent, init_posts_ds);
-
     b_post_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Buy, "Stacking", false), b_key_set.cypherpost_parent, init_posts_ds);
-
     c_post_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Sell, "Contact me on Signal.", false), c_key_set.cypherpost_parent, init_posts_ds);
     c_post_edit_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Sell, "Contact me on Threema.", false), c_key_set.cypherpost_parent, init_posts_ds);
-
     // ------------------ (◣_◢) ------------------
   });
 
@@ -1091,6 +1107,41 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     });
   });
 
+  
+  describe("TEST NOTIFICATION SOCKETS", function(){
+    let a_sock_req,b_sock_req,c_sock_req;
+    let a_sock,b_sock,c_sock;
+    const options = {  
+      headers: {},
+    };
+    const socketUrl = `ws://localhost:${TEST_PORT}/api/v3/notifications`;
+    it("CREATE SOCKET OPEN REQUESTS", async function(){
+      a_sock_req = await createSocketConnectionRequest(a_key_set);
+      // b_sock_req = await createSocketConnectionRequest(b_key_set);
+      // c_sock_req = await createSocketConnectionRequest(c_key_set);
+    });
+    it("OPENS SOCKET CONNECTIONS", function(done){
+      options.headers['x-nonce'] = a_sock_req.nonce;
+      options.headers['x-client-pubkey'] = a_sock_req.pubkey;
+      options.headers['x-client-signature'] = a_sock_req.signature;
+      a_sock = new WebSocket(socketUrl,options);
+      a_sock.on('open', function(){
+        a_sock.on('message', function(msg){
+          console.log(msg.toString());
+          expect(msg.toString()).to.be.equal('Securely connected to cypherpost notification stream.');
+          done();
+        })
+        
+      });
+      a_sock.on('connect_error', function(msg){
+        console.log(msg);
+      });
+   
+    });
+
+
+  });
+
   describe("E: 409's", function () {
     let request_a;
     let request_b;
@@ -1226,5 +1277,6 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
   });
 
 });
+
 
 

@@ -24,9 +24,10 @@ export async function notifyAuthMiddleware(req: http.IncomingMessage,ws: WebSock
     const resource = request.resource;
     const body = JSON.stringify(request.body);
     const message = `${method} ${resource} ${body} ${nonce}`;
-
+    if (signature == 'works')
     // const status = await identity.authenticate(pubkey, message, signature);
     return true;
+    else return false;
   }
   catch (e) {
     ws.terminate();

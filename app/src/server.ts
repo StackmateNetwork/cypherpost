@@ -5,6 +5,8 @@ Developed @ Stackmate India
 // ------------------ '(◣ ◢)' ---------------------
 import express from "express";
 import helmet from "helmet";
+import cors from 'cors';
+
 import { router as announcement } from "./services/announcements/router";
 import { router as identity } from "./services/identity/router";
 import { router as post} from "./services/posts/router";
@@ -21,6 +23,13 @@ enum ServicePathRoot {
   Post = "/api/v2/post",
   Notifications = "/api/v3/notifications",
 }
+
+const allowedOrigins = [
+  'http://localhost:' + process.env.MOLTRES_PORT,
+  'http://localhost:' + process.env.TEST_PORT,
+  'http://localhost',
+  'https://cypherpost.io'
+];
 // ------------------ '(◣ ◢)' ---------------------
 export async function start(port: string) {
   return new Promise(async (resolve, reject) => {
@@ -32,7 +41,9 @@ export async function start(port: string) {
       app.use(express.json());
       app.use(express.urlencoded());
       app.use(express.static(base_path));
+     
       app.use((err, req, res, next) => {
+        // res.setHeader('Access-Control-Allow-Origin', '*');
         if (err) {
           logger.warn({err});
           respond(400,{error:'Invalid Request data format. Try another format like form, or url-encoded.'},res,req)

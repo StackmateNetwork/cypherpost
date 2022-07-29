@@ -116,6 +116,15 @@ docker exec -it application sh -c "bash units.bash"
 
 ```
 
+ALWAYS LET TESTS COMPLETE. STOPPING A TEST HALF WAY CAN LEAD TO PERSISTENCE OF UNWANTED ARTIFACTS.
+
+If you end up in such a place where tests are breaking because of left over artifacts, use
+
+```bash
+pier delvols
+```
+To delete all persistent data. DO NOT RUN ON PROD!
+
 ## Inspect Database
 ```bash
 docker exec -it database mongo
