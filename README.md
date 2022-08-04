@@ -9,10 +9,9 @@
 - ECDSA Shared Secrets are used per identity, to encrypt decryption keys in transit.
 - Badges form a reputation system and help build a trusted network.
 - Value of badges are subjective and based on who the givers are.
-- Issuance of badges can be verified by all clients
-=======
+- # Issuance of badges can be verified by all clients
 
-### cypherpost can be run either as a `PUBLIC` or `PRIVATE` server. 
+### cypherpost can be run either as a `PUBLIC` or `PRIVATE` server.
 
 Running a public cypherpost instance requires attachment to `cyphernodeappsnet` to access payment facilities via `cyphernode`.
 
@@ -20,25 +19,29 @@ Public servers have no other means of protecting from spam, since neither email 
 
 Private servers generate an `invite code` during server setup. This code is required during client registration to maintain a closed network. Private servers can be run stand-alone without the need of payment facilites.
 
-#### Private Server LIVE at https://cypherpost.io/api/v2
+#### Private Server UNDER CONSTRUCTION at https://cypherpost.io/api/v2
 
 ![cypherpost](design/assets/owl.png)
 
-## Manual Development Environment 
+## Manual Development Environment
 
 You must have npm installed.
 To get the latest version of npm visit: https://nodejs.org/en/
 
 ### Install typescript
+
 ```bash
 sudo npm i -g typescript
 ```
+
 ### Clone repo
+
 ```bash
 git clone git@github.com:StackmateNetwork/cypherpost.git
 ```
 
 ### Install server dependencies and compile TS code
+
 ```bash
 cd cypherpost/app
 npm i
@@ -52,6 +55,7 @@ tsc
 ## Development Scripts
 
 ### SETUP:
+
 ```bash
 # setup dev compose environment
 cd ../../../../../compose
@@ -60,17 +64,20 @@ cd ../../../../../compose
 ```
 
 ### START & TEST
+
 ```bash
 ./start.sh
 ./test.sh
 ```
 
 ### STOP
+
 ```
 ./stop.sh
 ```
 
 ## Docker Helpers
+
 ```bash
 # to stop all containers
 docker-compose -f dev-compose.yaml down
@@ -123,9 +130,11 @@ If you end up in such a place where tests are breaking because of left over arti
 ```bash
 pier delvols
 ```
+
 To delete all persistent data. DO NOT RUN ON PROD!
 
 ## Inspect Database
+
 ```bash
 docker exec -it database mongo
 
@@ -154,12 +163,11 @@ In the root folder run `pier list` to view all possible commands.
 
 To use a command run `pier run <command> <args>` eg: `pier run dev-start`
 
-
 ### Extra Notes:
 
 #### Optional Reference Field
 
-Clients can use an optional  `reference` field, when making a post. References require the following:
+Clients can use an optional `reference` field, when making a post. References require the following:
 
 - reference must be an existing post_id
 - reference posts must be encrypted with the same key as the post it is referencing
@@ -168,5 +176,3 @@ Clients can use an optional  `reference` field, when making a post. References r
 References allow users to create group chats.
 
 Note that when the parent post is deleted, all references are also removed.
-
-
