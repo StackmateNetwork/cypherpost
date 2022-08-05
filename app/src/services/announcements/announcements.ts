@@ -2,7 +2,6 @@
 cypherpost.io
 Developed @ Stackmate India
 */
-
 import crypto from "crypto";
 import { CypherpostBitcoinOps } from "../../lib/bitcoin/bitcoin";
 import { handleError } from "../../lib/errors/e";
@@ -15,7 +14,7 @@ const uuid = new S5UID();
 const bitcoin = new CypherpostBitcoinOps();
 
 export class CypherpostAnnouncements implements AnnouncementInterface {
-  getAll(genesis_filter: Number): Promise<Announcement[] | Error> {
+  getAll(genesis_filter: number): Promise<Announcement[] | Error> {
     return store.readAll(genesis_filter);
   }
   removeAllOfUser(pubkey: string): Promise<boolean | Error> {
@@ -23,7 +22,6 @@ export class CypherpostAnnouncements implements AnnouncementInterface {
   }
   async create(by: string, to: string, type: AnnouncementType, nonce: string, signature: string): Promise<boolean | Error> {
     try{
-  
       const announcement_message = `${by}:${to}:${type.toString()}:${nonce}`;
       // console.log({badge_message});
       // console.log({signature});
@@ -35,9 +33,9 @@ export class CypherpostAnnouncements implements AnnouncementInterface {
       });
       const badge: Announcement = {
         genesis: Date.now(),
-        by: by,
-        to: to,
-        type: type,
+        by,
+        to,
+        type,
         hash:crypto.createHash("sha256").update(`${by}:${to}:${type.toString()}`).digest("hex"),
         nonce,
         signature,
@@ -49,10 +47,10 @@ export class CypherpostAnnouncements implements AnnouncementInterface {
       handleError(e);
     }
   }
-  findByMaker(by: string, genesis_filter: Number): Promise<Error | Announcement[]> {
+  findByMaker(by: string, genesis_filter: number): Promise<Error | Announcement[]> {
     return store.readByMaker(by,genesis_filter);
   }
-  findByReceiver(to: string,genesis_filter: Number): Promise<Error | Announcement[]> {
+  findByReceiver(to: string,genesis_filter: number): Promise<Error | Announcement[]> {
     return store.readByReceiver(to,genesis_filter);
   }
   revoke(by: string, to: string, type: AnnouncementType): Promise<boolean | Error> {

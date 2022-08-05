@@ -11,7 +11,7 @@ import { handleDeleteIdentity, handleGetAllIdentities, handleGetServerIdentity, 
 export const router = Router();
 // ------------------ '(◣ ◢)' ---------------------
 const registrationCheck = [
-  val.check('username').exists().matches(/^(?=.{1,15}$)(?![_.])(?!.*[_.]{2})[a-z][a-z0-9_.]+$/), 
+  val.check('username').exists().matches(/^(?=.{1,15}$)(?![_.])(?!.*[_.]{2})[a-z][a-z0-9_.]+$/),
 ];
 const checkGetIdentities = [
   val.check('genesis_filter').optional()

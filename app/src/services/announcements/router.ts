@@ -12,7 +12,7 @@ export const router = Router();
 // ------------------ '(◣ ◢)' ---------------------
 const createAnnouncementCheck = [
   val.check('recipient').exists(),
-  val.check('nonce').exists(), 
+  val.check('nonce').exists(),
   val.check('signature').exists(),
 ];
 

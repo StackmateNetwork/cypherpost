@@ -2,8 +2,6 @@
 cypherpost.io
 Developed @ Stackmate India
 */
-
-
 import { CypherpostBitcoinOps } from "../../lib/bitcoin/bitcoin";
 import { r_500 } from "../../lib/logger/winston";
 import { filterError, parseRequest, respond } from "../../lib/http/handler";
@@ -37,19 +35,16 @@ export async function identityMiddleware(req, res, next) {
     const resource = request.resource;
     const body = JSON.stringify(request.body);
     const message = `${method} ${resource} ${body} ${nonce}`;
-    
     if (resource !== "/api/v2/identity/admin/invitation")
     {
-      let verified = await bitcoin.verify(message, signature, pubkey);
+      const verified = await bitcoin.verify(message, signature, pubkey);
       if (verified instanceof Error) throw verified;
       else if (!verified) throw{
         code: 401,
         message: "Invalid Request Signature."
       };
     }
-    
     next();
-    
   }
   catch (e) {
     const result = filterError(e, r_500, request);
@@ -68,14 +63,14 @@ export async function handleRegistration(req, res) {
       }
     }
 
-    const registration_type = TYPE.toLowerCase().includes("pub") ? 
+    const registration_type = TYPE.toLowerCase().includes("pub") ?
       RegistrationType.Payment : RegistrationType.Invite;
-  
+
     const pubkey = request.headers['x-client-pubkey'];
     const invite_code = request.headers['x-client-invite-code']
-    let status = await identity.register(request.body.username, pubkey, registration_type,(registration_type===RegistrationType.Invite)?invite_code:"");
+    const status = await identity.register(request.body.username, pubkey, registration_type,(registration_type===RegistrationType.Invite)?invite_code:"");
     if (status instanceof Error) throw status;
-    
+
     const response = {
       status
     };
@@ -119,9 +114,7 @@ export async function handleGetAllIdentities(req, res) {
 
 export async function handleDeleteIdentity(req, res) {
   const request = parseRequest(req);
-
   try {
-
     const errors = validationResult(req)
     if (!errors.isEmpty()) {
       throw {
@@ -129,13 +122,6 @@ export async function handleDeleteIdentity(req, res) {
         message: errors.array()
       }
     }
-
-    // remove identity xpub from :
-    // profile + keys
-    // posts + keys
-    // preferences 
-    // badges
-    // identities
 
     const rm_posts = await posts.removeAllByOwner(request.headers['x-client-pubkey']);
     if(rm_posts instanceof Error) throw rm_posts;
@@ -148,7 +134,7 @@ export async function handleDeleteIdentity(req, res) {
 
     const rm_identity = await identity.remove(request.headers['x-client-pubkey']);
     if (rm_identity instanceof Error) throw rm_identity;
-    
+
     const response = {
       status: true
     };
@@ -163,9 +149,7 @@ export async function handleDeleteIdentity(req, res) {
 
 export async function handleGetServerIdentity(req, res) {
   const request = parseRequest(req);
-
   try {
- 
     const response = {
       type: TYPE,
       name: process.env.SERVER_NAME,
@@ -184,7 +168,7 @@ export async function handleAdminGetInvite(req,res){
   const request = parseRequest(req);
   try {
     console.log("IN")
-    if (request.headers['x-admin-invite-secret'] != INVITE_SECRET){
+    if (request.headers['x-admin-invite-secret'] !== INVITE_SECRET){
       throw {
         code: 401,
         message: "Incorrect Invite Secret"

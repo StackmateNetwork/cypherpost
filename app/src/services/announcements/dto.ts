@@ -116,7 +116,7 @@ export async function handleMakeAnnouncement(req, res) {
     let announcement= AnnouncementType.Trusted;
 
     switch (request.params.announcement.toUpperCase()){
-      case 'TRUST': 
+      case 'TRUST':
         announcement = AnnouncementType.Trusted;
         break;
       case 'SCAMMER':
@@ -130,7 +130,7 @@ export async function handleMakeAnnouncement(req, res) {
           break;
       default:
         announcement = AnnouncementType.Trusted;
-        break;  
+        break;
     }
 
     const status = await announcements.create(request.headers['x-client-pubkey'], request.body.recipient, AnnouncementType.Trusted, request.body.nonce, request.body.signature);

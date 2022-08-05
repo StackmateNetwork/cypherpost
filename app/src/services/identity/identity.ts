@@ -12,8 +12,6 @@ import { S5UID } from "../../lib/uid/uid";
 import { IdentityIndex, IdentityInterface, InvitationCodeStatus, RegistrationType, UserIdentity, VerificationStatus } from "./interface";
 import { MongoIdentityStore, MongoInviteStore } from "./mongo";
 
-
-
 const uid = new S5UID();
 const TYPE = process.env.TYPE;
 
@@ -30,11 +28,10 @@ const THIRTY_DAYS = 30 * 24 * ONE_HOUR;
 export class CypherpostIdentity implements IdentityInterface {
 
   async register(username: string, pubkey: string, type: RegistrationType, invite_code?: string): Promise<boolean | Error> {
-    
     if (type === RegistrationType.Invite){
-      const status = await inviteStore.checkOne(invite_code, InvitationCodeStatus.Unclaimed);
-      if(status instanceof Error) return status;
-      if(!status) return handleError({
+      const checkInviteStatus = await inviteStore.checkOne(invite_code, InvitationCodeStatus.Unclaimed);
+      if(checkInviteStatus instanceof Error) return checkInviteStatus;
+      if(!checkInviteStatus) return handleError({
         code: 400,
         message: "Invite code invalid or already claimed."
       });
@@ -45,21 +42,21 @@ export class CypherpostIdentity implements IdentityInterface {
     const new_identity: UserIdentity = {
       genesis: Date.now(),
       username,
-      pubkey: pubkey,
+      pubkey,
       status: type === RegistrationType.Payment ? VerificationStatus.Pending:VerificationStatus.Verified
     };
 
-    const status = await idStore.createOne(new_identity);
-    if (status instanceof Error) return status;
+    const createStatus = await idStore.createOne(new_identity);
+    if (createStatus instanceof Error) return createStatus;
 
-    return status;
+    return createStatus;
   }
   async authenticate(pubkey: string, message: string, signature: string): Promise<boolean | Error> {
     const identity = await idStore.readOne(pubkey, IdentityIndex.Pubkey);
     if (identity instanceof Error) return identity;
-    
+
     if (
-        identity.status===VerificationStatus.Pending || 
+        identity.status===VerificationStatus.Pending ||
         (identity.status === VerificationStatus.Partial && identity.genesis + THIRTY_DAYS > Date.now())
       )
     {
@@ -68,8 +65,8 @@ export class CypherpostIdentity implements IdentityInterface {
         message: TYPE.toLowerCase()==="public"?"Payment Required.":"Register with invite code."
       });
     }
-    
-    let verified = await bitcoin.verify(message, signature, pubkey);
+
+    const verified = await bitcoin.verify(message, signature, pubkey);
     if(verified instanceof Error) return verified;
     if (!verified) return handleError({
       code: 401,
@@ -85,7 +82,7 @@ export class CypherpostIdentity implements IdentityInterface {
     const result = await idStore.updateOne(pubkey,status);
     return result;
   }
-  async all(genesis_filter: Number): Promise<Array<UserIdentity> | Error> {
+  async all(genesis_filter: number): Promise<Array<UserIdentity> | Error> {
     const identities = await idStore.readAll(genesis_filter);
     return identities;
   }

@@ -2,7 +2,6 @@
 cypherpost.io
 Developed @ Stackmate India
 */
-
 import { expect } from "chai";
 import "mocha";
 import { CypherpostBitcoinOps } from "../../lib/bitcoin/bitcoin";
@@ -19,11 +18,11 @@ const identity = new CypherpostIdentity();
 const db = new MongoDatabase();
 const inviteStore = new MongoInviteStore();
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
-let username = "ishi";
+const username = "ishi";
 const username2 = "r21";
-let message = "POST identity/registration";
-let xpub = "xpub6CAEPnbkCHtuM1BR5iVQsXEkPBzDoEYF3gyHcZSzJW23CEJm55tmVxwVcdSX6FJFTrwccY8YG4ur3Wjyg2SoxVjGhpJpwUcMd3eBrC4wHdH";
-let xprv = "xprv9yAszH4rMvLc8X6wygxQWPJ1qA9jPmpPgU3gpB3NkAV4KRycXYaWxAd1mPo9yzybuhANVb7WmnjjLWyWjt5tq772RKPpcRF2FAN2nRTBMMC";
+const message = "POST identity/registration";
+const xpub = "xpub6CAEPnbkCHtuM1BR5iVQsXEkPBzDoEYF3gyHcZSzJW23CEJm55tmVxwVcdSX6FJFTrwccY8YG4ur3Wjyg2SoxVjGhpJpwUcMd3eBrC4wHdH";
+const xprv = "xprv9yAszH4rMvLc8X6wygxQWPJ1qA9jPmpPgU3gpB3NkAV4KRycXYaWxAd1mPo9yzybuhANVb7WmnjjLWyWjt5tq772RKPpcRF2FAN2nRTBMMC";
 let ecdsa_keys;
 let signature;
 const invite_secret = "d8e8fca2dc0f896fd7cb4cb0031ba249";
@@ -35,14 +34,14 @@ let invite_1;
   "xpub": "[8f8bb5c0/128'/0'/0']xpub6CAEPnbkCHtuM1BR5iVQsXEkPBzDoEYF3gyHcZSzJW23CEJm55tmVxwVcdSX6FJFTrwccY8YG4ur3Wjyg2SoxVjGhpJpwUcMd3eBrC4wHdH/*"
 }
 */
-let userIdentity: UserIdentity = {
+const userIdentity: UserIdentity = {
   username,
   genesis: Date.now(),
   pubkey:xpub,
   status: VerificationStatus.Pending
 };
 
-let genesis_filter = 0;
+const genesis_filter = 0;
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 describe("Initalizing Test: Identity Service", function () {
   before(async function () {

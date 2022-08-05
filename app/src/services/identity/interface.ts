@@ -7,7 +7,7 @@ export interface IdentityInterface{
   register(username: string, pubkey: string, type: RegistrationType, invite_code?: string):Promise<boolean | Error>;
   authenticate(pubkey: string, message: string, signature: string): Promise<boolean | Error>;
   updateStatus(pubkey:string, status: VerificationStatus): Promise<boolean | Error>;
-  all(genesis_filter: Number): Promise<Array<UserIdentity> | Error>;
+  all(genesis_filter: number): Promise<Array<UserIdentity> | Error>;
   createInvite(): Promise<string | Error>;
   remove(pubkey: string): Promise<boolean | Error>;
 }
@@ -16,7 +16,7 @@ export interface IdentityStore{
   createOne(identity: UserIdentity): Promise<boolean | Error>;
   readOne(index: string, indexType: IdentityIndex): Promise<UserIdentity | Error>;
   updateOne(pubkey: string, status: VerificationStatus):Promise<boolean | Error>;
-  readAll(genesis_filter: Number): Promise<Array<UserIdentity> | Error>;
+  readAll(genesis_filter: number): Promise<Array<UserIdentity> | Error>;
   removeOne(pubkey: string): Promise<boolean | Error>;
 }
 

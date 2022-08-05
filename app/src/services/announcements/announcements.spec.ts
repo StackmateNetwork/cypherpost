@@ -78,7 +78,6 @@ const identities = [
 ];
 const idObjects = {
   admin,pbz,sushi,bubble,ch2,satoshi,outlier,newuser,ishi,
- 
 };
 
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------

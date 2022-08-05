@@ -48,7 +48,7 @@ export class MongoIdentityStore implements IdentityStore {
         return true;
       }
     } catch (e) {
-      if (e['code'] && e['code'] == 11000) {
+      if (e['code'] && e['code'] === 11000) {
         return handleError({
           code: 409,
           message: "Duplicate Index."
@@ -100,9 +100,8 @@ export class MongoIdentityStore implements IdentityStore {
       return handleError(e);
     }
   }
-  async readAll(genesis_filter: Number): Promise<Array<UserIdentity> | Error> {
+  async readAll(genesis_filter: number): Promise<Array<UserIdentity> | Error> {
     try {
-      
       const docs = await identityStore.find({ genesis: { $gte: genesis_filter } }).exec();
       if (docs instanceof Error) {
         return handleError(docs);
@@ -131,7 +130,7 @@ export class MongoIdentityStore implements IdentityStore {
         return handleError(result);
       };
       return result.modifiedCount > 0 || result.matchedCount >0;
-      // if verified if true the document is not updated and will return modifiedCount = 0 
+      // if verified if true the document is not updated and will return modifiedCount = 0
       // watchout
     } catch (e) {
       return handleError(e);
@@ -162,13 +161,13 @@ const invite_schema = new mongoose.Schema(
 // ------------------ '(◣ ◢)' ---------------------
 const inviteStore = mongoose.model("invite", invite_schema);
 // ------------------ '(◣ ◢)' ---------------------
+// tslint:disable-next-line: max-classes-per-file
 export class MongoInviteStore implements InviteStore {
-
   async createOne(invite_code: string): Promise<boolean | Error> {
     try {
       await identityStore.syncIndexes();
       const doc = await inviteStore.create({
-        invite_code: invite_code,
+        invite_code,
         genesis: Date.now(),
         status: InvitationCodeStatus.Unclaimed
       });
@@ -178,7 +177,7 @@ export class MongoInviteStore implements InviteStore {
         return true;
       }
     } catch (e) {
-      if (e['code'] && e['code'] == 11000) {
+      if (e['code'] && e['code'] === 11000) {
         return handleError({
           code: 409,
           message: "Duplicate Index."
@@ -209,8 +208,8 @@ export class MongoInviteStore implements InviteStore {
         if (doc instanceof Error) {
           return handleError(doc);
         }
-        if (invite_code == doc['invite_code']) return true;
-        else false;
+        if (invite_code === doc['invite_code']) return true;
+        else return false;
       } else {
         // no data from findOne
         return false;
@@ -230,7 +229,7 @@ export class MongoInviteStore implements InviteStore {
         return handleError(result);
       };
       return result.modifiedCount > 0 || result.matchedCount >0;
-      // if verified if true the document is not updated and will return modifiedCount = 0 
+      // if verified if true the document is not updated and will return modifiedCount = 0
       // watchout
     } catch (e) {
       return handleError(e);
