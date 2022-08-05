@@ -61,7 +61,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
         return true;
       }
     } catch (e) {
-      if (e['code'] && e['code'] == 11000) {
+      if (e['code'] && e['code'] === 11000) {
         return handleError({
           code: 409,
           message: "Duplicate Index."
@@ -72,7 +72,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
   }
   async removeByReceiver(by: string, to: string, type: AnnouncementType): Promise<boolean | Error> {
     try {
-      const query = { by: by, to: to, type };
+      const query = { by, to, type };
 
       const status = await announcementStore.deleteOne(query)
       if (status instanceof Error) {
@@ -87,8 +87,6 @@ export class MongoAnnouncementStore implements AnnouncementStore {
   }
   async removeAll(pubkey: string): Promise<boolean | Error> {
     try {
-      
-      
       const by_query = { by : {$in: pubkey} };
 
       let status = await announcementStore.deleteMany(by_query)
@@ -103,26 +101,23 @@ export class MongoAnnouncementStore implements AnnouncementStore {
         return handleError(status);
       }
       return true;
-      
     } catch (e) {
       return handleError(e);
     }
   }
   async removeAllTest(): Promise<boolean | Error> {
     try {
-      
-      let status = await announcementStore.deleteMany();
+      const status = await announcementStore.deleteMany();
       if (status instanceof Error) {
         return handleError(status);
       }
 
       return true;
-      
     } catch (e) {
       return handleError(e);
     }
   }
-  async readByMaker(by: string, genesis_filter: Number): Promise<Announcement[] | Error> {
+  async readByMaker(by: string, genesis_filter: number): Promise<Announcement[] | Error> {
     try {
       const query = { by: { $in: by }, genesis: {$gte: genesis_filter} };
 
@@ -151,7 +146,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
       return handleError(e);
     }
   }
-  async readAll(genesis_filter: Number): Promise<Announcement[] | Error> {
+  async readAll(genesis_filter: number): Promise<Announcement[] | Error> {
     try {
       const docs = await announcementStore.find({genesis: {$gte: genesis_filter}}).sort({ "genesis": -1 }).exec();
       if (docs instanceof Error) {
@@ -179,7 +174,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
       return handleError(e);
     }
   }
-  async readByReceiver(to: string,  genesis_filter: Number): Promise<Announcement[] | Error> {
+  async readByReceiver(to: string,  genesis_filter: number): Promise<Announcement[] | Error> {
     try {
       const query = { to: { $in: to },  genesis: {$gte: genesis_filter} };
       const docs = await announcementStore.find(query).sort({ "genesis": -1 }).exec();

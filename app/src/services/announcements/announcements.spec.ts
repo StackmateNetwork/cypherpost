@@ -48,18 +48,16 @@ PARENT e2ee/cypherpost/identity
 }
 
 */
-let message = "GET /announcement/";
 
-let xpub = "xpub6DAo87N8pGxhyNo8uWWVwsTRHwozpSp2Scy1BiCjM2rN9R3vRnysqXr2ymokbVYGPzih9Ze1iW4GiKjnL7Eqdec4Gj2fcpvoScN1rfdVKjK";
-let xprv = "xprv9zBSibqEyuQQktifoUyVajWgjuyWQz6B5Q3QPKo7nhKPGcimtFfdHjXZ8UBYi7Ycz6V7R1QrSk9uExx2xTb9mW6SprakREwVuC91233nJaD";
-let xpub1 =  "xpub6CQuhNszNuSHTvynoBjh8d3wmYqkvTY9jLmvobQ8AFq67xEYgWRjQYELAXM5UCXiDYBZaiyoXsfGDd97imrJ3Btvo71Eb47ikZq8wJZYSoJ";
-let xprv1 =  "xprv9yRZHsM6YXszFSuKhACgmV7DDX1GWzpJN7rL1CzWbvJ7F9uQ8y7UrjurKGdCSteFhKPrytgtVLNdkLTUR3hksooDan6AUg8ACQqcApeu1sk";
-let nonce = Date.now().toString();
-let hash;
+const xpub = "xpub6DAo87N8pGxhyNo8uWWVwsTRHwozpSp2Scy1BiCjM2rN9R3vRnysqXr2ymokbVYGPzih9Ze1iW4GiKjnL7Eqdec4Gj2fcpvoScN1rfdVKjK";
+const xprv = "xprv9zBSibqEyuQQktifoUyVajWgjuyWQz6B5Q3QPKo7nhKPGcimtFfdHjXZ8UBYi7Ycz6V7R1QrSk9uExx2xTb9mW6SprakREwVuC91233nJaD";
+const xpub1 =  "xpub6CQuhNszNuSHTvynoBjh8d3wmYqkvTY9jLmvobQ8AFq67xEYgWRjQYELAXM5UCXiDYBZaiyoXsfGDd97imrJ3Btvo71Eb47ikZq8wJZYSoJ";
+const xprv1 =  "xprv9yRZHsM6YXszFSuKhACgmV7DDX1GWzpJN7rL1CzWbvJ7F9uQ8y7UrjurKGdCSteFhKPrytgtVLNdkLTUR3hksooDan6AUg8ACQqcApeu1sk";
+const nonceGlobal = Date.now().toString();
 let ecdsa_keys;
 let ecdsa_keys1;
-let signature;
-let genesis_filter = 0;
+let signatureGlobal;
+const genesis_filter = 0;
 
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 
@@ -89,7 +87,7 @@ describe("Initalizing Test: Badge Service", function () {
 
   before(async function () {
     sandbox.stub(CypherpostBitcoinOps.prototype, "verify").resolves(true);
-    
+
     const connection: DbConnection = {
       port: process.env.DB_PORT,
       ip: process.env.DB_IP,
@@ -101,15 +99,12 @@ describe("Initalizing Test: Badge Service", function () {
     ecdsa_keys = await bitcoin.extract_ecdsa_pair({xpub,xprv});
     if(ecdsa_keys instanceof Error) return ecdsa_keys;
 
-    console.log({ecdsa_keys})
     ecdsa_keys1 = await bitcoin.extract_ecdsa_pair({xpub:xpub1,xprv:xprv1});
     if(ecdsa_keys instanceof Error) return ecdsa_keys;
 
-    console.log({ecdsa_keys1})
-    
-    const message = `${ecdsa_keys.pubkey}:${ecdsa_keys1.pubkey}:${AnnouncementType.Trusted.toString()}:${nonce}`;
- 
-    signature = await bitcoin.sign(message,ecdsa_keys.privkey);
+    const message = `${ecdsa_keys.pubkey}:${ecdsa_keys1.pubkey}:${AnnouncementType.Trusted.toString()}:${nonceGlobal}`;
+
+    signatureGlobal = await bitcoin.sign(message,ecdsa_keys.privkey);
 
   });
   after(async () =>{
@@ -119,11 +114,11 @@ describe("Initalizing Test: Badge Service", function () {
 
   describe("ANNOUNCEMENT SERVICE UNIT TESTS:", async function () {
     it("CREATE new TRUST from xpub to xpub1", async function () {
-      const response = await announcement.create(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trusted,nonce, signature);
+      const response = await announcement.create(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trusted,nonceGlobal, signatureGlobal);
       expect(response).to.equal(true);
     });
     it("409 for CREATE duplicate TRUST from xpub to xpub1", async function () {
-      const response = await announcement.create(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trusted,nonce, signature);
+      const response = await announcement.create(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trusted,nonceGlobal, signatureGlobal);
       expect(response['name']).to.equal("409");
     });
     it("FIND announcements by maker", async function () {
@@ -157,7 +152,7 @@ describe("Initalizing Test: Badge Service", function () {
       expect(response.length === 0).to.equal(true);
     });
     it("CREATE new TRUST from pubkey to pubkey1", async function () {
-      const response = await announcement.create(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trusted,nonce, signature);
+      const response = await announcement.create(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trusted,nonceGlobal, signatureGlobal);
       expect(response).to.equal(true);
     });
     it("REMOVE ALL by pubkey", async function () {
@@ -172,8 +167,6 @@ describe("Initalizing Test: Badge Service", function () {
   });
 
   describe("BADGE SIMULATION: USER PERSPECTIVES", async function(){
-
-
     it("SIMULATE GIVING TRUST ANNOUNCEMENTS AMONG USERS:", async function () {
       await simulateAnnouncements('nonce', 'signature');
     });
@@ -182,27 +175,26 @@ describe("Initalizing Test: Badge Service", function () {
       if(all_announcements instanceof Error) throw all_announcements;
       // OPERATE ON ANNOUNCEMENTS
 
-      let trustObject = {};
-      let ids_with_announcements = [];
+      const trustObject = {};
+      const ids_with_announcements = [];
       identities.map((id)=>{
         ids_with_announcements.push({
-          id: id,
-          given: all_announcements.filter((announcement)=>
-            announcement.by === id
+          id,
+          given: all_announcements.filter((annElement)=>
+            annElement.by === id
           ).map((badge)=> Object({to:badge.to,type:badge.type})),
-          received: all_announcements.filter((announcement)=>
-          announcement.to === id
-          ).map((announcement)=>  Object({from: announcement.by, type:announcement.type})),
+          received: all_announcements.filter((annElement)=>
+          annElement.to === id
+          ).map((annElement)=>  Object({from: annElement.by, type:annElement.type})),
       })});
         ids_with_announcements.map((object)=>{
-        trustObject[object.id] = 
+        trustObject[object.id] =
           object.given.map(obj=>obj.to);
-           
       });
       console.log(JSON.stringify(trustObject,null,2));
     });
     it("CLEAN UP AFTER SIMULATION",async function(){
-      let response = await store.removeAllTest();
+      const response = await store.removeAllTest();
       expect(response).to.equal(true);
     })
   });
@@ -250,7 +242,7 @@ async function simulateAnnouncements(nonce: string,signature: string){
       response = await announcement.create(sushi, ch2, AnnouncementType.Scammer,nonce, signature);
       expect(response).to.equal(true);
       response = await announcement.create(ch2, ishi, AnnouncementType.Trusted,nonce, signature);
-      expect(response).to.equal(true);    
+      expect(response).to.equal(true);
       response = await announcement.create(ch2, bubble, AnnouncementType.Trusted,nonce, signature);
       expect(response).to.equal(true);
       response = await announcement.create(ch2, sushi, AnnouncementType.Trusted,nonce, signature);

@@ -133,7 +133,7 @@ export async function handleMakeAnnouncement(req, res) {
         break;  
     }
 
-    let status = await announcements.create(request.headers['x-client-pubkey'], request.body.recipient, AnnouncementType.Trusted, request.body.nonce, request.body.signature);
+    const status = await announcements.create(request.headers['x-client-pubkey'], request.body.recipient, AnnouncementType.Trusted, request.body.nonce, request.body.signature);
     if (status instanceof Error) throw status;
 
     const response = {
@@ -165,7 +165,7 @@ export async function handleRevokeTrust(req, res) {
     // REMOVE ALL RELATED KEYS
     status = await postKeys.removePostDecryptionKeyByReceiver(request.headers['x-client-pubkey'],request.body.revoking);
     if (status instanceof Error) throw status;
-    
+
     const response = {
       status
     };
