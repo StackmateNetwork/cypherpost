@@ -15,9 +15,6 @@ const posts = new CypherpostPosts();
 const identity = new CypherpostIdentity();
 const postKeys = new CypherpostPostKeys();
 
-// expressWs(express)
-
-
 export async function postMiddleware(req, res, next) {
   const request = parseRequest(req);
   try {
@@ -29,7 +26,7 @@ export async function postMiddleware(req, res, next) {
     const resource = request.resource;
     const body = JSON.stringify(request.body);
     const message = `${method} ${resource} ${body} ${nonce}`;
-    console.log({resource});
+    // console.log({resource});
     if(resource === '/api/v2/post/key/stream') next();
     else{
       const status = await identity.authenticate(pubkey, message, signature);
@@ -87,7 +84,7 @@ export async function handleGetMyPosts(req, res) {
 
     if (ids_removed.length > 0)
       ids_removed.map((id) => {
-        let status = postKeys.removePostDecryptionKeyById(req.headers['x-client-pubkey'], id);
+        const status = postKeys.removePostDecryptionKeyById(req.headers['x-client-pubkey'], id);
         if (status instanceof Error) {
           console.error("ERRORED WHILE DELETING EXPIRED POST KEYS", { status });
           throw status
@@ -122,8 +119,6 @@ export async function handleGetOthersPosts(req, res) {
         message: errors.array()
       }
     }
-    // find my trusted_by list of xpubs
-    // find their posts
 
     const genesis_filter = request.query['genesis_filter'] ? request.query['genesis_filter'] : 0;
 
@@ -132,10 +127,10 @@ export async function handleGetOthersPosts(req, res) {
 
     const posts_recieved = await posts.findManyById(receiver_keys.map(key => key.post_id), genesis_filter);
     if (posts_recieved instanceof Error) throw posts_recieved;
-    let expired_ids = [];
+    const expired_ids = [];
 
     posts_recieved.map(post => {
-      if (post.expiry < Date.now() && post.expiry != 0)
+      if (post.expiry < Date.now() && post.expiry !== 0)
         expired_ids.push(post.id);
     });
 
@@ -144,7 +139,7 @@ export async function handleGetOthersPosts(req, res) {
 
     if (expired_ids.length > 0)
       expired_ids.map((id) => {
-        let status = postKeys.removePostDecryptionKeyById(req.headers['x-client-pubkey'], id);
+        const status = postKeys.removePostDecryptionKeyById(req.headers['x-client-pubkey'], id);
         if (status instanceof Error) {
           console.error("ERRORED WHILE DELETING EXPIRED POST KEYS", { status });
           throw status
@@ -154,8 +149,8 @@ export async function handleGetOthersPosts(req, res) {
     const posts_and_keys = [];
 
     posts_recieved.filter(function (post) {
-      const key = receiver_keys.find(key => key.post_id === post.id);
-      key ? posts_and_keys.push({ ...post, decryption_key: key.decryption_key }) : null;
+      const key = receiver_keys.find(receiverKey => receiverKey.post_id === post.id);
+      if (key) posts_and_keys.push({ ...post, decryption_key: key.decryption_key });
     });
 
     const response = {
@@ -209,7 +204,6 @@ export async function handlePutKeys(req, res) {
       }
     }
     // check if giver is TRUSTED, or if receiver is OPEN
-    
     // let is_reference = await posts.isReference(req.body.post_id,request.headers['x-client-pubkey']);
     // if(is_reference instanceof Error) throw is_reference;
     // if(is_reference){

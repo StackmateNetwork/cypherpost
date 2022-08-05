@@ -65,7 +65,7 @@ export class MongoPostStore implements PostStore {
         return true;
       }
     } catch (e) {
-      if (e['code'] && e['code'] == 11000) {
+      if (e['code'] && e['code'] === 11000) {
         return handleError({
           code: 409,
           message: "Duplicate Index."
@@ -76,7 +76,7 @@ export class MongoPostStore implements PostStore {
   }
   async removeMany(indexes: Array<string>, index_type: PostStoreIndex): Promise<boolean | Error> {
     try {
-      const query = (index_type == PostStoreIndex.Owner)
+      const query = (index_type === PostStoreIndex.Owner)
         ? { owner: { $in: indexes } }
         : { $or: [{ id: { $in: indexes } }] };
 
@@ -93,7 +93,7 @@ export class MongoPostStore implements PostStore {
   }
   async removeOne(id: string, owner: string): Promise<boolean | Error> {
     try {
-      let id_delete_status = await postStore.deleteOne({ id, owner });
+      const id_delete_status = await postStore.deleteOne({ id, owner });
       if (id_delete_status instanceof Error) {
         return handleError(id_delete_status);
       }
@@ -106,12 +106,12 @@ export class MongoPostStore implements PostStore {
       return handleError(e);
     }
   }
-  async readMany(indexes: Array<string>, index_type: PostStoreIndex, genesis_filter: Number): Promise<Array<UserPost> | Error> {
+  async readMany(indexes: Array<string>, index_type: PostStoreIndex, genesis_filter: number): Promise<Array<UserPost> | Error> {
     try {
-      const query = (index_type == PostStoreIndex.Owner)
+      const query = (index_type === PostStoreIndex.Owner)
         ? { owner: { $in: indexes }, genesis: { "$gte": genesis_filter } }
         : { id: { $in: indexes } , genesis: { "$gte": genesis_filter } };
-        
+
       const docs = await postStore.find(query).sort({ "genesis": -1 }).exec();
       if (docs instanceof Error) {
         return handleError(docs);
@@ -138,7 +138,7 @@ export class MongoPostStore implements PostStore {
     }
   }
 
-  async readAll(genesis_filter: Number): Promise<Array<UserPost> | Error> {
+  async readAll(genesis_filter: number): Promise<Array<UserPost> | Error> {
     try {
       const docs = await postStore
       .find({ genesis: { "$gte": genesis_filter } })
@@ -147,7 +147,7 @@ export class MongoPostStore implements PostStore {
       if (docs instanceof Error) {
         return handleError(docs);
       }
-      
+
       if (docs.length > 0) {
         const posts = docs.map(doc => {
           return {
@@ -179,7 +179,7 @@ export class MongoPostStore implements PostStore {
       if (status instanceof Error) {
         return handleError(status);
       };
-      
+
       return status.modifiedCount > 0;
     } catch (e) {
       return handleError(e);
@@ -187,10 +187,5 @@ export class MongoPostStore implements PostStore {
   }
 
 }
-
-
-
-
-// ------------------ '(◣ ◢)' ---------------------
 
 // ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------

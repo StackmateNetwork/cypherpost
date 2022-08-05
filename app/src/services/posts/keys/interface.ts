@@ -6,8 +6,8 @@ Developed @ Stackmate India
 export interface PostKeyInterface {
   addPostDecryptionKeys(giver: string, post_id: string, key_updates: PostKeyStoreUpdate[]): Promise<boolean | Error>;
   updatePostDecryptionKeys(giver: string, post_id: string, key_update: PostKeyStoreUpdate[]): Promise<boolean | Error>;
-  findPostDecryptionKeyByReceiver(receiver: string, genesis_filter: Number): Promise<PostDecryptionKey[] | Error>;
-  findPostDecryptionKeyByGiver(giver: string, genesis_filter: Number): Promise<PostDecryptionKey[] | Error>;
+  findPostDecryptionKeyByReceiver(receiver: string, genesis_filter: number): Promise<PostDecryptionKey[] | Error>;
+  findPostDecryptionKeyByGiver(giver: string, genesis_filter: number): Promise<PostDecryptionKey[] | Error>;
   findPostDecryptionKeyById(post_id: string): Promise<PostDecryptionKey[] | Error>;
   removePostDecryptionKeyById(giver: string, post_id: string): Promise<boolean | Error>;
   removePostDecryptionKeyByReceiver(giver: string, receiver: string): Promise<boolean | Error>;
@@ -18,8 +18,8 @@ export interface PostKeyInterface {
 
 export interface PostDecryptionKeyStore {
   createMany(keys: PostDecryptionKey[]): Promise<boolean | Error>;
-  readByGiver(giver: string, genesis_filter: Number): Promise<PostDecryptionKey[] | Error>;
-  readByReceiver(receiver: string, genesis_filter: Number): Promise<PostDecryptionKey[] | Error>;
+  readByGiver(giver: string, genesis_filter: number): Promise<PostDecryptionKey[] | Error>;
+  readByReceiver(receiver: string, genesis_filter: number): Promise<PostDecryptionKey[] | Error>;
   readByPostId(post_id: string): Promise<PostDecryptionKey[] | Error>;
   removeManyByPostId(giver: string, post_id: string): Promise<boolean | Error>;
   removeManyByReceiver(giver: string, receiver: string): Promise<boolean | Error>;

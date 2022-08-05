@@ -19,18 +19,18 @@ export class CypherpostPosts implements PostInterface {
     const post = await store.readMany([id], PostStoreIndex.PostId, 0);
     if (post instanceof Error) return post;
 
-    if (post.length == 0){
+    if (post.length === 0){
       handleError({
         code: 404,
         message: "Could not find post with this id."
       });
-    } 
+    }
 
-    const is_reference = (post[0].reference != "NONE" )? false: true;
+    const is_reference = (post[0].reference !== "NONE" )? false: true;
     return is_reference;
 
   }
-  async findAllByOwner(owner: string, genesis_filter: Number): Promise<UserPost[] | Error> {
+  async findAllByOwner(owner: string, genesis_filter: number): Promise<UserPost[] | Error> {
     return store.readMany([owner], PostStoreIndex.Owner, genesis_filter);
   }
 
@@ -79,10 +79,10 @@ export class CypherpostPosts implements PostInterface {
     try {
       const user_posts = await store.readMany([owner], PostStoreIndex.Owner, 0);
       if (user_posts instanceof Error) return user_posts;
-      let expired_ids = [];
+      const expired_ids = [];
 
       user_posts.filter((post) => {
-        if (post.expiry < Date.now() && post.expiry != 0)
+        if (post.expiry < Date.now() && post.expiry !== 0)
           expired_ids.push(post.id);
       });
 
@@ -102,10 +102,10 @@ export class CypherpostPosts implements PostInterface {
     try {
       const user_posts = await store.readAll(0);
       if (user_posts instanceof Error) return user_posts;
-      let expired_ids = [];
+      const expired_ids = [];
 
       user_posts.filter((post) => {
-        if (post.expiry < Date.now() && post.expiry != 0)
+        if (post.expiry < Date.now() && post.expiry !== 0)
           expired_ids.push(post.id);
       });
 

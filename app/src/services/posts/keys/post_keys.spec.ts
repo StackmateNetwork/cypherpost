@@ -46,21 +46,16 @@ PARENT e2ee/cypherpost/identity
 }
 
 */
-let message = "GET /posts/keys";
+const message = "GET /posts/keys";
 
-let xpub = "xpub6DAo87N8pGxhyNo8uWWVwsTRHwozpSp2Scy1BiCjM2rN9R3vRnysqXr2ymokbVYGPzih9Ze1iW4GiKjnL7Eqdec4Gj2fcpvoScN1rfdVKjK";
-let xprv = "xprv9zBSibqEyuQQktifoUyVajWgjuyWQz6B5Q3QPKo7nhKPGcimtFfdHjXZ8UBYi7Ycz6V7R1QrSk9uExx2xTb9mW6SprakREwVuC91233nJaD";
-let xpub1 =  "xpub6CQuhNszNuSHTvynoBjh8d3wmYqkvTY9jLmvobQ8AFq67xEYgWRjQYELAXM5UCXiDYBZaiyoXsfGDd97imrJ3Btvo71Eb47ikZq8wJZYSoJ";
-let xprv1 =  "xprv9yRZHsM6YXszFSuKhACgmV7DDX1GWzpJN7rL1CzWbvJ7F9uQ8y7UrjurKGdCSteFhKPrytgtVLNdkLTUR3hksooDan6AUg8ACQqcApeu1sk";
+const xpub = "xpub6DAo87N8pGxhyNo8uWWVwsTRHwozpSp2Scy1BiCjM2rN9R3vRnysqXr2ymokbVYGPzih9Ze1iW4GiKjnL7Eqdec4Gj2fcpvoScN1rfdVKjK";
+const xprv = "xprv9zBSibqEyuQQktifoUyVajWgjuyWQz6B5Q3QPKo7nhKPGcimtFfdHjXZ8UBYi7Ycz6V7R1QrSk9uExx2xTb9mW6SprakREwVuC91233nJaD";
+const xpub1 =  "xpub6CQuhNszNuSHTvynoBjh8d3wmYqkvTY9jLmvobQ8AFq67xEYgWRjQYELAXM5UCXiDYBZaiyoXsfGDd97imrJ3Btvo71Eb47ikZq8wJZYSoJ";
+const xprv1 =  "xprv9yRZHsM6YXszFSuKhACgmV7DDX1GWzpJN7rL1CzWbvJ7F9uQ8y7UrjurKGdCSteFhKPrytgtVLNdkLTUR3hksooDan6AUg8ACQqcApeu1sk";
 let  shared_secret;
 let encryption_key;
 let decryption_key;
 let decryption_key2;
-const derivation_scheme = "m/0'/0'/0'";
-let cypher_json;
-let post1_id;
-let post2_id;
-let post3_id;
 
 const post_id = "somePostId";
 const post_id_1 = "somePostId1";
@@ -68,14 +63,14 @@ const post_id_2 = "somePostId2";
 const post_id_3 = "somePostId3";
 
 
-let post_key: PostDecryptionKey = {
+const post_key: PostDecryptionKey = {
   genesis: 0,
   giver: xpub,
   receiver: xpub1,
   post_id: "5omePostID",
   decryption_key: ""
 };
-let genesis_filter = 0;
+const genesis_filter = 0;
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 describe("Initalizing Test: Post Key Service", function () {
   before(async function () {
@@ -90,7 +85,7 @@ describe("Initalizing Test: Post Key Service", function () {
     encryption_key = bitcoin.derive_hardened(xprv,2,0,0);
     if (encryption_key instanceof Error) throw encryption_key;
     encryption_key = crypto.createHash('sha256').update(encryption_key.xprv).digest('hex');
-    let pair = await bitcoin.extract_ecdsa_pair({xprv: xprv, xpub: xpub1});
+    const pair = await bitcoin.extract_ecdsa_pair({xprv, xpub: xpub1});
     if(pair instanceof Error) throw pair;
     shared_secret = bitcoin.calculate_shared_secret(pair);
     decryption_key = s5crypto.encryptAESMessageWithIV(encryption_key as string,shared_secret as string);
@@ -103,7 +98,7 @@ describe("Initalizing Test: Post Key Service", function () {
   describe("POST KEY SERVICE OPERATIONS:", async function () {
     it("CREATE new post decryption key from xpub to xpub1", async function () {
       const response = await postKeys.addPostDecryptionKeys(xpub, post_id,[
-        {receiver: xpub1, decryption_key: decryption_key }
+        {receiver: xpub1, decryption_key}
       ]);
       expect(response).to.equal(true);
     });
@@ -117,14 +112,14 @@ describe("Initalizing Test: Post Key Service", function () {
       encryption_key = bitcoin.derive_hardened(xprv,2,0,1);
       if (encryption_key instanceof Error) throw encryption_key;
       encryption_key = crypto.createHash('sha256').update(encryption_key.xprv).digest('hex');
-      let pair = await bitcoin.extract_ecdsa_pair({xprv: xprv, xpub: xpub1});
+      const pair = await bitcoin.extract_ecdsa_pair({xprv, xpub: xpub1});
       if(pair instanceof Error) throw pair;
       shared_secret = bitcoin.calculate_shared_secret(pair);
       decryption_key = s5crypto.encryptAESMessageWithIV(encryption_key as string,shared_secret as string);
       if (decryption_key instanceof Error) throw decryption_key;
 
       const response = await postKeys.updatePostDecryptionKeys(xpub, post_id,[
-        {receiver: xpub1, decryption_key: decryption_key }
+        {receiver: xpub1, decryption_key }
       ]);
       expect(response).to.equal(true);
     });
@@ -156,7 +151,7 @@ describe("Initalizing Test: Post Key Service", function () {
     });
     it("CREATE new post decryption key from xpub to xpub1", async function () {
       const response = await postKeys.addPostDecryptionKeys(xpub, post_id,[
-        {receiver: xpub1, decryption_key: decryption_key }
+        {receiver: xpub1, decryption_key }
       ]);
       expect(response).to.equal(true);
     });

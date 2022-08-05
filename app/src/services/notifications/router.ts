@@ -40,7 +40,7 @@ export async function setupNotificationSocket(path: string, server: http.Server)
         ws.send(recipients.message);
         return 1;
       }
-    
+
       wss.clients.forEach(function each(client) {
         if (
           client !== ws && // is not sender

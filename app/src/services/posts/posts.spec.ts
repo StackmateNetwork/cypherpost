@@ -44,9 +44,9 @@ let post2_id;
 let post3_id;
 const reference = "NONE";
 /**
- * 
+ *
  * UPdate bitcoin ops to use derivation path string
- * 
+ *
  */
 const plain_json_post = {
   message: "**URGENT**",
@@ -61,12 +61,12 @@ const plain_json_post = {
   reference_percent: "-2.0"
 };
 
-let user_post: UserPost = {
+const user_post: UserPost = {
   expiry: Date.now() + 100,
   derivation_scheme,
   cypher_json
 };
-let genesis_filter = 0;
+const genesis_filter = 0;
 
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 describe("Initalizing Test: Profile Service", function () {

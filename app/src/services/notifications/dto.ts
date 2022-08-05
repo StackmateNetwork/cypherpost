@@ -10,7 +10,6 @@ import { handleError } from "../../lib/errors/e";
 import { CypherpostPosts } from "../posts/posts";
 import { CypherpostPostKeys } from "../posts/keys/post_keys";
 
-
 const identity = new CypherpostIdentity();
 const posts = new CypherpostPosts();
 const postKeys = new CypherpostPostKeys();

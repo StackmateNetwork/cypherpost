@@ -73,7 +73,7 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
         return true;
       }
     } catch (e) {
-      if (e['code'] && e['code'] == 11000) {
+      if (e['code'] && e['code'] === 11000) {
         // console.error({e});
         return handleError({
           code: 409,
@@ -83,7 +83,7 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
       return handleError(e);
     }
   }
-  async readByGiver(giver: string, genesis_filter: Number): Promise<PostDecryptionKey[] | Error> {
+  async readByGiver(giver: string, genesis_filter: number): Promise<PostDecryptionKey[] | Error> {
     try {
       const query = { giver: { $in: giver } , genesis: {$gte: genesis_filter }};
 
@@ -92,7 +92,7 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
         return handleError(docs);
       }
       if (docs.length > 0) {
-   
+
         const keys = docs.map(doc => {
           return {
             genesis: doc["genesis"],
@@ -112,7 +112,7 @@ export class MongoPostKeyStore implements PostDecryptionKeyStore {
       return handleError(e);
     }
   }
-  async readByReceiver(receiver: string, genesis_filter: Number): Promise<PostDecryptionKey[] | Error> {
+  async readByReceiver(receiver: string, genesis_filter: number): Promise<PostDecryptionKey[] | Error> {
     try {
       const query = { receiver: { $in: receiver } , genesis: {$gte: genesis_filter } };
 
