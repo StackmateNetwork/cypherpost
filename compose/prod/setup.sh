@@ -25,6 +25,13 @@ echo "Which server type would you prefer? (PUB/priv)"
 read -r TYPE
 printf "\n"
 
+
+echo "Give your server a name. Clients will see this when they join."
+
+read -r NAME
+printf "\n"
+
+
 echo "At what domain name would you like to host cypherpost on?"
 read -r MY_DOMAIN_NAME
 printf "\n"
@@ -138,6 +145,7 @@ echo "COMPOSE_PROJECT_NAME=cypherpost-prod" >> .env
 echo "REPO=$REPO/app" > .env
 echo "KEYS=$HOME/.keys" >> .env
 echo "TYPE=$TYPE" >> .env
+echo "NAME=$NAME" >> .env
 echo "SECRET=$SECRET" >> .env
 echo "DOMAIN=$MY_DOMAIN_NAME" >> .env
 echo "EMAIL=$EMAIL" >> .env

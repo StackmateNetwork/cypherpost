@@ -52,7 +52,14 @@ else
   echo "[*] Setting up as public server."
 fi
 
+
+echo "Give your server a name. Clients will see this when they join."
+
+read -r server_name
+printf "\n"
+
 TYPE=$server_type
+NAME=$server_name
 REPO="$(dirname $(dirname $(pwd)))"
 REPO_APP="$REPO/app"
 echo "[*] Using $REPO_APP as path to development codebase."

@@ -12,6 +12,7 @@ services:
       - APP_PORT=3021
       - TYPE=$TYPE
       - SECRET=$SECRET
+      - NAME=$NAME
     ports:
       - "3021:3021"
     volumes:
