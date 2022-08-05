@@ -20,7 +20,6 @@ import { AnnouncementType } from "./services/announcements/interface";
 import { CypherpostIdentity } from "./services/identity/identity";
 import { CypherpostPostKeys } from "./services/posts/keys/post_keys";
 import { CypherpostPosts } from "./services/posts/posts";
-import { truncateSync } from "fs";
 
 const sinon = require('sinon');
 import WebSocket, { createWebSocketStream } from 'ws';
@@ -39,6 +38,8 @@ let c_invitation;
 let server;
 const TEST_PORT = "13021";
 const expect = chai.expect;
+const should = chai.should();
+
 chai.use(chaiHttp);
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 /**
