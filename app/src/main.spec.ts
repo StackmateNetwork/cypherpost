@@ -23,7 +23,6 @@ import { CypherpostPosts } from "./services/posts/posts";
 import { truncateSync } from "fs";
 
 const sinon = require('sinon');
-const io = require('socket.io-client');
 import WebSocket, { createWebSocketStream } from 'ws';
 
 const bitcoin = new CypherpostBitcoinOps();
@@ -38,7 +37,7 @@ let a_invitation;
 let b_invitation;
 let c_invitation;
 let server;
-const TEST_PORT = process.env.TEST_PORT;
+const TEST_PORT = "13021";
 const should = chai.should();
 const expect = chai.expect;
 chai.use(chaiHttp);
