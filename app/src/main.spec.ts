@@ -38,7 +38,6 @@ let b_invitation;
 let c_invitation;
 let server;
 const TEST_PORT = "13021";
-const should = chai.should();
 const expect = chai.expect;
 chai.use(chaiHttp);
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
@@ -144,9 +143,7 @@ interface TestKeySet {
 
 const init_identity_ds = "m/0h/0h/0h";
 const init_profile_ds = "m/1h/0h/0h";
-const init_preferences_ds = "m/2h/0h/0h"
 const init_posts_ds = "m/3h/0h/0h";
-const trusted_announcement = AnnouncementType.Trusted;
 
 let a_key_set: TestKeySet;
 let b_key_set: TestKeySet;
@@ -161,24 +158,17 @@ let b_post_set: TestPostSet;
 let c_post_set: TestPostSet;
 let c_post_edit_set: TestPostSet;
 
-let endpoint;
-let body;
-let nonce = Date.now();
-let request_signature;
-
 let all_identities;
 let all_announcements;
 
-let a_trust = [];
-let b_trust = [];
-let c_trust = [];
+const a_trust = [];
+const b_trust = [];
+const c_trust = [];
 
-let a_preferences = {
+const a_preferences = {
   muted: [],
 };
-let cypher_preference;
 
-let b_post_to_notify_a;
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 // ------------------ INITIALIZERS ------------------
 async function createTestKeySet(): Promise<TestKeySet | Error> {
@@ -267,7 +257,7 @@ async function createIdentityRegistrationRequest(username, key_set: TestKeySet) 
     nonce,
     endpoint,
     body,
-    signature: signature,
+    signature,
     pubkey: key_set.identity_pubkey
   }
 }
@@ -281,7 +271,7 @@ async function createIdentityGetRequest(key_set: TestKeySet) {
   return {
     nonce,
     endpoint,
-    signature: signature,
+    signature,
     pubkey: key_set.identity_pubkey
   }
 }
@@ -304,7 +294,7 @@ async function createAnnouncementIssueRequest(announcement: AnnouncementType, to
     nonce,
     endpoint,
     body,
-    signature: signature,
+    signature,
     pubkey: key_set.identity_pubkey
   }
 }
@@ -319,7 +309,7 @@ async function createGetAllAnnouncementsRequest(key_set: TestKeySet) {
   return {
     nonce,
     endpoint,
-    signature: signature,
+    signature,
     pubkey: key_set.identity_pubkey
   }
 }
@@ -339,7 +329,7 @@ async function createPostRequest(expiry: number, post_set: TestPostSet, key_set:
     nonce,
     endpoint,
     body,
-    signature: signature,
+    signature,
     pubkey: key_set.identity_pubkey
   }
 }
@@ -359,7 +349,7 @@ async function editPostRequest(post_set: TestPostSet, key_set: TestKeySet) {
     nonce,
     endpoint,
     body,
-    signature: signature,
+    signature,
     pubkey: key_set.identity_pubkey
   }
 }
@@ -375,7 +365,7 @@ async function createPostsGetSelfRequest(key_set: TestKeySet) {
     nonce,
     endpoint,
     body,
-    signature: signature,
+    signature,
     pubkey: key_set.identity_pubkey
   }
 }
@@ -391,7 +381,7 @@ async function createPostsGetOthersRequest(key_set: TestKeySet) {
     nonce,
     endpoint,
     body,
-    signature: signature,
+    signature,
     pubkey: key_set.identity_pubkey
   }
 }
@@ -444,7 +434,7 @@ async function createRevokeTrustRequest(revoke: string, key_set: TestKeySet) {
     nonce,
     endpoint,
     body,
-    signature: signature,
+    signature,
     pubkey: key_set.identity_pubkey
   }
 }
@@ -689,10 +679,10 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           all_identities = res.body['identities'];
           let counter = 0;
           // console.log({ all_identities });
-          all_identities.map((identity) => {
-            if (identity.pubkey === a_key_set.identity_pubkey ||
-              identity.pubkey === b_key_set.identity_pubkey ||
-              identity.pubkey === c_key_set.identity_pubkey)
+          all_identities.map((eachIdentity) => {
+            if (eachIdentity.pubkey === a_key_set.identity_pubkey ||
+              eachIdentity.pubkey === b_key_set.identity_pubkey ||
+              eachIdentity.pubkey === c_key_set.identity_pubkey)
               counter++;
           })
           expect(counter).to.equal(3);
@@ -1112,7 +1102,8 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     });
   });
   describe("UPDATED POST BY C", function () {
-    let request_c_edit, request_c_get_self;
+    let request_c_edit;
+    let request_c_get_self;
     it("CREATES EDIT/GET POST REQUESTS", async function () {
       request_c_edit = await editPostRequest(c_post_set, c_key_set);
       request_c_get_self = await createPostsGetSelfRequest(c_key_set);
@@ -1176,11 +1167,13 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     });
   });
 
-  
   describe("TEST NOTIFICATION SOCKETS", function(){
-    let b_sock_req,c_sock_req;
-    let b_sock,c_sock;
-    const options = {  
+    let b_sock_req;
+    let c_sock_req;
+    let b_sock;
+    let c_sock;
+
+    const options = {
       headers: {},
     };
     const socketUrl = `ws://localhost:${TEST_PORT}/api/v3/notifications`;
@@ -1322,7 +1315,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           "x-nonce": request_a.nonce,
           "x-client-signature": request_a.signature,
         })
-        .send(body)
+        .send(request_a.body)
         .end((err, res) => {
           res.should.have.status(200);
         });
@@ -1335,7 +1328,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           "x-nonce": request_b.nonce,
           "x-client-signature": request_b.signature,
         })
-        .send(body)
+        .send(request_b.body)
         .end((err, res) => {
           res.should.have.status(200);
         });
@@ -1348,7 +1341,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           "x-nonce": request_c.nonce,
           "x-client-signature": request_c.signature,
         })
-        .send(body)
+        .send(request_c.body)
         .end((err, res) => {
           res.should.have.status(200);
           done();
