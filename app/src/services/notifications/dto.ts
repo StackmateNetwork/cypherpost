@@ -23,11 +23,10 @@ export async function notifyAuthMiddleware(req: http.IncomingMessage,ws: WebSock
     const nonce = request.headers['x-nonce'];
     const method = request.method;
     const resource = "/api/v3/notifications";
-    const body = "{}";
-    const message = `${method} ${resource} ${body} ${nonce}`;
+    const message = `${method} ${resource} ${nonce}`;
     console.log(message);
     const status = await identity.authenticate(pubkey, message, signature);
-    // console.log(status)
+    console.log(status)
     return status;
   }
   catch (e) {

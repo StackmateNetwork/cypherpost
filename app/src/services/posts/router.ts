@@ -6,7 +6,7 @@ Developed @ Stackmate India
 import express from "express";
 
 import * as val from "express-validator";
-import { handleCreatePost, handleDeletePostAndReferenceKeys, handleEditPost, handleGetMyPosts, handleGetOthersPosts, handlePutKeys, postMiddleware,handlePostKeyStream } from "./dto";
+import { handleCreatePost,handleGetPostAndKeysById, handleDeletePostAndReferenceKeys, handleEditPost, handleGetMyPosts, handleGetOthersPosts, handlePutKeys, postMiddleware } from "./dto";
 
 // ------------------ '(◣ ◢)' ---------------------
 export const router = express.Router();
@@ -39,7 +39,6 @@ router.get("/self",checkGetPosts, handleGetMyPosts);
 router.get("/others", checkGetPosts, handleGetOthersPosts);
 router.put("/keys",checkUpdatePutKeys, handlePutKeys);
 router.delete("/:id", handleDeletePostAndReferenceKeys);
+router.get("/:id", handleGetPostAndKeysById);
 router.post("/edit", checkEditPost, handleEditPost);
-router.put('/key/stream', handlePostKeyStream);
 // ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------
-

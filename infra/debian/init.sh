@@ -3,21 +3,7 @@
 
 
 sudo apt-get update --allow-releaseinfo-change
-sudo apt-get install -y \
-    build-essential \
-    cmake \ 
-    apt-transport-https \
-    ca-certificates \
-    curl \
-    gnupg2 \
-    software-properties-common \
-    dirmngr \
-    unzip \
-    git \
-    expect \
-    jq \
-    lsb-release \
-    ufw
+sudo apt-get install -y build-essential cmake apt-transport-https ca-certificates curl gnupg2 software-properties-common dirmngr unzip git expect jq lsb-release ufw
     
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 export PATH="$HOME/.cargo/bin:$PATH"

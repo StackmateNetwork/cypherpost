@@ -24,8 +24,7 @@ export async function announcementsMiddleware(req, res, next) {
     const nonce = request.headers['x-nonce'];
     const method = request.method;
     const resource = request.resource;
-    const body = JSON.stringify(request.body);
-    const message = `${method} ${resource} ${body} ${nonce}`;
+    const message = `${method} ${resource} ${nonce}`;
 
 
     const status = await identity.authenticate(pubkey, message, signature);

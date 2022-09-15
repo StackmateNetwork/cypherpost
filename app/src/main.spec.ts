@@ -39,7 +39,6 @@ let server;
 const TEST_PORT = "13021";
 const expect = chai.expect;
 const should = chai.should();
-
 chai.use(chaiHttp);
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 /**

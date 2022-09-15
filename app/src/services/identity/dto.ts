@@ -34,7 +34,7 @@ export async function identityMiddleware(req, res, next) {
     const method = request.method;
     const resource = request.resource;
     const body = JSON.stringify(request.body);
-    const message = `${method} ${resource} ${body} ${nonce}`;
+    const message = `${method} ${resource} ${nonce}`;
     if (resource !== "/api/v2/identity/admin/invitation")
     {
       const verified = await bitcoin.verify(message, signature, pubkey);
@@ -167,7 +167,6 @@ export async function handleGetServerIdentity(req, res) {
 export async function handleAdminGetInvite(req,res){
   const request = parseRequest(req);
   try {
-    console.log("IN")
     if (request.headers['x-admin-invite-secret'] !== INVITE_SECRET){
       throw {
         code: 401,

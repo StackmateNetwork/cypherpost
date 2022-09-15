@@ -20,7 +20,6 @@ export async function setupNotificationSocket(path: string, server: http.Server)
       ws.terminate();
       return 1;
     }
-    ws.send('Securely connected to cypherpost notification stream.');
     ws['id'] = req.headers['x-client-pubkey'];
 
     const extWs = ws as ExtWebSocket;
@@ -29,8 +28,11 @@ export async function setupNotificationSocket(path: string, server: http.Server)
       extWs.isAlive = true;
     });
     // connection is up, let's add a simple simple event
+    console.log("Successfully connected to cypherpost server!")
     ws.on('message', async function message(data, isBinary) {
       const postId = data.toString();
+      console.log({postId});
+
       if(!postId.startsWith('s5')) {
         ws.send("Invalid Post Id.");
         return 1;
@@ -40,10 +42,11 @@ export async function setupNotificationSocket(path: string, server: http.Server)
         ws.send(recipients.message);
         return 1;
       }
+      recipients.push(ws['id']);
 
+      console.log(recipients);
       wss.clients.forEach(function each(client) {
         if (
-          client !== ws && // is not sender
           client.readyState === WebSocket.OPEN && // has open connection
           recipients.includes(client['id']) // is included in recipients to this post_id
         ) {

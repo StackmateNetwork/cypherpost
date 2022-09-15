@@ -24,8 +24,7 @@ export async function postMiddleware(req, res, next) {
     const nonce = request.headers['x-nonce'];
     const method = request.method;
     const resource = request.resource;
-    const body = JSON.stringify(request.body);
-    const message = `${method} ${resource} ${body} ${nonce}`;
+    const message = `${method} ${resource} ${nonce}`;
     // console.log({resource});
     if(resource === '/api/v2/post/key/stream') next();
     else{
@@ -165,6 +164,48 @@ export async function handleGetOthersPosts(req, res) {
   }
 }
 
+
+export async function handleGetPostAndKeysById(req, res) {
+  const request = parseRequest(req);
+  try {
+
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      throw {
+        code: 400,
+        message: errors.array()
+      }
+    }
+
+    const dec_keys = await postKeys.findPostDecryptionKeyById(req.params.id);
+    if (dec_keys instanceof Error) throw dec_keys;
+
+    const single_post_vec = await posts.findManyById([req.params.id],0);
+    if (single_post_vec instanceof Error) throw single_post_vec;
+
+    if (single_post_vec[0].owner == request.headers['x-client-pubkey']){
+      const response = {
+        post: single_post_vec[0]
+      };
+      respond(200, response, res, request);
+    }
+
+    else{
+      let single_dec_key = dec_keys.find(receiverKey => receiverKey.receiver === request.headers['x-client-pubkey']);
+
+      const response = {
+        post: { ...single_post_vec[0], decryption_keys: single_dec_key.decryption_key },
+      };
+
+      respond(200, response, res, request);
+    }
+  }
+  catch (e) {
+    const result = filterError(e, r_500, request);
+    respond(result.code, result.message, res, request);
+  }
+}
+
 export async function handleDeletePostAndReferenceKeys(req, res) {
   const request = parseRequest(req);
   try {
@@ -259,17 +300,3 @@ export async function handleEditPost(req, res) {
     respond(result.code, result.message, res, request);
   }
 }
-
-export async function handlePostKeyStream(req, res){
-  req.wss.on('connection', (ws: WebSocket) => {
-    // connection is up, let's add a simple simple event
-    req.wss.on('message', (message: string) => {
-        // log the received message and send it back to the client
-        console.log('received: %s', message);
-        ws.send(`Hello, you sent -> ${message}`);
-    });
-    // send immediatly a feedback to the incoming connection
-    ws.send('Hi there, I am a WebSocket server');
-  });
-}
-
