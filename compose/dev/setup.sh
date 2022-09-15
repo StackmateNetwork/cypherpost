@@ -76,6 +76,10 @@ cp "$REPO_NGINX_CONF/template.conf" "$REPO_NGINX_CONF/default.conf"
 perl -i -pe"s/___DOMAIN___/$MY_DOMAIN_NAME/g" "$REPO_NGINX_CONF/default.conf"
 echo "[*] Created nginx default.conf with $MY_DOMAIN_NAME as hostname."
 
+perl -i -pe"s/___USER___/cp/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
+perl -i -pe"s/___PWD___/secret/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
+
+
 rm -rf .env
 touch .env
 chmod +r .env
