@@ -5,7 +5,8 @@
 sudo apt-get update --allow-releaseinfo-change
 sudo apt-get install -y build-essential cmake apt-transport-https ca-certificates curl gnupg2 software-properties-common dirmngr unzip git expect jq lsb-release ufw
     
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+curl https://sh.rustup.rs -sSf | sh -s -- -y
+
 export PATH="$HOME/.cargo/bin:$PATH"
 source $HOME/.cargo/env
 cargo install pier
@@ -31,7 +32,6 @@ echo "[*] Installed docker."
 
 # Pull repos
 git clone https://github.com/StackmateNetwork/cypherpost.git
-git clone https://github.com/SatoshiPortal/cyphernode.git
 echo "[*] Cloned cypherpost and cyphernode from github."
 
 sudo chmod -R 700 cypherpost

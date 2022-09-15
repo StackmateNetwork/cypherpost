@@ -127,8 +127,8 @@ if [[ -f .secrets.json ]]; then
     then
         exit 1
     fi
-    INITDB_ROOT_PASS=$(echo $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5 )
-    DB_PASS=$(echo $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5 )
+    INITDB_ROOT_PASS=$(echo -n $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5sum | cut -d' ' -f1)
+    DB_PASS=$(echo -n $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5sum | cut -d' ' -f1)
     jq -n --arg DB_PASS "$DB_PASS" --arg INITDB_ROOT_PASS "$INITDB_ROOT_PASS" '{initdb_name: "cypherpost", initdb_root_user: "admin", initdb_root_pass: $INITDB_ROOT_PASS, db_user: "cp", db_pass: $DB_PASS}' > .secrets.json
     INITDB_NAME="cypherpost"
     INITDB_ROOT_USER="admin"
