@@ -8,6 +8,7 @@ NGINX_CONF="$REPO/infra/nginx/prod/nginx-conf"
 cat $NGINX_CONF/pre
 cp $NGINX_CONF/pre $NGINX_CONF/default.conf
 # Run docker-compose up to aquire SSL certificates
-docker-compose up -d
+docker-compose up --no-deps certbot && \
+cp $CONFIG/post $CONFIG/default.conf && \
 # Run docker-compose down
 docker-compose down

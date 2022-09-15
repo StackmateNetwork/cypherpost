@@ -110,11 +110,11 @@ echo "[*] Created nginx pre & post conf files with $MY_DOMAIN_NAME as hostname."
 # If secrets files !exists, create it and add DB creds to .env
 if [[ -f .secrets.json ]]; then
     echo "[*] DB secrets are already set."
-    DB_USER=$(cat .secrets.json | jq -r "db_user")
-    DB_PASS=$(cat .secrets.json | jq -r "db_pass")
-    INITDB_NAME=$(cat .secrets.json | jq -r "initdb_name")
-    INITDB_ROOT_USER=$(cat .secrets.json | jq -r "initdb_root_user")
-    INITDB_ROOT_PASS=$(cat .secrets.json | jq -r "initdb_root_pass")
+    DB_USER=$(cat .secrets.json | jq ".db_user")
+    DB_PASS=$(cat .secrets.json | jq ".db_pass")
+    INITDB_NAME=$(cat .secrets.json | jq ".initdb_name")
+    INITDB_ROOT_USER=$(cat .secrets.json | jq ".initdb_root_user")
+    INITDB_ROOT_PASS=$(cat .secrets.json | jq ".initdb_root_pass")
   else
     echo "[!] Database secrets are about to be generated in a .secrets.json file"
     echo "[!] Once set, this can only be changed manually via mongo shell."
@@ -139,6 +139,7 @@ fi
 
 perl -i -pe"s/___USER___/$DB_USER/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
 perl -i -pe"s/___PWD___/$DB_PASS/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
+perl -i -pe"s/___DBAUTH___/$DB_USER:$DB_PASS/g" ../../app/Dockerfile.main
 
 touch .env
 echo "COMPOSE_PROJECT_NAME=cypherpost-prod" >> .env
