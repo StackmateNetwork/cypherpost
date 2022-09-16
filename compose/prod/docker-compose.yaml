@@ -102,17 +102,7 @@ volumes:
       o: bind
   web-root:
   certbot-etc:
-    driver: local
-    driver_opts:
-      type: none
-      device: $CERTS_VOLUME/certbot/etc
-      o: bind
   certbot-var:
-    driver: local
-    driver_opts:
-      type: none
-      device: $CERTS_VOLUME/certbot/var
-      o: bind
   dhparam:
     driver: local
     driver_opts:
