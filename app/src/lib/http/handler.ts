@@ -49,6 +49,7 @@ export async function respond(
       "x-s5-time": now
     };
 
+    console.log({sats_id})
     const signature = await getResponseSignature(
       status_code,
       request["resource"],
@@ -56,6 +57,8 @@ export async function respond(
       headers,
       message
     );
+    console.log({signature})
+
     if (signature instanceof Error) {
       return signature;
     }
@@ -126,7 +129,8 @@ export async function getResponseSignature(
       sign.update(message);
       sign.end();
 
-      const signature = sign.sign({ key: private_key, passphrase: "test" }, 'base64');
+      const signature = sign.sign({ key: private_key }, 'base64');
+      console.log({signature})
 
       const status = await checkResponseSignature(status_code, headers, signature);
       if (status instanceof Error) return status;

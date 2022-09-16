@@ -6,12 +6,7 @@ Developed @ Stackmate India
 import { logger } from "./lib/logger/winston";
 import { start as startServer } from "./server";
 import { MongoDatabase } from "./lib/storage/mongo";
-
-
 const db = new MongoDatabase();
-const key_path = process.env.KEY_PATH;
-const filename = "sats_sig";
-
 // -----° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °-----------
 
 db.connect({

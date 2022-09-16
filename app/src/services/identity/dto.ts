@@ -11,7 +11,6 @@ import { CypherpostPosts } from "../posts/posts";
 import { CypherpostIdentity } from "./identity";
 import { RegistrationType } from "./interface";
 
-import {S5UID} from "../../lib/uid/uid";
 const { validationResult } = require('express-validator');
 
 const TYPE = process.env.TYPE;
@@ -22,7 +21,7 @@ const badges = new CypherpostAnnouncements();
 const posts = new CypherpostPosts();
 const posts_keys = new CypherpostPostKeys();
 const bitcoin = new CypherpostBitcoinOps();
-const uid = new S5UID();
+
 export async function identityMiddleware(req, res, next) {
   const request = parseRequest(req);
   try {
@@ -34,6 +33,7 @@ export async function identityMiddleware(req, res, next) {
     const method = request.method;
     const resource = request.resource;
     const message = `${method} ${resource} ${nonce}`;
+    console.log({resource});
     if (resource !== "/api/v2/identity/admin/invitation")
     {
       const verified = await bitcoin.verify(message, signature, pubkey);
@@ -166,6 +166,8 @@ export async function handleGetServerIdentity(req, res) {
 export async function handleAdminGetInvite(req,res){
   const request = parseRequest(req);
   try {
+    console.log({secret:request.headers['x-admin-invite-secret']});
+
     if (request.headers['x-admin-invite-secret'] !== INVITE_SECRET){
       throw {
         code: 401,
@@ -174,6 +176,7 @@ export async function handleAdminGetInvite(req,res){
     }
     const invite_code = await identity.createInvite();
     if(invite_code instanceof Error) throw invite_code;
+    console.log({invite_code});
 
     const response = {
       invite_code
