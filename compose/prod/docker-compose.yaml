@@ -29,6 +29,7 @@ services:
     volumes:
       - cp-datadb:/data/db
       - cp-configdb:/data/configdb    
+      - ../../infra/mongo/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     environment:
       - MONGO_INITDB_DATABASE=$INITDB_NAME
       - MONGO_INITDB_ROOT_USERNAME=$INITDB_ROOT_USER
