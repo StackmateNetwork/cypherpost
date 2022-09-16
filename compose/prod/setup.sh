@@ -52,12 +52,16 @@ fi
 NODE_VOLUME="$VOLUMES_PARENT_DIR/node"
 MONGO_VOLUME="$VOLUMES_PARENT_DIR/mongo"
 CERTS_VOLUME="$VOLUMES_PARENT_DIR/certs"
+CERTBOTETC_VOLUME="$VOLUMES_PARENT_DIR/certs/certbot/etc"
+CERTBOTVAR_VOLUME="$VOLUMES_PARENT_DIR/certs/certbot/var"
 
 mkdir -p "$NODE_VOLUME/.keys" 2> /dev/null
 mkdir -p "$NODE_VOLUME/winston" 2> /dev/null
 mkdir -p "$MONGO_VOLUME/data/db" 2> /dev/null
 mkdir -p "$MONGO_VOLUME/configdb" 2> /dev/null
 mkdir -p "$CERTS_VOLUME" 2> /dev/null
+mkdir -p "$CERTBOTETC_VOLUME" 2> /dev/null
+mkdir -p "$CERTBOTVAR_VOLUME" 2> /dev/null
 
 echo "[*] Container volume parent directories are setup."
 printf "\n"
@@ -126,6 +130,7 @@ if [[ -f .secrets.json ]]; then
     then
         exit 1
     fi
+
     INITDB_ROOT_PASS=$(echo -n $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5sum | cut -d' ' -f1)
     DB_PASS=$(echo -n $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5sum | cut -d' ' -f1)
     jq -n --arg DB_PASS "$DB_PASS" --arg INITDB_ROOT_PASS "$INITDB_ROOT_PASS" '{initdb_name: "cypherpost", initdb_root_user: "admin", initdb_root_pass: $INITDB_ROOT_PASS, db_user: "cp", db_pass: $DB_PASS}' > .secrets.json
@@ -136,8 +141,7 @@ if [[ -f .secrets.json ]]; then
 
 fi
 
-DB_AUTH=$DB_USER:$DB_PASS
-
+DB_AUTH="$DB_USER:$DB_PASS"
 perl -i -pe"s/___USER___/$DB_USER/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
 perl -i -pe"s/___PWD___/$DB_PASS/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
 perl -i -pe"s/___DBAUTH___/$DB_AUTH/g" ../../app/Dockerfile.main
