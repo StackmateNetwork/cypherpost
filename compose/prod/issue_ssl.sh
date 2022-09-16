@@ -9,6 +9,6 @@ cat $NGINX_CONF/pre
 cp $NGINX_CONF/pre $NGINX_CONF/default.conf
 # Run docker-compose up to aquire SSL certificates
 docker-compose up --no-deps certbot && \
-cp $CONFIG/post $CONFIG/default.conf && \
+cp $NGINX_CONF/post $NGINX_CONF/default.conf && \
 # Run docker-compose down
 docker-compose down

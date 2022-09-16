@@ -104,7 +104,6 @@ perl -i -pe"s/___DOMAIN___/$MY_DOMAIN_NAME/g" "$REPO_NGINX_CONF/post"
 
 echo "[*] Created nginx pre & post conf files with $MY_DOMAIN_NAME as hostname."
 
-
 # CREATE DB PASSWORD IN A .secrets file
 # If secrets file exists, use it to add DB creds to .env
 # If secrets files !exists, create it and add DB creds to .env
@@ -137,9 +136,11 @@ if [[ -f .secrets.json ]]; then
 
 fi
 
+DB_AUTH=$DB_USER:$DB_PASS
+
 perl -i -pe"s/___USER___/$DB_USER/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
 perl -i -pe"s/___PWD___/$DB_PASS/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
-perl -i -pe"s/___DBAUTH___/$DB_USER:$DB_PASS/g" ../../app/Dockerfile.main
+perl -i -pe"s/___DBAUTH___/$DB_AUTH/g" ../../app/Dockerfile.main
 
 touch .env
 echo "COMPOSE_PROJECT_NAME=cypherpost-prod" >> .env
