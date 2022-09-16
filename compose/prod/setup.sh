@@ -90,8 +90,8 @@ fi
 sudo openssl genrsa -out $NODE_VOLUME/.keys/sats_sig.pem 4096
 sudo openssl rsa -in $NODE_VOLUME/.keys/sats_sig.pem -outform PEM -pubout -out $NODE_VOLUME/.keys/sats_sig.pub
 echo "[!] Giving node container GUI 1300 permission to use response signing keys."
-sudo chown -R $(whoami):1300 $NODE_VOLUME
-sudo chmod -R 770 $NODE_VOLUME
+# sudo chown -R $(whoami):1300 $NODE_VOLUME
+# sudo chmod -R 770 $NODE_VOLUME
 echo "[*] Generated new server signing keys."
 
 ## NGINX CONFIG

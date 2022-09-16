@@ -52,6 +52,11 @@ export class CypherpostIdentity implements IdentityInterface {
     return createStatus;
   }
   async authenticate(pubkey: string, message: string, signature: string): Promise<boolean | Error> {
+    if (signature == "")return handleError({
+      code: 401,
+      message: "Signature Required."
+    });
+
     const identity = await idStore.readOne(pubkey, IdentityIndex.Pubkey);
     if (identity instanceof Error) return identity;
 
@@ -90,7 +95,7 @@ export class CypherpostIdentity implements IdentityInterface {
    const code =  uid.createRandomID(32);
    const created = await inviteStore.createOne(code);
    if(created instanceof Error) return created;
-   return code;
+   else return code;
   }
 };
 

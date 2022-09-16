@@ -118,8 +118,6 @@ export async function getResponseSignature(
         .readFileSync(`${KEY_PATH}/${KEY_NAME}.pem`)
         .toString("ascii");
 
-
-
       const message = `${status_code}-${headers["x-s5-id"]}-${headers["x-s5-time"]}`;
 
       // RESPONSE WITHOUT BODY

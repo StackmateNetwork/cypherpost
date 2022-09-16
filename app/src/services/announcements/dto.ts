@@ -25,8 +25,6 @@ export async function announcementsMiddleware(req, res, next) {
     const method = request.method;
     const resource = request.resource;
     const message = `${method} ${resource} ${nonce}`;
-
-
     const status = await identity.authenticate(pubkey, message, signature);
     if (status instanceof Error) throw status;
     else next();

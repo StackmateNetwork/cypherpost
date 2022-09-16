@@ -25,15 +25,12 @@ export async function postMiddleware(req, res, next) {
     const method = request.method;
     const resource = request.resource;
     const message = `${method} ${resource} ${nonce}`;
-    // console.log({resource});
-    if(resource === '/api/v2/post/key/stream') next();
-    else{
-      const status = await identity.authenticate(pubkey, message, signature);
-      if (status instanceof Error) {
-        throw status;
-      }
-      else next();
+    const status = await identity.authenticate(pubkey, message, signature);
+    if (status instanceof Error) {
+      throw status;
     }
+    else next();
+  
   }
   catch (e) {
     const result = filterError(e, r_500, request);
