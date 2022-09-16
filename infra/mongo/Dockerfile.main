@@ -16,7 +16,7 @@ COPY dumps/  /dumps
 
 RUN	chown -R mongodb:mongodb /data/db /data/configdb /docker-entrypoint-initdb.d /etc/mongod.conf /usr/local/bin/docker-entrypoint.sh
 
-VOLUME /data/db /data/configdb docker-entrypoint-initdb.d
+VOLUME /data/db /data/configdb /docker-entrypoint-initdb.d
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 27017
 CMD ["mongod"]

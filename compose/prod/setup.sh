@@ -131,23 +131,22 @@ if [[ -f .secrets.json ]]; then
         exit 1
     fi
 
-    INITDB_ROOT_PASS=$(echo -n $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5sum | cut -d' ' -f1)
-    DB_PASS=$(echo -n $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5sum | cut -d' ' -f1)
-    jq -n --arg DB_PASS "$DB_PASS" --arg INITDB_ROOT_PASS "$INITDB_ROOT_PASS" '{initdb_name: "cypherpost", initdb_root_user: "admin", initdb_root_pass: $INITDB_ROOT_PASS, db_user: "cp", db_pass: $DB_PASS}' > .secrets.json
     INITDB_NAME="cypherpost"
     INITDB_ROOT_USER="admin"
+    INITDB_ROOT_PASS=$(echo -n $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5sum | cut -d' ' -f1)
     DB_USER="cp"
+    DB_PASS=$(echo -n $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5sum | cut -d' ' -f1)
+    DB_AUTH="$DB_USER:$DB_PASS"
+    jq -n --arg DB_PASS "$DB_PASS" --arg INITDB_ROOT_PASS "$INITDB_ROOT_PASS" '{initdb_name: "cypherpost", initdb_root_user: "admin", initdb_root_pass: $INITDB_ROOT_PASS, db_user: "cp", db_pass: $DB_PASS}' > .secrets.json
     echo "[*] Created DB secrets"
-
 fi
 
-DB_AUTH="$DB_USER:$DB_PASS"
 perl -i -pe"s/___USER___/$DB_USER/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
 perl -i -pe"s/___PWD___/$DB_PASS/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
 perl -i -pe"s/___DBAUTH___/$DB_AUTH/g" ../../app/Dockerfile.main
 
 touch .env
-echo "COMPOSE_PROJECT_NAME=cypherpost-prod" >> .env
+echo "COMPOSE_PROJECT_NAME=cypherpost-production" >> .env
 echo "REPO=$REPO/app" > .env
 echo "KEYS=$HOME/.keys" >> .env
 echo "TYPE=$TYPE" >> .env

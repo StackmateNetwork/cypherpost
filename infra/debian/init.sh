@@ -35,10 +35,11 @@ git clone https://github.com/StackmateNetwork/cypherpost.git
 echo "[*] Cloned cypherpost and cyphernode from github."
 
 sudo chmod -R 700 cypherpost
-sudo chmod -R 700 cyphernode
 sudo chown -R $(whoami) cypherpost 
 sudo chown -R $(whoami) cypherpost 
 
+mkdir /home/debian/volumes 
+sudo chmod -R 777 /home/debian/volumes
 echo "[*] Permissions Set."
 
 echo "[*] Server initialization complete!"
