@@ -94,7 +94,6 @@ export class CypherpostIdentity implements IdentityInterface {
   async createInvite(): Promise<string | Error> {
    const code =  uid.createRandomID(32);
    const created = await inviteStore.createOne(code);
-   console.log({created});
    if(created instanceof Error) return created;
    else return code;
   }

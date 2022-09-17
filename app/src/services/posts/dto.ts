@@ -161,7 +161,6 @@ export async function handleGetOthersPosts(req, res) {
   }
 }
 
-
 export async function handleGetPostAndKeysById(req, res) {
   const request = parseRequest(req);
   try {
@@ -191,7 +190,7 @@ export async function handleGetPostAndKeysById(req, res) {
       let single_dec_key = dec_keys.find(receiverKey => receiverKey.receiver === request.headers['x-client-pubkey']);
 
       const response = {
-        post: { ...single_post_vec[0], decryption_keys: single_dec_key.decryption_key },
+        post: { ...single_post_vec[0], decryption_key: single_dec_key.decryption_key },
       };
 
       respond(200, response, res, request);

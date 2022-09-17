@@ -176,3 +176,14 @@ Clients can use an optional `reference` field, when making a post. References re
 References allow users to create group chats.
 
 Note that when the parent post is deleted, all references are also removed.
+
+
+### TODO 
+
+Iron out production compose scripts
+
+Sort out volume permissions in prod
+
+Lock .env file with password
+
+Update pier for prod tasks
