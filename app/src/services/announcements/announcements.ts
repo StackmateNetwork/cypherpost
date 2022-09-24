@@ -20,10 +20,10 @@ export class CypherpostAnnouncements implements AnnouncementInterface {
   removeAllOfUser(pubkey: string): Promise<boolean | Error> {
     return store.removeAll(pubkey);
   }
-  async create(by: string, to: string, type: AnnouncementType, nonce: string, signature: string): Promise<boolean | Error> {
+  async create(by: string, to: string, kind: AnnouncementType, nonce: string, signature: string): Promise<boolean | Error> {
     try{
-      const announcement_message = `${by}:${to}:${type.toString()}:${nonce}`;
-      // console.log({badge_message});
+      const announcement_message = `${by}:${to}:${kind.toString()}:${nonce}`;
+      console.log({announcement_message});
       // console.log({signature});
       const verify = await bitcoin.verify(announcement_message, signature,by);
       if (verify instanceof Error) return verify;
@@ -35,8 +35,8 @@ export class CypherpostAnnouncements implements AnnouncementInterface {
         genesis: Date.now(),
         by,
         to,
-        type,
-        hash:crypto.createHash("sha256").update(`${by}:${to}:${type.toString()}`).digest("hex"),
+        kind: kind,
+        hash:crypto.createHash("sha256").update(`${by}:${to}:${kind.toString()}`).digest("hex"),
         nonce,
         signature,
       };
@@ -53,8 +53,8 @@ export class CypherpostAnnouncements implements AnnouncementInterface {
   findByReceiver(to: string,genesis_filter: number): Promise<Error | Announcement[]> {
     return store.readByReceiver(to,genesis_filter);
   }
-  revoke(by: string, to: string, type: AnnouncementType): Promise<boolean | Error> {
-    return store.removeByReceiver(by,to, type);
+  revoke(by: string, to: string, kind: AnnouncementType): Promise<boolean | Error> {
+    return store.removeByReceiver(by,to, kind);
   }
 
 }

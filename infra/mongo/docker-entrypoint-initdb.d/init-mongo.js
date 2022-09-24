@@ -1,7 +1,7 @@
 db = db.getSiblingDB('cypherpost')
 db.createUser({
-  user: "___USER___",
-  pwd: "___PWD___",
+  user: "cp",
+  pwd: "secret",
   roles: [{
     role: "readWrite",
     db: "cypherpost"

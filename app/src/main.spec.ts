@@ -250,7 +250,7 @@ async function createIdentityRegistrationRequest(username, key_set: TestKeySet) 
     username,
   };
   const nonce = Date.now();
-  const message = `POST ${endpoint} ${JSON.stringify(body)} ${nonce}`;
+  const message = `POST ${endpoint} ${nonce}`;
   const signature = await bitcoin.sign(message, key_set.identity_private) as string;
 
   return {
@@ -265,7 +265,7 @@ async function createIdentityGetRequest(key_set: TestKeySet) {
   const endpoint = "/api/v2/identity/all";
   const nonce = Date.now();
   const body = {};
-  const message = `GET ${endpoint} ${JSON.stringify(body)} ${nonce}`;
+  const message = `GET ${endpoint} ${nonce}`;
   const signature = await bitcoin.sign(message, key_set.identity_private) as string;
 
   return {
@@ -287,7 +287,7 @@ async function createAnnouncementIssueRequest(announcement: AnnouncementType, to
     signature: announcement_signature
   };
 
-  const message = `POST ${endpoint} ${JSON.stringify(body)} ${nonce}`;
+  const message = `POST ${endpoint} ${nonce}`;
   const signature = await bitcoin.sign(message, key_set.identity_private) as string;
 
   return {
@@ -303,7 +303,7 @@ async function createGetAllAnnouncementsRequest(key_set: TestKeySet) {
   const endpoint = "/api/v2/announcement/all";
   const nonce = Date.now();
   const body = {};
-  const message = `GET ${endpoint} ${JSON.stringify(body)} ${nonce}`;
+  const message = `GET ${endpoint} ${nonce}`;
   const signature = await bitcoin.sign(message, key_set.identity_private) as string;
 
   return {
@@ -322,7 +322,7 @@ async function createPostRequest(expiry: number, post_set: TestPostSet, key_set:
     derivation_scheme: init_posts_ds
   };
 
-  const message = `PUT ${endpoint} ${JSON.stringify(body)} ${nonce}`;
+  const message = `PUT ${endpoint} ${nonce}`;
   const signature = await bitcoin.sign(message, key_set.identity_private) as string;
 
   return {
@@ -342,7 +342,7 @@ async function editPostRequest(post_set: TestPostSet, key_set: TestKeySet) {
     cypher_json: post_set.cypher,
   };
 
-  const message = `POST ${endpoint} ${JSON.stringify(body)} ${nonce}`;
+  const message = `POST ${endpoint} ${nonce}`;
   const signature = await bitcoin.sign(message, key_set.identity_private) as string;
 
   return {
@@ -358,7 +358,7 @@ async function createPostsGetSelfRequest(key_set: TestKeySet) {
   const nonce = Date.now();
   const body = {};
 
-  const message = `GET ${endpoint} ${JSON.stringify(body)} ${nonce}`;
+  const message = `GET ${endpoint} ${nonce}`;
   const signature = await bitcoin.sign(message, key_set.identity_private) as string;
 
   return {
@@ -374,7 +374,7 @@ async function createPostsGetOthersRequest(key_set: TestKeySet) {
   const nonce = Date.now();
   const body = {};
 
-  const message = `GET ${endpoint} ${JSON.stringify(body)} ${nonce}`;
+  const message = `GET ${endpoint} ${nonce}`;
   const signature = await bitcoin.sign(message, key_set.identity_private) as string;
 
   return {
@@ -410,7 +410,7 @@ async function createKeyStoreUpdate(post_set: TestPostSet, trusted_list: string[
     body.decryption_keys.push(dk_entry);
   });
 
-  const signature = await bitcoin.sign(`PUT ${endpoint} ${JSON.stringify(body)} ${nonce}`, key_set.identity_private);
+  const signature = await bitcoin.sign(`PUT ${endpoint} ${nonce}`, key_set.identity_private);
 
   // console.log( JSON.stringify({body},null,2))
   return {
@@ -429,7 +429,7 @@ async function createRevokeTrustRequest(revoke: string, key_set: TestKeySet) {
     revoking: revoke,
   };
   const nonce = Date.now();
-  const signature = await bitcoin.sign(`POST ${endpoint} ${JSON.stringify(body)} ${nonce}`, key_set.identity_private);
+  const signature = await bitcoin.sign(`POST ${endpoint} ${nonce}`, key_set.identity_private);
   return {
     nonce,
     endpoint,
@@ -442,7 +442,7 @@ async function createDeleteIdentityRequest(key_set: TestKeySet) {
   const endpoint = "/api/v2/identity";
   const nonce = Date.now();
   const body = {};
-  const signature = await bitcoin.sign(`DELETE ${endpoint} ${JSON.stringify(body)} ${nonce}`, key_set.identity_private) as string;
+  const signature = await bitcoin.sign(`DELETE ${endpoint} ${nonce}`, key_set.identity_private) as string;
   return {
     nonce,
     endpoint,
@@ -454,7 +454,7 @@ async function createServerIdentityRequest(key_set: TestKeySet) {
   const endpoint = "/api/v2/identity/server";
   const nonce = Date.now();
   const body = {};
-  const signature = await bitcoin.sign(`GET ${endpoint} ${JSON.stringify(body)} ${nonce}`, key_set.identity_private) as string;
+  const signature = await bitcoin.sign(`GET ${endpoint} ${nonce}`, key_set.identity_private) as string;
   return {
     nonce,
     endpoint,
@@ -467,7 +467,7 @@ async function createSocketConnectionRequest(key_set: TestKeySet){
   const endpoint = "/api/v3/notifications";
   const nonce = Date.now();
   const body = {};
-  const message = `GET ${endpoint} {} ${nonce}`;
+  const message = `GET ${endpoint} ${nonce}`;
   console.log({message})
   const signature = await bitcoin.sign(message, key_set.identity_private) as string;
   return {
@@ -699,9 +699,9 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     let request_c_get_all;
 
     it("CREATES REQUEST OBJECTS", async function () {
-      request_a = await createAnnouncementIssueRequest(AnnouncementType.Trusted, b_key_set.identity_pubkey, a_key_set);
-      request_b = await createAnnouncementIssueRequest(AnnouncementType.Trusted, c_key_set.identity_pubkey, b_key_set);
-      request_c = await createAnnouncementIssueRequest(AnnouncementType.Trusted, a_key_set.identity_pubkey, c_key_set);
+      request_a = await createAnnouncementIssueRequest(AnnouncementType.Trust, b_key_set.identity_pubkey, a_key_set);
+      request_b = await createAnnouncementIssueRequest(AnnouncementType.Trust, c_key_set.identity_pubkey, b_key_set);
+      request_c = await createAnnouncementIssueRequest(AnnouncementType.Trust, a_key_set.identity_pubkey, c_key_set);
       request_c_get_all = await createGetAllAnnouncementsRequest(c_key_set);
     });
 
@@ -771,7 +771,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     });
     it("VERIFIES ALL ANNOUNCEMENTS ISSUED and POPULATES EACH USER's TRUSTED", function (done) {
       all_announcements.map(async (announcement) => {
-        const message = `${announcement.by}:${announcement.to}:${announcement.type}:${announcement.nonce}`;
+        const message = `${announcement.by}:${announcement.to}:${announcement.kind}:${announcement.nonce}`;
         const verify = await bitcoin.verify(message, announcement.signature, announcement.by);
         const failedSig = "Announcement Signature failed.";
         if (!verify) throw failedSig;
@@ -1224,7 +1224,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     it("CREATES REQUEST OBJECTS", async function () {
       request_a = await createIdentityRegistrationRequest("alivf", a_key_set);
       // console.log({ request_a })
-      request_b = await createAnnouncementIssueRequest(AnnouncementType.Trusted, c_key_set.identity_pubkey, b_key_set);
+      request_b = await createAnnouncementIssueRequest(AnnouncementType.Trust, c_key_set.identity_pubkey, b_key_set);
       request_c = await createKeyStoreUpdate(c_post_set, c_trust, c_key_set);
     });
     it("PREVENTS REUSING INVITATION", function (done) {
