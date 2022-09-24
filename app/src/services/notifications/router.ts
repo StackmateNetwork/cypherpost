@@ -24,11 +24,12 @@ export async function setupNotificationSocket(path: string, server: http.Server)
 
     const extWs = ws as ExtWebSocket;
     extWs.isAlive = true;
+    console.log("Successfully connected to cypherpost server!")
+
     ws.on('pong',function(){
       extWs.isAlive = true;
     });
     // connection is up, let's add a simple simple event
-    console.log("Successfully connected to cypherpost server!")
     ws.on('message', async function message(data, isBinary) {
       const postId = data.toString();
       console.log({postId});
