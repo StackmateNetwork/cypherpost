@@ -23,7 +23,7 @@ const announcement_schema = new mongoose.Schema(
       required: true,
       index: true,
     },
-    type: {
+    kind: {
       type: String,
       required: true,
     },
@@ -53,6 +53,7 @@ const announcementStore = mongoose.model("announcement", announcement_schema);
 export class MongoAnnouncementStore implements AnnouncementStore {
   async create(announcement: Announcement): Promise<boolean | Error> {
     try {
+      console.log(announcement['kind'])
       await announcementStore.syncIndexes();
       const doc = await announcementStore.create(announcement);
       if (doc instanceof Error) {
@@ -70,9 +71,9 @@ export class MongoAnnouncementStore implements AnnouncementStore {
       return handleError(e);
     }
   }
-  async removeByReceiver(by: string, to: string, type: AnnouncementType): Promise<boolean | Error> {
+  async removeByReceiver(by: string, to: string, kind: AnnouncementType): Promise<boolean | Error> {
     try {
-      const query = { by, to, type };
+      const query = { by, to, kind };
 
       const status = await announcementStore.deleteOne(query)
       if (status instanceof Error) {
@@ -128,13 +129,14 @@ export class MongoAnnouncementStore implements AnnouncementStore {
 
       if (docs.length > 0) {
         const announcements = docs.map(doc => {
+          console.log(doc['kind'])
           return {
             genesis: doc["genesis"],
             hash: doc["hash"],
             by: doc["by"],
             to: doc["to"],
             signature: doc["signature"],
-            type: doc["type"],
+            kind: doc["kind"],
             nonce: doc["nonce"],
           }
         });
@@ -161,7 +163,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
             by: doc["by"],
             to: doc["to"],
             signature: doc["signature"],
-            type: doc["type"],
+            kind: doc["kind"],
             nonce: doc["nonce"],
 
           }
@@ -190,7 +192,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
             by: doc["by"],
             to: doc["to"],
             signature: doc["signature"],
-            type: doc["type"],
+            kind: doc["kind"],
             nonce: doc["nonce"],
           }
         });

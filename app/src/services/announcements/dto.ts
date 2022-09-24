@@ -110,27 +110,24 @@ export async function handleMakeAnnouncement(req, res) {
         message: "Trust in self implied."
       }
     }
-    let announcement= AnnouncementType.Trusted;
+    let announcement= AnnouncementType.Trust;
 
     switch (request.params.announcement.toUpperCase()){
       case 'TRUST':
-        announcement = AnnouncementType.Trusted;
+        announcement = AnnouncementType.Trust;
         break;
-      case 'SCAMMER':
-        announcement = AnnouncementType.Scammer;
+      case 'SCAM':
+        announcement = AnnouncementType.Scam;
         break;
-      case 'BUY':
-        announcement= AnnouncementType.Buy;
+      case 'ESCROW':
+        announcement= AnnouncementType.Escrow;
         break;
-        case "SELL":
-          announcement= AnnouncementType.Sell;
-          break;
       default:
-        announcement = AnnouncementType.Trusted;
+        announcement = AnnouncementType.Trust;
         break;
     }
 
-    const status = await announcements.create(request.headers['x-client-pubkey'], request.body.recipient, AnnouncementType.Trusted, request.body.nonce, request.body.signature);
+    const status = await announcements.create(request.headers['x-client-pubkey'], request.body.recipient, AnnouncementType.Trust, request.body.nonce, request.body.signature);
     if (status instanceof Error) throw status;
 
     const response = {
@@ -157,11 +154,11 @@ export async function handleRevokeTrust(req, res) {
       }
     }
 
-    let status = await announcements.revoke(request.headers['x-client-pubkey'], request.body.revoking, AnnouncementType.Trusted);
+    let status = await announcements.revoke(request.headers['x-client-pubkey'], request.body.revoking, AnnouncementType.Trust);
     if (status instanceof Error) throw status;
     // REMOVE ALL RELATED KEYS
-    status = await postKeys.removePostDecryptionKeyByReceiver(request.headers['x-client-pubkey'],request.body.revoking);
-    if (status instanceof Error) throw status;
+    let altstatus = await postKeys.removePostDecryptionKeyByReceiver(request.headers['x-client-pubkey'],request.body.revoking);
+    if (altstatus instanceof Error) throw altstatus;
 
     const response = {
       status

@@ -5,7 +5,6 @@ Developed @ Stackmate India
 // ------------------ '(◣ ◢)' ---------------------
 import express from "express";
 import helmet from "helmet";
-import cors from 'cors';
 
 import { router as announcement } from "./services/announcements/router";
 import { router as identity } from "./services/identity/router";

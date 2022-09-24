@@ -101,7 +101,7 @@ describe("Initalizing Test: Badge Service", function () {
     ecdsa_keys1 = await bitcoin.extract_ecdsa_pair({xpub:xpub1,xprv:xprv1});
     if(ecdsa_keys instanceof Error) return ecdsa_keys;
 
-    const message = `${ecdsa_keys.pubkey}:${ecdsa_keys1.pubkey}:${AnnouncementType.Trusted.toString()}:${nonceGlobal}`;
+    const message = `${ecdsa_keys.pubkey}:${ecdsa_keys1.pubkey}:${AnnouncementType.Trust.toString()}:${nonceGlobal}`;
 
     signatureGlobal = await bitcoin.sign(message,ecdsa_keys.privkey);
 
@@ -113,11 +113,11 @@ describe("Initalizing Test: Badge Service", function () {
 
   describe("ANNOUNCEMENT SERVICE UNIT TESTS:", async function () {
     it("CREATE new TRUST from xpub to xpub1", async function () {
-      const response = await announcement.create(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trusted,nonceGlobal, signatureGlobal);
+      const response = await announcement.create(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trust,nonceGlobal, signatureGlobal);
       expect(response).to.equal(true);
     });
     it("409 for CREATE duplicate TRUST from xpub to xpub1", async function () {
-      const response = await announcement.create(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trusted,nonceGlobal, signatureGlobal);
+      const response = await announcement.create(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trust,nonceGlobal, signatureGlobal);
       expect(response['name']).to.equal("409");
     });
     it("FIND announcements by maker", async function () {
@@ -142,7 +142,7 @@ describe("Initalizing Test: Badge Service", function () {
       expect(response.length === 0).to.equal(true);
     });
     it("REVOKE badge", async function () {
-      const response = await announcement.revoke(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trusted);
+      const response = await announcement.revoke(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trust);
       expect(response).to.equal(true);
     });
     it("FIND 0 announcements post revoke", async function () {
@@ -151,7 +151,7 @@ describe("Initalizing Test: Badge Service", function () {
       expect(response.length === 0).to.equal(true);
     });
     it("CREATE new TRUST from pubkey to pubkey1", async function () {
-      const response = await announcement.create(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trusted,nonceGlobal, signatureGlobal);
+      const response = await announcement.create(ecdsa_keys.pubkey, ecdsa_keys1.pubkey, AnnouncementType.Trust,nonceGlobal, signatureGlobal);
       expect(response).to.equal(true);
     });
     it("REMOVE ALL by pubkey", async function () {
@@ -181,10 +181,10 @@ describe("Initalizing Test: Badge Service", function () {
           id,
           given: all_announcements.filter((annElement)=>
             annElement.by === id
-          ).map((badge)=> Object({to:badge.to,type:badge.type})),
+          ).map((badge)=> Object({to:badge.to,kind:badge.kind})),
           received: all_announcements.filter((annElement)=>
           annElement.to === id
-          ).map((annElement)=>  Object({from: annElement.by, type:annElement.type})),
+          ).map((annElement)=>  Object({from: annElement.by, kind:annElement.kind})),
       })});
         ids_with_announcements.map((object)=>{
         trustObject[object.id] =
@@ -202,50 +202,50 @@ describe("Initalizing Test: Badge Service", function () {
 
 
 async function simulateAnnouncements(nonce: string,signature: string){
-  let response = await announcement.create(admin, ishi, AnnouncementType.Trusted,nonce, signature);
+  let response = await announcement.create(admin, ishi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(admin, pbz, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(admin, pbz, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(pbz, ishi, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(pbz, ishi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(ishi, pbz, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(ishi, pbz, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(sushi, ishi, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(sushi, ishi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(bubble, ishi, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(bubble, ishi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(ishi, sushi, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(ishi, sushi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(ishi, bubble, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(ishi, bubble, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(satoshi, pbz, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(satoshi, pbz, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(pbz, satoshi, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(pbz, satoshi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(ishi, satoshi, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(ishi, satoshi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(sushi, satoshi, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(sushi, satoshi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(bubble, satoshi, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(bubble, satoshi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(newuser, satoshi, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(newuser, satoshi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(newuser, admin, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(newuser, admin, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(outlier, satoshi, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(outlier, satoshi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(ishi, ch2, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(ishi, ch2, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(bubble, ch2, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(bubble, ch2, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(sushi, ch2, AnnouncementType.Scammer,nonce, signature);
+      response = await announcement.create(sushi, ch2, AnnouncementType.Scam,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(ch2, ishi, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(ch2, ishi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(ch2, bubble, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(ch2, bubble, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(ch2, sushi, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(ch2, sushi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
-      response = await announcement.create(ch2, satoshi, AnnouncementType.Trusted,nonce, signature);
+      response = await announcement.create(ch2, satoshi, AnnouncementType.Trust,nonce, signature);
       expect(response).to.equal(true);
 }
