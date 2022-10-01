@@ -35,9 +35,6 @@ export class CypherpostIdentity implements IdentityInterface {
         code: 400,
         message: "Invite code invalid or already claimed."
       });
-
-      const update = await inviteStore.updateOne(invite_code,InvitationCodeStatus.Claimed);
-      if (update instanceof Error) return update;
     }
     const new_identity: UserIdentity = {
       genesis: Date.now(),
@@ -48,6 +45,11 @@ export class CypherpostIdentity implements IdentityInterface {
 
     const createStatus = await idStore.createOne(new_identity);
     if (createStatus instanceof Error) return createStatus;
+    
+    if (type === RegistrationType.Invite){
+      const update = await inviteStore.updateOne(invite_code,InvitationCodeStatus.Claimed);
+      if (update instanceof Error) return update;
+    }
 
     return createStatus;
   }
