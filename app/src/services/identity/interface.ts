@@ -8,7 +8,8 @@ export interface IdentityInterface{
   authenticate(pubkey: string, message: string, signature: string): Promise<boolean | Error>;
   updateStatus(pubkey:string, status: VerificationStatus): Promise<boolean | Error>;
   all(genesis_filter: number): Promise<Array<UserIdentity> | Error>;
-  createInvite(): Promise<string | Error>;
+  createInvite(type: InvitationCodeType): Promise<string | Error>;
+  createUserInvite(invite_secret: string): Promise<string | Error>;
   remove(pubkey: string): Promise<boolean | Error>;
 }
 
@@ -21,8 +22,9 @@ export interface IdentityStore{
 }
 
 export interface InviteStore{
-  createOne(invite_code: string): Promise<boolean | Error>;
-  checkOne(invite_code: string, status: InvitationCodeStatus): Promise<boolean | Error>;
+  createOne(invite_code: string,type: InvitationCodeType): Promise<boolean | Error>;
+  checkOneStatus(invite_code: string, status: InvitationCodeStatus): Promise<boolean | Error>;
+  checkOneType(invite_code: string, type: InvitationCodeType): Promise<boolean | Error>;
   updateOne(invite_code: string, status: InvitationCodeStatus):Promise<boolean | Error>;
   removeOne(invite_code: string): Promise<boolean | Error>;
 }
@@ -48,6 +50,10 @@ export enum VerificationStatus{
 export enum InvitationCodeStatus{
   Unclaimed = "UNCLAIMED",
   Claimed = "CLAIMED",
+}
+export enum InvitationCodeType{
+  Standard = "STANDARD",
+  Privileged = "PRIVILEGED",
 }
 
 export enum IdentityIndex{

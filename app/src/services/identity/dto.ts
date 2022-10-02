@@ -9,7 +9,7 @@ import { CypherpostAnnouncements } from "../announcements/announcements";
 import { CypherpostPostKeys } from "../posts/keys/post_keys";
 import { CypherpostPosts } from "../posts/posts";
 import { CypherpostIdentity } from "./identity";
-import { RegistrationType } from "./interface";
+import { InvitationCodeType, RegistrationType } from "./interface";
 
 const { validationResult } = require('express-validator');
 
@@ -172,7 +172,39 @@ export async function handleAdminGetInvite(req,res){
         message: "Incorrect Invite Secret"
       }
     }
-    const invite_code = await identity.createInvite();
+    let invite_type;
+    if (req.params.type.startsWith("priv")){
+      invite_type = InvitationCodeType.Privileged
+    }
+    else{
+      invite_type = InvitationCodeType.Standard
+
+    }
+    const invite_code = await identity.createInvite(invite_type);
+    if(invite_code instanceof Error) throw invite_code;
+
+    const response = {
+      invite_code
+    }
+    respond(200, response, res, request);
+  }
+  catch (e) {
+    const result = filterError(e, r_500, request);
+    respond(result.code, result.message, res, request);
+  }
+}
+
+export async function handleUserGetInvite(req,res){
+  const request = parseRequest(req);
+  try {
+
+    if (!request.headers['x-invite-secret']){
+      throw {
+        code: 401,
+        message: "Incorrect Invite Secret"
+      }
+    }
+    const invite_code = await identity.createUserInvite(request.headers['x-invite-secret']);
     if(invite_code instanceof Error) throw invite_code;
 
     const response = {

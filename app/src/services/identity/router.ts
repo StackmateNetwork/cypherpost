@@ -5,7 +5,7 @@ Developed @ Stackmate India
 // ------------------ '(◣ ◢)' ---------------------
 import { Router } from "express";
 import * as val from "express-validator";
-import { handleDeleteIdentity, handleGetAllIdentities, handleGetServerIdentity, handleRegistration,handleAdminGetInvite, identityMiddleware } from "./dto";
+import { handleDeleteIdentity, handleGetAllIdentities, handleGetServerIdentity,handleUserGetInvite, handleRegistration,handleAdminGetInvite, identityMiddleware } from "./dto";
 
 // ------------------ '(◣ ◢)' ---------------------
 export const router = Router();
@@ -22,7 +22,8 @@ router.post("/",registrationCheck, handleRegistration);
 router.get("/all",checkGetIdentities,handleGetAllIdentities);
 router.delete("/",handleDeleteIdentity);
 router.get("/server",handleGetServerIdentity);
-router.get("/admin/invitation",handleAdminGetInvite);
+router.get("/admin/invitation/:type",handleAdminGetInvite);
+router.get("/invitation/",handleUserGetInvite);
 
 // ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------
 

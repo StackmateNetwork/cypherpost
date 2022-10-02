@@ -9,7 +9,7 @@ import { S5Crypto } from "../../lib/crypto/crypto";
 import { handleError } from "../../lib/errors/e";
 import * as jwt from "../../lib/jwt/jwt";
 import { S5UID } from "../../lib/uid/uid";
-import { IdentityIndex, IdentityInterface, InvitationCodeStatus, RegistrationType, UserIdentity, VerificationStatus } from "./interface";
+import { IdentityIndex, IdentityInterface, InvitationCodeStatus,InvitationCodeType, RegistrationType, UserIdentity, VerificationStatus } from "./interface";
 import { MongoIdentityStore, MongoInviteStore } from "./mongo";
 
 const uid = new S5UID();
@@ -29,7 +29,7 @@ export class CypherpostIdentity implements IdentityInterface {
 
   async register(username: string, pubkey: string, type: RegistrationType, invite_code?: string): Promise<boolean | Error> {
     if (type === RegistrationType.Invite){
-      const checkInviteStatus = await inviteStore.checkOne(invite_code, InvitationCodeStatus.Unclaimed);
+      const checkInviteStatus = await inviteStore.checkOneStatus(invite_code, InvitationCodeStatus.Unclaimed);
       if(checkInviteStatus instanceof Error) return checkInviteStatus;
       if(!checkInviteStatus) return handleError({
         code: 400,
@@ -45,7 +45,7 @@ export class CypherpostIdentity implements IdentityInterface {
 
     const createStatus = await idStore.createOne(new_identity);
     if (createStatus instanceof Error) return createStatus;
-    
+
     if (type === RegistrationType.Invite){
       const update = await inviteStore.updateOne(invite_code,InvitationCodeStatus.Claimed);
       if (update instanceof Error) return update;
@@ -93,11 +93,25 @@ export class CypherpostIdentity implements IdentityInterface {
     const identities = await idStore.readAll(genesis_filter);
     return identities;
   }
-  async createInvite(): Promise<string | Error> {
+  async createInvite(type: InvitationCodeType): Promise<string | Error> {
    const code =  uid.createRandomID(32);
-   const created = await inviteStore.createOne(code);
+   const created = await inviteStore.createOne(code,type);
    if(created instanceof Error) return created;
    else return code;
+  }
+
+  async createUserInvite(invite_secret: string): Promise<string | Error>{
+    const checkInviteType = await inviteStore.checkOneType(invite_secret, InvitationCodeType.Privileged);
+    if(checkInviteType instanceof Error) return checkInviteType;
+    if(!checkInviteType) return handleError({
+      code: 400,
+      message: "Invite code does not have priviledged permissions."
+    });
+  
+    const code =  uid.createRandomID(32);
+    const created = await inviteStore.createOne(code,InvitationCodeType.Standard);
+    if(created instanceof Error) return created;
+    else return code;
   }
 };
 
