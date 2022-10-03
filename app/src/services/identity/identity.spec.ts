@@ -9,7 +9,7 @@ import { S5Crypto } from "../../lib/crypto/crypto";
 import { DbConnection } from "../../lib/storage/interface";
 import { MongoDatabase } from "../../lib/storage/mongo";
 import { CypherpostIdentity } from "./identity";
-import { RegistrationType, UserIdentity, VerificationStatus } from "./interface";
+import { InvitationCodeType, RegistrationType, UserIdentity, VerificationStatus } from "./interface";
 import { MongoInviteStore } from "./mongo";
 
 const bitcoin = new CypherpostBitcoinOps();
@@ -64,8 +64,8 @@ describe("Initalizing Test: Identity Service", function () {
   });
   describe("IDENTITY SERVICE OPERATIONS:", async function () {
     it("should CREATE INVITES for 2 new users", async function () {
-      invite_0 = await identity.createInvite() as string;
-      invite_1 = await identity.createInvite() as string;
+      invite_0 = await identity.createInvite(InvitationCodeType.Standard) as string;
+      invite_1 = await identity.createInvite(InvitationCodeType.Standard) as string;
 
       expect(invite_0).to.be.a('string');
       expect(invite_0).to.be.a('string');

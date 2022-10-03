@@ -173,13 +173,13 @@ export async function handleAdminGetInvite(req,res){
       }
     }
     let invite_type;
-    if (req.params.type.startsWith("priv")){
+    if (req.query.type && req.query.type.startsWith("priv")){
       invite_type = InvitationCodeType.Privileged
     }
     else{
       invite_type = InvitationCodeType.Standard
-
     }
+    
     const invite_code = await identity.createInvite(invite_type);
     if(invite_code instanceof Error) throw invite_code;
 
@@ -200,8 +200,8 @@ export async function handleUserGetInvite(req,res){
 
     if (!request.headers['x-invite-secret']){
       throw {
-        code: 401,
-        message: "Incorrect Invite Secret"
+        code: 400,
+        message: "No Invite Secret Provided"
       }
     }
     const invite_code = await identity.createUserInvite(request.headers['x-invite-secret']);

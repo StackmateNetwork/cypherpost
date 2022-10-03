@@ -22,7 +22,7 @@ router.post("/",registrationCheck, handleRegistration);
 router.get("/all",checkGetIdentities,handleGetAllIdentities);
 router.delete("/",handleDeleteIdentity);
 router.get("/server",handleGetServerIdentity);
-router.get("/admin/invitation/:type",handleAdminGetInvite);
+router.get("/admin/invitation",handleAdminGetInvite);
 router.get("/invitation/",handleUserGetInvite);
 
 // ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------
