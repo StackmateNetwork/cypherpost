@@ -29,7 +29,7 @@ export class CypherpostIdentity implements IdentityInterface {
 
   async register(username: string, pubkey: string, type: RegistrationType, invite_code?: string): Promise<boolean | Error> {
     if (type === RegistrationType.Invite){
-      const checkInviteStatus = await inviteStore.checkOneStatus(invite_code, InvitationCodeStatus.Unclaimed);
+      const checkInviteStatus = await inviteStore.checkOneByStatus(invite_code, InvitationCodeStatus.Unclaimed);
       if(checkInviteStatus instanceof Error) return checkInviteStatus;
       if(!checkInviteStatus) return handleError({
         code: 400,
@@ -40,14 +40,14 @@ export class CypherpostIdentity implements IdentityInterface {
       genesis: Date.now(),
       username,
       pubkey,
-      status: type === RegistrationType.Payment ? VerificationStatus.Pending:VerificationStatus.Verified
+      status: type === RegistrationType.Payment ? VerificationStatus.Pending:VerificationStatus.Verified,
     };
 
     const createStatus = await idStore.createOne(new_identity);
     if (createStatus instanceof Error) return createStatus;
 
     if (type === RegistrationType.Invite){
-      const update = await inviteStore.updateOne(invite_code,InvitationCodeStatus.Claimed);
+      const update = await inviteStore.updateOneStatus(invite_code,InvitationCodeStatus.Claimed);
       if (update instanceof Error) return update;
     }
 
@@ -93,25 +93,29 @@ export class CypherpostIdentity implements IdentityInterface {
     const identities = await idStore.readAll(genesis_filter);
     return identities;
   }
-  async createInvite(type: InvitationCodeType): Promise<string | Error> {
+  async createInviteAsAdmin(type: InvitationCodeType): Promise<string | Error> {
    const code =  uid.createRandomID(32);
    const created = await inviteStore.createOne(code,type);
    if(created instanceof Error) return created;
    else return code;
   }
 
-  async createUserInvite(invite_secret: string): Promise<string | Error>{
-    const checkInviteType = await inviteStore.checkOneType(invite_secret, InvitationCodeType.Privileged);
-    if(checkInviteType instanceof Error) return checkInviteType;
-    if(!checkInviteType) return handleError({
+  async createInviteAsUser(invite_secret: string): Promise<string | Error>{
+    const inviteCount = await inviteStore.findOneByTypeAndCount(invite_secret, InvitationCodeType.Privileged);
+    if(inviteCount instanceof Error) return inviteCount;
+    if(inviteCount == 0) return handleError({
       code: 400,
-      message: "Invite code does not have priviledged permissions."
+      message: "Invite code privelage exhausted."
     });
   
     const code =  uid.createRandomID(32);
     const created = await inviteStore.createOne(code,InvitationCodeType.Standard);
     if(created instanceof Error) return created;
-    else return code;
+
+    const decStatus = await inviteStore.decrementCount(invite_secret);
+    if(decStatus instanceof Error) return decStatus;
+
+    return code;
   }
 };
 

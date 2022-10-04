@@ -38,7 +38,7 @@ const userIdentity: UserIdentity = {
   username,
   genesis: Date.now(),
   pubkey:xpub,
-  status: VerificationStatus.Pending
+  status: VerificationStatus.Pending,
 };
 
 const genesis_filter = 0;
@@ -64,9 +64,8 @@ describe("Initalizing Test: Identity Service", function () {
   });
   describe("IDENTITY SERVICE OPERATIONS:", async function () {
     it("should CREATE INVITES for 2 new users", async function () {
-      invite_0 = await identity.createInvite(InvitationCodeType.Standard) as string;
-      invite_1 = await identity.createInvite(InvitationCodeType.Standard) as string;
-
+      invite_0 = await identity.createInviteAsAdmin(InvitationCodeType.Privileged) as string;
+      invite_1 = await identity.createInviteAsAdmin(InvitationCodeType.Standard) as string;
       expect(invite_0).to.be.a('string');
       expect(invite_0).to.be.a('string');
 
@@ -102,6 +101,14 @@ describe("Initalizing Test: Identity Service", function () {
       const response = await identity.all(Date.now());
       if (response instanceof Error) throw response;
       expect(response.length).to.equal(0);
+    });
+    it("should get a new invite code as Privileged user - and decrement privilege count.", async function(){
+      const response: any = await identity.createInviteAsUser(invite_0);
+      if (response instanceof Error) throw response;
+      let count = await inviteStore.findOneByTypeAndCount(invite_0,InvitationCodeType.Privileged);
+      if (count instanceof Error) throw response;
+      expect(count).to.equal(9); //count
+
     });
     it("should REMOVE a user identity", async function () {
       const response = await identity.remove(ecdsa_keys.pubkey);

@@ -180,7 +180,7 @@ export async function handleAdminGetInvite(req,res){
       invite_type = InvitationCodeType.Standard
     }
     
-    const invite_code = await identity.createInvite(invite_type);
+    const invite_code = await identity.createInviteAsAdmin(invite_type);
     if(invite_code instanceof Error) throw invite_code;
 
     const response = {
@@ -204,7 +204,7 @@ export async function handleUserGetInvite(req,res){
         message: "No Invite Secret Provided"
       }
     }
-    const invite_code = await identity.createUserInvite(request.headers['x-invite-secret']);
+    const invite_code = await identity.createInviteAsUser(request.headers['x-invite-secret']);
     if(invite_code instanceof Error) throw invite_code;
 
     const response = {

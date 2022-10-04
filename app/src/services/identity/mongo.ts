@@ -30,7 +30,7 @@ const identity_schema = new mongoose.Schema(
       type: String,
       required: true,
       default: "PENDING"
-    }
+    },
   }
 );
 // ------------------ '(◣ ◢)' ---------------------
@@ -160,6 +160,11 @@ const invite_schema = new mongoose.Schema(
       type: String,
       required: false,
       default: "STANDARD"
+    },
+    count: {
+      type: Number,
+      required: true,
+      default: 10
     }
   }
 );
@@ -205,17 +210,15 @@ export class MongoInviteStore implements InviteStore {
       return handleError(e);
     }
   }
-  async checkOneStatus(invite_code: string, status: InvitationCodeStatus): Promise<boolean | Error> {
+  async checkOneByStatus(invite_code: string, status: InvitationCodeStatus): Promise<boolean | Error> {
     try {
       const query =  { invite_code, status };
       const doc = await inviteStore.findOne(query).exec();
-
       if (doc) {
         if (doc instanceof Error) {
           return handleError(doc);
         }
-        if (invite_code === doc['invite_code']) return true;
-        else return false;
+        return true;
       } else {
         // no data from findOne
         return false;
@@ -224,7 +227,7 @@ export class MongoInviteStore implements InviteStore {
       return handleError(e);
     }
   }
-  async checkOneType(invite_code: string, type: InvitationCodeType): Promise<boolean | Error> {
+  async findOneByTypeAndCount(invite_code: string, type: InvitationCodeType): Promise<number | Error> {
     try {
       const query =  { invite_code, type };
       const doc = await inviteStore.findOne(query).exec();
@@ -233,20 +236,36 @@ export class MongoInviteStore implements InviteStore {
         if (doc instanceof Error) {
           return handleError(doc);
         }
-        if (invite_code === doc['invite_code']) return true;
-        else return false;
+        return doc['count'];
       } else {
         // no data from findOne
-        return false;
+        return 0;
       }
     } catch (e) {
       return handleError(e);
     }
   }
-  async updateOne(invite_code: string, status: InvitationCodeStatus): Promise<boolean | Error> {
+  async updateOneStatus(invite_code: string, status: InvitationCodeStatus): Promise<boolean | Error> {
     try {
       const q = { invite_code };
       const u = { $set: { status: status.toString() } };
+      // console.log({q,u})
+
+      const result = await inviteStore.updateOne(q, u);
+      if (result instanceof Error) {
+        return handleError(result);
+      };
+      return result.modifiedCount > 0 || result.matchedCount >0;
+      // if verified if true the document is not updated and will return modifiedCount = 0
+      // watchout
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+  async decrementCount(invite_code: string): Promise<boolean | Error> {
+    try {
+      const q = { invite_code };
+      const u = { $inc: {"count": -1}};
       // console.log({q,u})
 
       const result = await inviteStore.updateOne(q, u);
