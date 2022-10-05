@@ -22,11 +22,13 @@ export interface IdentityStore{
 }
 
 export interface InviteStore{
-  createOne(invite_code: string,type: InvitationCodeType): Promise<boolean | Error>;
+  createOne(invite_code: string,type: InvitationCodeType,created_by: string): Promise<boolean | Error>;
   checkOneByStatus(invite_code: string, status: InvitationCodeStatus): Promise<boolean | Error>;
   findOneByTypeAndCount(invite_code: string, type: InvitationCodeType): Promise<number | Error>;
-  updateOneStatus(invite_code: string, status: InvitationCodeStatus):Promise<boolean | Error>;
+  findOneByType(invite_code: string, type: InvitationCodeType): Promise<InviteCode | Error>
+  updateOneStatus(invite_code: string, status: InvitationCodeStatus,claimed_by: string):Promise<boolean | Error>;
   removeOne(invite_code: string): Promise<boolean | Error>;
+  
 }
 
 export interface UserIdentity{
@@ -34,6 +36,15 @@ export interface UserIdentity{
   username: string;
   pubkey:string;
   status: VerificationStatus;
+};
+export interface InviteCode{
+  genesis : number;
+  invite_code: string;
+  type:InvitationCodeType;
+  status: VerificationStatus;
+  claimed_by: string,
+  created_by: string,
+  count: number,
 };
 
 export enum RegistrationType{

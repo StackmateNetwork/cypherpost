@@ -47,7 +47,7 @@ export class CypherpostIdentity implements IdentityInterface {
     if (createStatus instanceof Error) return createStatus;
 
     if (type === RegistrationType.Invite){
-      const update = await inviteStore.updateOneStatus(invite_code,InvitationCodeStatus.Claimed);
+      const update = await inviteStore.updateOneStatus(invite_code,InvitationCodeStatus.Claimed, pubkey);
       if (update instanceof Error) return update;
     }
 
@@ -95,21 +95,21 @@ export class CypherpostIdentity implements IdentityInterface {
   }
   async createInviteAsAdmin(type: InvitationCodeType): Promise<string | Error> {
    const code =  uid.createRandomID(32);
-   const created = await inviteStore.createOne(code,type);
+   const created = await inviteStore.createOne(code,type,"ADMIN");
    if(created instanceof Error) return created;
    else return code;
   }
 
   async createInviteAsUser(invite_secret: string): Promise<string | Error>{
-    const inviteCount = await inviteStore.findOneByTypeAndCount(invite_secret, InvitationCodeType.Privileged);
-    if(inviteCount instanceof Error) return inviteCount;
-    if(inviteCount == 0) return handleError({
+    const inviteCode = await inviteStore.findOneByType(invite_secret, InvitationCodeType.Privileged);
+    if(inviteCode instanceof Error) return inviteCode;
+    if(inviteCode['count'] == 0) return handleError({
       code: 400,
       message: "Invite code privelage exhausted."
     });
   
     const code =  uid.createRandomID(32);
-    const created = await inviteStore.createOne(code,InvitationCodeType.Standard);
+    const created = await inviteStore.createOne(code,InvitationCodeType.Standard,inviteCode['claimed_by']);
     if(created instanceof Error) return created;
 
     const decStatus = await inviteStore.decrementCount(invite_secret);

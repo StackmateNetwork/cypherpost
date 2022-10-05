@@ -105,9 +105,9 @@ describe("Initalizing Test: Identity Service", function () {
     it("should get a new invite code as Privileged user - and decrement privilege count.", async function(){
       const response: any = await identity.createInviteAsUser(invite_0);
       if (response instanceof Error) throw response;
-      let count = await inviteStore.findOneByTypeAndCount(invite_0,InvitationCodeType.Privileged);
-      if (count instanceof Error) throw response;
-      expect(count).to.equal(9); //count
+      let inviteCode = await inviteStore.findOneByType(invite_0,InvitationCodeType.Privileged);
+      if (inviteCode instanceof Error) throw response;
+      expect(inviteCode['count']).to.equal(9); //count
 
     });
     it("should REMOVE a user identity", async function () {

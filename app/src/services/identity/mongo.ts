@@ -5,7 +5,7 @@ Developed @ Stackmate India
 // ---------------- ┌∩┐(◣_◢)┌∩┐ -----------------
 import mongoose from "mongoose";
 import { handleError } from "../../lib/errors/e";
-import { IdentityIndex, IdentityStore, InvitationCodeStatus, InvitationCodeType, InviteStore, UserIdentity, VerificationStatus } from "./interface";
+import { IdentityIndex, IdentityStore, InviteCode,InvitationCodeStatus, InvitationCodeType, InviteStore, UserIdentity, VerificationStatus } from "./interface";
 
 // ---------------- ┌∩┐(◣_◢)┌∩┐ -----------------
 const identity_schema = new mongoose.Schema(
@@ -161,6 +161,15 @@ const invite_schema = new mongoose.Schema(
       required: false,
       default: "STANDARD"
     },
+    created_by: {
+      type:String,
+      required: true,
+      default: "ADMIN",
+    },
+    claimed_by: {
+      type:String,
+      required: false,
+    },
     count: {
       type: Number,
       required: true,
@@ -173,14 +182,15 @@ const inviteStore = mongoose.model("invite", invite_schema);
 // ------------------ '(◣ ◢)' ---------------------
 // tslint:disable-next-line: max-classes-per-file
 export class MongoInviteStore implements InviteStore {
-  async createOne(invite_code: string,type: InvitationCodeType): Promise<boolean | Error> {
+  async createOne(invite_code: string,type: InvitationCodeType,created_by: String): Promise<boolean | Error> {
     try {
       await identityStore.syncIndexes();
       const doc = await inviteStore.create({
         invite_code,
         genesis: Date.now(),
         status: InvitationCodeStatus.Unclaimed,
-        type: type
+        type: type,
+        created_by,
       });
       if (doc instanceof Error) {
         return handleError(doc);
@@ -245,10 +255,38 @@ export class MongoInviteStore implements InviteStore {
       return handleError(e);
     }
   }
-  async updateOneStatus(invite_code: string, status: InvitationCodeStatus): Promise<boolean | Error> {
+  async findOneByType(invite_code: string, type: InvitationCodeType): Promise<InviteCode | Error> {
+    try {
+      const query =  { invite_code, type };
+      const doc = await inviteStore.findOne(query).exec();
+
+      if (doc) {
+        if (doc instanceof Error) {
+          return handleError(doc);
+        }
+         return {
+          genesis: doc["genesis"],
+          invite_code: doc["invite_code"],
+          claimed_by: doc["claimed_by"],
+          created_by: doc["created_by"],
+          status: doc["status"],
+          type: doc["type"],
+          count: doc["count"],
+        };
+      } else {
+        return handleError({
+          code: 404,
+          message: "No InviteCode entry found."
+        });
+      }
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+  async updateOneStatus(invite_code: string, status: InvitationCodeStatus, claimed_by: string): Promise<boolean | Error> {
     try {
       const q = { invite_code };
-      const u = { $set: { status: status.toString() } };
+      const u = { $set: { status: status.toString() , claimed_by} };
       // console.log({q,u})
 
       const result = await inviteStore.updateOne(q, u);
