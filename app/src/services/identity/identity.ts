@@ -3,25 +3,18 @@ cypherpost.io
 Developed @ Stackmate India
 */
 
-import { mongo } from "mongoose";
 import { CypherpostBitcoinOps } from "../../lib/bitcoin/bitcoin";
-import { S5Crypto } from "../../lib/crypto/crypto";
 import { handleError } from "../../lib/errors/e";
-import * as jwt from "../../lib/jwt/jwt";
 import { S5UID } from "../../lib/uid/uid";
 import { IdentityIndex, IdentityInterface, InvitationCodeStatus,InvitationCodeType, RegistrationType, UserIdentity, VerificationStatus } from "./interface";
-import { MongoIdentityStore, MongoInviteStore } from "./mongo";
+import { MongoIdentityStore, MongoInviteStore,  } from "./mongo";
 
 const uid = new S5UID();
 const TYPE = process.env.TYPE;
 
 const bitcoin = new CypherpostBitcoinOps();
-const local_jwt = new jwt.S5LocalJWT();
 const idStore = new MongoIdentityStore();
 const inviteStore = new MongoInviteStore();
-
-const crypto = new S5Crypto();
-
 const ONE_HOUR = 60 * 60 * 1000;
 const THIRTY_DAYS = 30 * 24 * ONE_HOUR;
 

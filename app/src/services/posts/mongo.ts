@@ -5,7 +5,7 @@ Developed @ Stackmate India
 // ---------------- ┌∩┐(◣_◢)┌∩┐ -----------------
 import mongoose from "mongoose";
 import { handleError } from "../../lib/errors/e";
-import { PostStore, PostStoreIndex, UserPost } from "./interface";
+import { DerivationStore, PostStore, PostStoreIndex, UserPost } from "./interface";
 // ---------------- ┌∩┐(◣_◢)┌∩┐ -----------------
 const post_schema = new mongoose.Schema(
   {
@@ -187,5 +187,72 @@ export class MongoPostStore implements PostStore {
   }
 
 }
+// ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------
+// ---------------- ┌∩┐(◣_◢)┌∩┐ -----------------
+const derivation_schema = new mongoose.Schema(
+  {
+    owner: {
+      type: String,
+      required: true,
+    },    
+    last_used: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    strict: true
+  }
+);
+// ------------------ '(◣ ◢)' ---------------------
+const derivationStore = mongoose.model("derivation", derivation_schema);
+// ------------------ '(◣ ◢)' ---------------------
+export class MongoDerivationStore implements DerivationStore {
+  
+  async upsertOne(owner: string, derivation_scheme:string): Promise<boolean | Error> {
+    try {
+      const q = { owner };
+      const u = { $set: {  last_used: derivation_scheme } };
 
+      const status = await derivationStore.updateOne(q, u,{upsert: true});
+      if (status instanceof Error) {
+        return handleError(status);
+      };
+
+      return status.modifiedCount > 0;
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+
+  async readOne(owner: string): Promise<string | Error> {
+    try {
+      const query = {owner};
+
+      const doc = await derivationStore.findOne(query).exec();
+      if (doc instanceof Error) {
+        return handleError(doc);
+      }
+      else return doc['last_used'];
+      
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+  
+  async removeOne(owner: string): Promise<boolean | Error> {
+    try {
+      const query = {owner};
+
+      const status = await derivationStore.deleteMany(query)
+      if (status instanceof Error) {
+        return handleError(status);
+      }
+      return true;
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+
+}
 // ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------

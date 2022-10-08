@@ -11,6 +11,7 @@ import { S5Crypto } from "../../lib/crypto/crypto";
 import { DbConnection } from "../../lib/storage/interface";
 import { MongoDatabase } from "../../lib/storage/mongo";
 import { UserPost } from "./interface";
+import { MongoDerivationStore } from "./mongo";
 import { CypherpostPosts } from "./posts";
 const sinon = require("sinon");
 
@@ -19,6 +20,7 @@ const bitcoin = new CypherpostBitcoinOps();
 const posts = new CypherpostPosts();
 const s5crypto = new S5Crypto();
 const db = new MongoDatabase();
+const derivationStore = new MongoDerivationStore();
 // ------------------ ┌∩┐(◣_◢)┌∩┐ ------------------
 /*
 ROOT
@@ -38,6 +40,9 @@ const xpub = "xpub6BGW7x5qXVvKubVBvXKiHN2dDxwVU9aLfn6riBvcnhNA9g4wkPBMuugFxDtCYL
 const xprv = "xprv9xH9iSYwh8N2h7QipVnhvE5tfw714grVJZBFuoX1EMqBGsjoCqs7N7Mn6whrJtTTpGyXVX2KSzZ5uWPfCax9J6Lp9oKAteavTp9aA5VGTGW";
 let encryption_key;
 const derivation_scheme = "m/0'/0'/0'";
+const derivation_scheme1 = "m/0'/0'/1'";
+const derivation_scheme2 = "m/0'/0'/2'";
+
 let cypher_json;
 let post1_id;
 let post2_id;
@@ -94,13 +99,13 @@ describe("Initalizing Test: Profile Service", function () {
       post1_id = response;
     });
     it("CREATE a new post (expired)", async function () {
-      const response = await posts.create(xpub,user_post.expiry,cypher_json,derivation_scheme, reference);
+      const response = await posts.create(xpub,user_post.expiry,cypher_json,derivation_scheme1, reference);
       expect(response).to.be.a("string");
       post2_id = response;
 
     });
     it("CREATE a new post (not-expired)", async function () {
-      const response = await posts.create(xpub,user_post.expiry + 100000,cypher_json,derivation_scheme, reference);
+      const response = await posts.create(xpub,user_post.expiry + 100000,cypher_json,derivation_scheme2, reference);
       expect(response).to.be.a("string");
       post3_id = response;
     });
@@ -159,6 +164,11 @@ describe("Initalizing Test: Profile Service", function () {
       const response = await posts.findAllByOwner(xpub, genesis_filter);
       if(response instanceof Error) throw response;
       expect(response.length === 0).to.equal(true);
+    });
+    it("SHOULD HAVE LAST DERIVATION SCHEME STORED", async function(){
+      const response = await derivationStore.readOne(xpub);
+      if(response instanceof Error) throw response;
+      expect(response).to.equal(derivation_scheme2);
     });
   });
 });

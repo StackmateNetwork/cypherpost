@@ -6,17 +6,19 @@ Developed @ Stackmate India
 import { handleError } from "../../lib/errors/e";
 import { S5UID } from "../../lib/uid/uid";
 import { PostInterface, PostStoreIndex, UserPost } from "./interface";
-import { MongoPostStore } from "./mongo";
+import { MongoPostStore,MongoDerivationStore } from "./mongo";
 
-const store = new MongoPostStore();
+const postStore = new MongoPostStore();
+const derivationStore = new MongoDerivationStore();
+
 const uuid = new S5UID();
 
 export class CypherpostPosts implements PostInterface {
   editOne(id: string, owner: string, cypher_json: string): Promise<boolean | Error> {
-    return store.updateOne(id, owner, cypher_json);
+    return postStore.updateOne(id, owner, cypher_json);
   }
   async isReference(id: string, owner: string): Promise<boolean | Error>{
-    const post = await store.readMany([id], PostStoreIndex.PostId, 0);
+    const post = await postStore.readMany([id], PostStoreIndex.PostId, 0);
     if (post instanceof Error) return post;
 
     if (post.length === 0){
@@ -31,7 +33,7 @@ export class CypherpostPosts implements PostInterface {
 
   }
   async findAllByOwner(owner: string, genesis_filter: number): Promise<UserPost[] | Error> {
-    return store.readMany([owner], PostStoreIndex.Owner, genesis_filter);
+    return postStore.readMany([owner], PostStoreIndex.Owner, genesis_filter);
   }
 
   async create(
@@ -52,32 +54,36 @@ export class CypherpostPosts implements PostInterface {
       edited: false,
     }
 
-    const status = await store.createOne(post);
+    const status = await postStore.createOne(post);
     if (status instanceof Error) return status;
+
+    const update_status = await derivationStore.upsertOne(owner,derivation_scheme);
+    if (update_status instanceof Error) return update_status;
+
     return post.id;
   }
   async findManyById(ids: Array<string>, genesis_filter): Promise<Array<UserPost> | Error> {
-    return store.readMany(ids, PostStoreIndex.PostId, genesis_filter);
+    return postStore.readMany(ids, PostStoreIndex.PostId, genesis_filter);
   }
   async removeOneById(id: string, owner: string): Promise<boolean | Error> {
-    return store.removeOne(id, owner);
+    return postStore.removeOne(id, owner);
   }
   async removeManyById(ids: string[]): Promise<boolean | Error> {
-    return store.removeMany([...ids], PostStoreIndex.PostId);
+    return postStore.removeMany([...ids], PostStoreIndex.PostId);
 
   }
   async removeAllByOwner(owner: string): Promise<Array<string> | Error> {
-    const user_posts = await store.readMany([owner], PostStoreIndex.Owner, 0);
+    const user_posts = await postStore.readMany([owner], PostStoreIndex.Owner, 0);
     if (user_posts instanceof Error) return user_posts;
 
-    const status = await store.removeMany([owner], PostStoreIndex.Owner);
+    const status = await postStore.removeMany([owner], PostStoreIndex.Owner);
     if (status instanceof Error) return status;
 
     return user_posts.map(post => post.id);
   }
   async removeAllExpiredByOwner(owner: string): Promise<Array<string> | Error> {
     try {
-      const user_posts = await store.readMany([owner], PostStoreIndex.Owner, 0);
+      const user_posts = await postStore.readMany([owner], PostStoreIndex.Owner, 0);
       if (user_posts instanceof Error) return user_posts;
       const expired_ids = [];
 
@@ -88,7 +94,7 @@ export class CypherpostPosts implements PostInterface {
 
       if (expired_ids.length === 0) return [];
       else {
-        const status = await store.removeMany([...expired_ids], PostStoreIndex.PostId);
+        const status = await postStore.removeMany([...expired_ids], PostStoreIndex.PostId);
         if (status instanceof Error) return status;
         else return expired_ids;
       }
@@ -100,7 +106,7 @@ export class CypherpostPosts implements PostInterface {
   }
   async removeAllExpired(): Promise<Array<string> | Error> {
     try {
-      const user_posts = await store.readAll(0);
+      const user_posts = await postStore.readAll(0);
       if (user_posts instanceof Error) return user_posts;
       const expired_ids = [];
 
@@ -111,7 +117,7 @@ export class CypherpostPosts implements PostInterface {
 
       if (expired_ids.length === 0) return [];
       else {
-        const status = await store.removeMany([...expired_ids], PostStoreIndex.PostId);
+        const status = await postStore.removeMany([...expired_ids], PostStoreIndex.PostId);
         if (status instanceof Error) return status;
         else return expired_ids;
       }

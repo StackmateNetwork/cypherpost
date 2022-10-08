@@ -24,6 +24,17 @@ export interface PostStore {
   removeMany(indexes: Array<string>, index_type: PostStoreIndex): Promise<boolean | Error>;
 }
 
+export interface DerivationStore {
+  readOne(owner:string): Promise<string | Error>;
+  removeOne(owner: string): Promise<boolean | Error>;
+  upsertOne(owner: string, derivation_scheme: string): Promise<boolean | Error>;
+}
+
+export interface DerivationIndex{
+  owner: string,
+  last_index: string
+}
+
 export interface UserPost {
   id?: string;
   reference?: string;
