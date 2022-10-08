@@ -434,7 +434,6 @@ async function createKeyStoreUpdate(post_set: TestPostSet, trusted_list: string[
 
   const signature = await bitcoin.sign(`PUT ${endpoint} ${nonce}`, key_set.identity_private);
 
-  // console.log( JSON.stringify({body},null,2))
   return {
     nonce,
     endpoint,
@@ -444,6 +443,22 @@ async function createKeyStoreUpdate(post_set: TestPostSet, trusted_list: string[
   }
 }
 
+async function createGetLastDSRequest(key_set: TestKeySet) {
+  const endpoint = "/api/v2/post/last/derivation";
+  const nonce = Date.now();
+  const body = {};
+
+  const message = `GET ${endpoint} ${nonce}`;
+  const signature = await bitcoin.sign(message, key_set.identity_private) as string;
+
+  return {
+    nonce,
+    endpoint,
+    body,
+    signature,
+    pubkey: key_set.identity_pubkey
+  }
+};
 
 async function createRevokeTrustRequest(revoke: string, key_set: TestKeySet) {
   const endpoint = "/api/v2/announcement/trust/revoke";
@@ -843,7 +858,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     let request_c;
     let request_c_get_self;
     let request_c_get_others;
-
+    let request_a_last_derivation;
     it("CREATES REQUEST OBJECTS", async function () {
       request_a = await createPostRequest(Date.now() + 10, a_post_set, a_key_set);
       request_a0 = await createPostRequest(Date.now() + 10000, a_post_set, a_key_set);
@@ -855,6 +870,9 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
       request_c_get_self = await createPostsGetSelfRequest(c_key_set);
 
       request_c_get_others = await createPostsGetOthersRequest(c_key_set);
+
+      request_a_last_derivation = await createGetLastDSRequest(a_key_set);
+
     });
 
     it("CREATES POSTS: A - 1 expires", function (done) {
@@ -887,6 +905,21 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           res.should.have.status(200);
           expect(res.body['id'].startsWith('s5')).to.equal(true);
           a_post_set.post_id = res.body['id'];
+          done();
+        });
+    });
+    it("GETS A LAST DERIVATION SCHEME", function (done) {
+      chai
+        .request(server)
+        .get(request_a_last_derivation.endpoint)
+        .set({
+          "x-client-pubkey": request_a_last_derivation.pubkey,
+          "x-nonce": request_a_last_derivation.nonce,
+          "x-client-signature": request_a_last_derivation.signature,
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          expect(res.body['last_used']).to.equal(request_a0.body.derivation_scheme);
           done();
         });
     });
@@ -1019,7 +1052,6 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     let request_a_get_others;
     let request_b_get_others;
     let request_c_get_others;
-
     it("CREATES POST KEY REQUESTS", async function () {
       request_a = await createKeyStoreUpdate(a_post_set, a_trust, a_key_set);
       request_b = await createKeyStoreUpdate(b_post_set, b_trust, b_key_set);
@@ -1152,6 +1184,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
         });
     });
   });
+
   describe("UPDATED POST BY C", function () {
     let request_c_edit;
     let request_c_get_self;

@@ -70,7 +70,6 @@ export class CypherpostPosts implements PostInterface {
   }
   async removeManyById(ids: string[]): Promise<boolean | Error> {
     return postStore.removeMany([...ids], PostStoreIndex.PostId);
-
   }
   async removeAllByOwner(owner: string): Promise<Array<string> | Error> {
     const user_posts = await postStore.readMany([owner], PostStoreIndex.Owner, 0);
@@ -126,5 +125,8 @@ export class CypherpostPosts implements PostInterface {
       // console.error({ e });
       return handleError(e)
     }
+  }
+  async getLastDerivationScheme(owner: string): Promise<string | Error> {
+    return derivationStore.readOne(owner);
   }
 }

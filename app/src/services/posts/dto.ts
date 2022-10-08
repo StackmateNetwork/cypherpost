@@ -178,8 +178,13 @@ export async function handleGetPostAndKeysById(req, res) {
 
     const single_post_vec = await posts.findManyById([req.params.id],0);
     if (single_post_vec instanceof Error) throw single_post_vec;
-
-    if (single_post_vec[0].owner == request.headers['x-client-pubkey']){
+    if (single_post_vec.length==0){
+      throw {
+        code: 404,
+        message: "No Post Found"
+      }
+    }
+    else if (single_post_vec[0].owner == request.headers['x-client-pubkey']){
       const response = {
         post: single_post_vec[0]
       };
@@ -288,6 +293,31 @@ export async function handleEditPost(req, res) {
 
     const response = {
       status
+    };
+    respond(200, response, res, request);
+  }
+  catch (e) {
+    const result = filterError(e, r_500, request);
+    respond(result.code, result.message, res, request);
+  }
+}
+
+export async function handleGetLastDerivation(req, res) {
+  const request = parseRequest(req);
+  try {
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      throw {
+        code: 400,
+        message: errors.array()
+      }
+    }
+
+    const last_used = await posts.getLastDerivationScheme(request.headers['x-client-pubkey']);
+    if (last_used instanceof Error) throw last_used;
+
+    const response = {
+      last_used
     };
     respond(200, response, res, request);
   }

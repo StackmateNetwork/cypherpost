@@ -14,6 +14,7 @@ export interface PostInterface {
   removeAllByOwner(owner: string): Promise<Array<string> | Error>;
   removeAllExpired(owner: string): Promise<Array<string> | Error>;
   removeAllExpiredByOwner(owner: string): Promise<Array<string> | Error>;
+  getLastDerivationScheme(owner: string): Promise<string | Error>;
 }
 
 export interface PostStore {
