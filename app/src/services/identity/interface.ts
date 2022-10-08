@@ -8,7 +8,7 @@ export interface IdentityInterface{
   authenticate(pubkey: string, message: string, signature: string): Promise<boolean | Error>;
   updateStatus(pubkey:string, status: VerificationStatus): Promise<boolean | Error>;
   all(genesis_filter: number): Promise<Array<UserIdentity> | Error>;
-  createInviteAsAdmin(type: InvitationCodeType): Promise<string | Error>;
+  createInviteAsAdmin(type: InvitationCodeType,count: number): Promise<string | Error>;
   createInviteAsUser(invite_code: string): Promise<string | Error>;
   remove(pubkey: string): Promise<boolean | Error>;
 }
@@ -22,7 +22,7 @@ export interface IdentityStore{
 }
 
 export interface InviteStore{
-  createOne(invite_code: string,type: InvitationCodeType,created_by: string): Promise<boolean | Error>;
+  createOne(invite_code: string,type: InvitationCodeType,created_by: string,count: number): Promise<boolean | Error>;
   checkOneByStatus(invite_code: string, status: InvitationCodeStatus): Promise<boolean | Error>;
   findOneByTypeAndCount(invite_code: string, type: InvitationCodeType): Promise<number | Error>;
   findOneByType(invite_code: string, type: InvitationCodeType): Promise<InviteCode | Error>

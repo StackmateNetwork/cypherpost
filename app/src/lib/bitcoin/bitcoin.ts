@@ -173,7 +173,7 @@ export class CypherpostBitcoinOps implements BitcoinKeyOperations {
       console.error({e});
       return handleError({
         code: 401,
-        message: "Invalid signature"
+        message: "Error Verifying Pubkey's Message Signature."
       });    
     }
   }

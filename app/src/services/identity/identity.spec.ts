@@ -64,8 +64,8 @@ describe("Initalizing Test: Identity Service", function () {
   });
   describe("IDENTITY SERVICE OPERATIONS:", async function () {
     it("should CREATE INVITES for 2 new users", async function () {
-      invite_0 = await identity.createInviteAsAdmin(InvitationCodeType.Privileged) as string;
-      invite_1 = await identity.createInviteAsAdmin(InvitationCodeType.Standard) as string;
+      invite_0 = await identity.createInviteAsAdmin(InvitationCodeType.Privileged,1) as string;
+      invite_1 = await identity.createInviteAsAdmin(InvitationCodeType.Standard,0) as string;
       expect(invite_0).to.be.a('string');
       expect(invite_0).to.be.a('string');
 

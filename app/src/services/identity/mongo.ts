@@ -173,7 +173,7 @@ const invite_schema = new mongoose.Schema(
     count: {
       type: Number,
       required: true,
-      default: 10
+      default: 0
     }
   }
 );
@@ -182,7 +182,7 @@ const inviteStore = mongoose.model("invite", invite_schema);
 // ------------------ '(◣ ◢)' ---------------------
 // tslint:disable-next-line: max-classes-per-file
 export class MongoInviteStore implements InviteStore {
-  async createOne(invite_code: string,type: InvitationCodeType,created_by: String): Promise<boolean | Error> {
+  async createOne(invite_code: string,type: InvitationCodeType,created_by: String, count: number): Promise<boolean | Error> {
     try {
       await identityStore.syncIndexes();
       const doc = await inviteStore.create({
@@ -191,6 +191,7 @@ export class MongoInviteStore implements InviteStore {
         status: InvitationCodeStatus.Unclaimed,
         type: type,
         created_by,
+        count
       });
       if (doc instanceof Error) {
         return handleError(doc);

@@ -236,12 +236,34 @@ function createDefaultTestPost(type: PostType, order: OrderType, message: string
     reference_percent: (fixed) ? 0 : 5
   }
 }
-function adminGetInvitationRequest() {
+function adminGetInvitationStdRequest() {
   const endpoint = "/api/v2/identity/admin/invitation";
 
   return {
     endpoint,
     invite_secret,
+  }
+}
+function adminGetInvitationPrivRequest() {
+  const endpoint = "/api/v2/identity/admin/invitation?type=priv&count=1";
+
+  return {
+    endpoint,
+    invite_secret,
+  }
+}
+async function userGetInvitationStdRequest(key_set: TestKeySet) {
+  const endpoint = "/api/v2/identity/invitation";
+
+  const nonce = Date.now();
+  const message = `GET ${endpoint} ${nonce}`;
+  const signature = await bitcoin.sign(message, key_set.identity_private) as string;
+
+  return {
+    nonce,
+    endpoint,
+    signature,
+    pubkey: key_set.identity_pubkey
   }
 }
 async function createIdentityRegistrationRequest(username, key_set: TestKeySet) {
@@ -540,19 +562,22 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
   });
 
   describe("ADMIN CREATES INVITE CODES for A B C to register", function () {
-    let request_admin;
-
+    let request_admin_std;
+    let request_admin_priv;
+    let request_user_std;
     it("CREATES REQUEST OBJECTS", async function () {
-      request_admin = await adminGetInvitationRequest();
+      request_admin_std = await adminGetInvitationStdRequest();
+      request_admin_priv = await adminGetInvitationPrivRequest();
+
     });
 
-    it("GETS A's INVITATION", function (done) {
-      console.log({ request_admin })
+    it("GETS A's STANDARD INVITATION", function (done) {
+      console.log({ request_admin_std })
       chai
         .request(server)
-        .get(request_admin.endpoint)
+        .get(request_admin_std.endpoint)
         .set({
-          "x-admin-invite-secret": request_admin.invite_secret
+          "x-admin-invite-secret": request_admin_std.invite_secret
         })
         .end((err, res) => {
           res.should.have.status(200);
@@ -562,13 +587,13 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           done();
         });
     });
-    it("GETS B's INVITATION", function (done) {
+    it("GETS B's PRIVELEGED INVITATION", function (done) {
       // console.log({ request_a })
       chai
         .request(server)
-        .get(request_admin.endpoint)
+        .get(request_admin_priv.endpoint)
         .set({
-          "x-admin-invite-secret": request_admin.invite_secret
+          "x-admin-invite-secret": request_admin_priv.invite_secret
         })
         .end((err, res) => {
           res.should.have.status(200);
@@ -577,18 +602,44 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           done();
         });
     });
-    it("GETS C's INVITATION", function (done) {
+    it("CREATES B INVITATION REQUEST OBJECT", async function () {
+      request_user_std = await userGetInvitationStdRequest(b_key_set);
+    });
+    it("GETS C's INVITATION FROM B", function (done) {
       // console.log({ request_a })
       chai
         .request(server)
-        .get(request_admin.endpoint)
+        .get(request_user_std.endpoint)
         .set({
-          "x-admin-invite-secret": request_admin.invite_secret
+          "x-client-pubkey": request_user_std.pubkey,
+          "x-nonce": request_user_std.nonce,
+          "x-client-signature": request_user_std.signature,
+          "x-invite-secret": b_invitation
         })
         .end((err, res) => {
           res.should.have.status(200);
           expect(res.body['invite_code']).to.be.a('string');
           c_invitation = res.body['invite_code']
+          done();
+        });
+    });
+
+    it("CREATES B INVITATION REQUEST OBJECT FOR ERROR", async function () {
+      request_user_std = await userGetInvitationStdRequest(b_key_set);
+    });
+    it("SHOULD ERROR FOR B's EXHAUSTED PRIVILEGE", function (done) {
+      // console.log({ request_a })
+      chai
+        .request(server)
+        .get(request_user_std.endpoint)
+        .set({
+          "x-client-pubkey": request_user_std.pubkey,
+          "x-nonce": request_user_std.nonce,
+          "x-client-signature": request_user_std.signature,
+          "x-invite-secret": b_invitation
+        })
+        .end((err, res) => {
+          res.should.have.status(403);
           done();
         });
     });

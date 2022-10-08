@@ -33,7 +33,7 @@ export async function identityMiddleware(req, res, next) {
     const method = request.method;
     const resource = request.resource;
     const message = `${method} ${resource} ${nonce}`;
-    if (resource !== "/api/v2/identity/admin/invitation")
+    if (!resource.startsWith("/api/v2/identity/admin/invitation"))
     {
       const verified = await bitcoin.verify(message, signature, pubkey);
       if (verified instanceof Error) throw verified;
@@ -179,8 +179,8 @@ export async function handleAdminGetInvite(req,res){
     else{
       invite_type = InvitationCodeType.Standard
     }
-    
-    const invite_code = await identity.createInviteAsAdmin(invite_type);
+    const count = req.query.count?req.query.count:0; 
+    const invite_code = await identity.createInviteAsAdmin(invite_type,count);
     if(invite_code instanceof Error) throw invite_code;
 
     const response = {

@@ -93,9 +93,9 @@ export class CypherpostIdentity implements IdentityInterface {
     const identities = await idStore.readAll(genesis_filter);
     return identities;
   }
-  async createInviteAsAdmin(type: InvitationCodeType): Promise<string | Error> {
+  async createInviteAsAdmin(type: InvitationCodeType,count: number): Promise<string | Error> {
    const code =  uid.createRandomID(32);
-   const created = await inviteStore.createOne(code,type,"ADMIN");
+   const created = await inviteStore.createOne(code,type,"ADMIN",count);
    if(created instanceof Error) return created;
    else return code;
   }
@@ -104,12 +104,12 @@ export class CypherpostIdentity implements IdentityInterface {
     const inviteCode = await inviteStore.findOneByType(invite_secret, InvitationCodeType.Privileged);
     if(inviteCode instanceof Error) return inviteCode;
     if(inviteCode['count'] == 0) return handleError({
-      code: 400,
+      code: 403,
       message: "Invite code privelage exhausted."
     });
   
     const code =  uid.createRandomID(32);
-    const created = await inviteStore.createOne(code,InvitationCodeType.Standard,inviteCode['claimed_by']);
+    const created = await inviteStore.createOne(code,InvitationCodeType.Standard,inviteCode['claimed_by'],0);
     if(created instanceof Error) return created;
 
     const decStatus = await inviteStore.decrementCount(invite_secret);
