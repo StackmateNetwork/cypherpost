@@ -30,7 +30,6 @@ const post_schema = new mongoose.Schema(
       index: true,
       default: "NONE"
     },
-    // no filters
     expiry: {
       type: Number,
       required: true,
@@ -39,8 +38,8 @@ const post_schema = new mongoose.Schema(
       type: String,
       required: true
     },
-    derivation_scheme: {
-      type: String,
+    derivation_index: {
+      type: Number,
       required: true
     },
     edited: {
@@ -125,7 +124,7 @@ export class MongoPostStore implements PostStore {
             expiry: doc["expiry"],
             reference: doc['reference'] || "NONE",
             cypher_json: doc["cypher_json"],
-            derivation_scheme: doc["derivation_scheme"],
+            derivation_index: doc["derivation_index"],
             edited: doc["edited"] || false
           }
         });
@@ -157,7 +156,7 @@ export class MongoPostStore implements PostStore {
             expiry: doc["expiry"],
             reference: doc['reference'] || "NONE",
             cypher_json: doc["cypher_json"],
-            derivation_scheme: doc["derivation_scheme"],
+            derivation_index: doc["derivation_index"],
             edited: doc["edited"] || false
           }
         });
@@ -196,7 +195,7 @@ const derivation_schema = new mongoose.Schema(
       required: true,
     },    
     last_used: {
-      type: String,
+      type: Number,
       required: true,
     },
   },
@@ -209,10 +208,10 @@ const derivationStore = mongoose.model("derivation", derivation_schema);
 // ------------------ '(◣ ◢)' ---------------------
 export class MongoDerivationStore implements DerivationStore {
   
-  async upsertOne(owner: string, derivation_scheme:string): Promise<boolean | Error> {
+  async upsertOne(owner: string, derivation_index:number): Promise<boolean | Error> {
     try {
       const q = { owner };
-      const u = { $set: {  last_used: derivation_scheme } };
+      const u = { $set: {  last_used: derivation_index } };
 
       const status = await derivationStore.updateOne(q, u,{upsert: true});
       if (status instanceof Error) {
@@ -225,7 +224,7 @@ export class MongoDerivationStore implements DerivationStore {
     }
   }
 
-  async readOne(owner: string): Promise<string | Error> {
+  async readOne(owner: string): Promise<number | Error> {
     try {
       const query = {owner};
 

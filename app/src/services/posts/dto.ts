@@ -50,7 +50,7 @@ export async function handleCreatePost(req, res) {
       }
     }
 
-    const id = await posts.create(req.headers['x-client-pubkey'], req.body.expiry, req.body.cypher_json, req.body.derivation_scheme, req.body.reference);
+    const id = await posts.create(req.headers['x-client-pubkey'], req.body.expiry, req.body.cypher_json, req.body.derivation_index, req.body.reference);
     if (id instanceof Error) throw id;
 
     const response = {
@@ -275,7 +275,6 @@ export async function handlePutKeys(req, res) {
     respond(result.code, result.message, res, request);
   }
 }
-
 
 export async function handleEditPost(req, res) {
   const request = parseRequest(req);

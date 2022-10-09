@@ -4,7 +4,7 @@ Developed @ Stackmate India
 */
 
 export interface PostInterface {
-  create(owner: string, expiry: number, cypher_json: string, derivation_scheme: string, reference?: string): Promise<string | Error>;
+  create(owner: string, expiry: number, cypher_json: string, derivation_index: number, reference?: string): Promise<string | Error>;
   findManyById(ids: Array<string>, genesis_filter: number): Promise<Array<UserPost> | Error>;
   findAllByOwner(owner: string, genesis_filter: number): Promise<Array<UserPost> | Error>;
 
@@ -14,7 +14,7 @@ export interface PostInterface {
   removeAllByOwner(owner: string): Promise<Array<string> | Error>;
   removeAllExpired(owner: string): Promise<Array<string> | Error>;
   removeAllExpiredByOwner(owner: string): Promise<Array<string> | Error>;
-  getLastDerivationScheme(owner: string): Promise<string | Error>;
+  getLastDerivationScheme(owner: string): Promise<number | Error>;
 }
 
 export interface PostStore {
@@ -26,14 +26,14 @@ export interface PostStore {
 }
 
 export interface DerivationStore {
-  readOne(owner:string): Promise<string | Error>;
+  readOne(owner:string): Promise<number | Error>;
   removeOne(owner: string): Promise<boolean | Error>;
-  upsertOne(owner: string, derivation_scheme: string): Promise<boolean | Error>;
+  upsertOne(owner: string, derivation_index: number): Promise<boolean | Error>;
 }
 
 export interface DerivationIndex{
   owner: string,
-  last_index: string
+  last_index: number
 }
 
 export interface UserPost {
@@ -43,7 +43,7 @@ export interface UserPost {
   expiry?: number;
   owner?: string;
   cypher_json?: string;
-  derivation_scheme?: string;
+  derivation_index?: number;
   edited?: boolean;
 }
 

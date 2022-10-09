@@ -39,9 +39,9 @@ const message = "GET /posts";
 const xpub = "xpub6BGW7x5qXVvKubVBvXKiHN2dDxwVU9aLfn6riBvcnhNA9g4wkPBMuugFxDtCYLu51gFKabc49y6Ssvv3axE57pDk4hem63LjCa4Qq2eAFpZ";
 const xprv = "xprv9xH9iSYwh8N2h7QipVnhvE5tfw714grVJZBFuoX1EMqBGsjoCqs7N7Mn6whrJtTTpGyXVX2KSzZ5uWPfCax9J6Lp9oKAteavTp9aA5VGTGW";
 let encryption_key;
-const derivation_scheme = "m/0'/0'/0'";
-const derivation_scheme1 = "m/0'/0'/1'";
-const derivation_scheme2 = "m/0'/0'/2'";
+const derivation_index = 0;
+const derivation_index1 = 1;
+const derivation_index2 = 2;
 
 let cypher_json;
 let post1_id;
@@ -68,7 +68,7 @@ const plain_json_post = {
 
 const user_post: UserPost = {
   expiry: Date.now() + 100,
-  derivation_scheme,
+  derivation_index,
   cypher_json
 };
 const genesis_filter = 0;
@@ -94,18 +94,18 @@ describe("Initalizing Test: Profile Service", function () {
 
   describe("POST SERVICE OPERATIONS:", async function () {
     it("CREATE a new post (expired)", async function () {
-      const response = await posts.create(xpub,user_post.expiry,cypher_json,derivation_scheme, reference);
+      const response = await posts.create(xpub,user_post.expiry,cypher_json,derivation_index, reference);
       expect(response).to.be.a("string");
       post1_id = response;
     });
     it("CREATE a new post (expired)", async function () {
-      const response = await posts.create(xpub,user_post.expiry,cypher_json,derivation_scheme1, reference);
+      const response = await posts.create(xpub,user_post.expiry,cypher_json,derivation_index1, reference);
       expect(response).to.be.a("string");
       post2_id = response;
 
     });
     it("CREATE a new post (not-expired)", async function () {
-      const response = await posts.create(xpub,user_post.expiry + 100000,cypher_json,derivation_scheme2, reference);
+      const response = await posts.create(xpub,user_post.expiry + 100000,cypher_json,derivation_index2, reference);
       expect(response).to.be.a("string");
       post3_id = response;
     });
@@ -168,7 +168,7 @@ describe("Initalizing Test: Profile Service", function () {
     it("SHOULD HAVE LAST DERIVATION SCHEME STORED", async function(){
       const response = await derivationStore.readOne(xpub);
       if(response instanceof Error) throw response;
-      expect(response).to.equal(derivation_scheme2);
+      expect(response).to.equal(derivation_index2);
     });
   });
 });

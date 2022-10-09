@@ -141,9 +141,9 @@ interface TestKeySet {
   identity_pubkey: string;
 };
 
-const init_identity_ds = "m/0h/0h/0h";
-const init_profile_ds = "m/1h/0h/0h";
-const init_posts_ds = "m/3h/0h/0h";
+// Index never increments in this test.
+// As client, ensure to increment for forward secrecy
+const derivation_index = 0;
 
 let a_key_set: TestKeySet;
 let b_key_set: TestKeySet;
@@ -179,7 +179,7 @@ async function createTestKeySet(): Promise<TestKeySet | Error> {
     if (root_xprv instanceof Error) throw root_xprv;
     const cypherpost_parent = bitcoin.derive_parent_128(root_xprv);
     if (cypherpost_parent instanceof Error) throw cypherpost_parent;
-    const identity_parent = await bitcoin.derive_hardened_str(cypherpost_parent.xprv, init_identity_ds);
+    const identity_parent = await bitcoin.derive_hardened(cypherpost_parent.xprv, 0,derivation_index,0);
     if (identity_parent instanceof Error) throw identity_parent;
     const identity_ecdsa = await bitcoin.extract_ecdsa_pair(identity_parent);
     if (identity_ecdsa instanceof Error) throw identity_ecdsa;
@@ -199,8 +199,8 @@ async function createTestKeySet(): Promise<TestKeySet | Error> {
   }
 }
 
-function createProfileSet(plain_profile: Profile, cypherpost_parent: ExtendedKeys, derivation_scheme: string): TestProfileSet {
-  const profile_xkey = bitcoin.derive_hardened_str(cypherpost_parent['xprv'], derivation_scheme) as ExtendedKeys;
+function createProfileSet(plain_profile: Profile, cypherpost_parent: ExtendedKeys, derivation_index: number): TestProfileSet {
+  const profile_xkey = bitcoin.derive_hardened(cypherpost_parent['xprv'], 1,derivation_index,0) as ExtendedKeys;
   const encryption_key = crypto.createHash('sha256').update(profile_xkey['xprv']).digest('hex');
   const cypher = s5crypto.encryptAESMessageWithIV(JSON.stringify(plain_profile), encryption_key) as string;
   return {
@@ -209,8 +209,8 @@ function createProfileSet(plain_profile: Profile, cypherpost_parent: ExtendedKey
     encryption_key
   }
 }
-function createPostSet(plain_post: Post, cypherpost_parent: ExtendedKeys, derivation_scheme: string): TestPostSet {
-  const ppost_xkey = bitcoin.derive_hardened_str(cypherpost_parent['xprv'], derivation_scheme) as ExtendedKeys;
+function createPostSet(plain_post: Post, cypherpost_parent: ExtendedKeys, derivation_index: number): TestPostSet {
+  const ppost_xkey = bitcoin.derive_hardened(cypherpost_parent['xprv'],1, derivation_index,0) as ExtendedKeys;
   const encryption_key = crypto.createHash('sha256').update(ppost_xkey['xprv']).digest('hex');
   const cypher = s5crypto.encryptAESMessageWithIV(JSON.stringify(plain_post), encryption_key) as string;
   return {
@@ -341,7 +341,7 @@ async function createPostRequest(expiry: number, post_set: TestPostSet, key_set:
   const body = {
     expiry,
     cypher_json: post_set.cypher,
-    derivation_scheme: init_posts_ds
+    derivation_index: derivation_index
   };
 
   const message = `PUT ${endpoint} ${nonce}`;
@@ -538,26 +538,26 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
       nickname: "Alice Articulates",
       status: "Sound Money, Sound World.",
       contact: "@alice3us on Telegram"
-    }, a_key_set.cypherpost_parent, init_profile_ds);
+    }, a_key_set.cypherpost_parent, derivation_index);
 
     b_profile_set = createProfileSet({
       type: PostType.Profile,
       nickname: "Bobby Breeds",
       status: "Making Babies.",
       contact: "@bob3us on Telegram"
-    }, b_key_set.cypherpost_parent, init_profile_ds);
+    }, b_key_set.cypherpost_parent, derivation_index);
 
     c_profile_set = createProfileSet({
       type: PostType.Profile,
       nickname: "Carol Cares",
       status: "Trying Hard Not To Cry.",
       contact: "@carol3us on Telegram"
-    }, c_key_set.cypherpost_parent, init_profile_ds);
+    }, c_key_set.cypherpost_parent, derivation_index);
     // ------------------ (◣_◢) ------------------
-    a_post_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Sell, "Urgent", true), a_key_set.cypherpost_parent, init_posts_ds);
-    b_post_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Buy, "Stacking", false), b_key_set.cypherpost_parent, init_posts_ds);
-    c_post_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Sell, "Contact me on Signal.", false), c_key_set.cypherpost_parent, init_posts_ds);
-    c_post_edit_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Sell, "Contact me on Threema.", false), c_key_set.cypherpost_parent, init_posts_ds);
+    a_post_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Sell, "Urgent", true), a_key_set.cypherpost_parent, derivation_index);
+    b_post_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Buy, "Stacking", false), b_key_set.cypherpost_parent, derivation_index);
+    c_post_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Sell, "Contact me on Signal.", false), c_key_set.cypherpost_parent, derivation_index);
+    c_post_edit_set = createPostSet(createDefaultTestPost(PostType.Ad, OrderType.Sell, "Contact me on Threema.", false), c_key_set.cypherpost_parent, derivation_index);
     // ------------------ (◣_◢) ------------------
   });
 
@@ -908,7 +908,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           done();
         });
     });
-    it("GETS A LAST DERIVATION SCHEME", function (done) {
+    it("GETS A LAST DERIVATION INDEX", function (done) {
       chai
         .request(server)
         .get(request_a_last_derivation.endpoint)
@@ -919,7 +919,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
         })
         .end((err, res) => {
           res.should.have.status(200);
-          expect(res.body['last_used']).to.equal(request_a0.body.derivation_scheme);
+          expect(res.body['last_used']).to.equal(request_a0.body.derivation_index);
           done();
         });
     });

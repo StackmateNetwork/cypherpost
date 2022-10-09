@@ -40,7 +40,7 @@ export class CypherpostPosts implements PostInterface {
     owner: string,
     expiry: number,
     cypher_json: string,
-    derivation_scheme: string,
+    derivation_index: number,
     reference: string
   ): Promise<string | Error> {
     const post: UserPost = {
@@ -49,7 +49,7 @@ export class CypherpostPosts implements PostInterface {
       owner,
       expiry,
       cypher_json,
-      derivation_scheme,
+      derivation_index,
       reference: reference || "NONE",
       edited: false,
     }
@@ -57,7 +57,7 @@ export class CypherpostPosts implements PostInterface {
     const status = await postStore.createOne(post);
     if (status instanceof Error) return status;
 
-    const update_status = await derivationStore.upsertOne(owner,derivation_scheme);
+    const update_status = await derivationStore.upsertOne(owner,derivation_index);
     if (update_status instanceof Error) return update_status;
 
     return post.id;
@@ -126,7 +126,7 @@ export class CypherpostPosts implements PostInterface {
       return handleError(e)
     }
   }
-  async getLastDerivationScheme(owner: string): Promise<string | Error> {
+  async getLastDerivationScheme(owner: string): Promise<number | Error> {
     return derivationStore.readOne(owner);
   }
 }

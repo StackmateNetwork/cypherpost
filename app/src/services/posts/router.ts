@@ -13,7 +13,7 @@ export const router = express.Router();
 // ------------------ '(◣ ◢)' ---------------------
 const checkCreatePost = [
   val.check('expiry').exists(),
-  val.check('derivation_scheme').exists(),
+  val.check('derivation_index').exists().isInt(),
   val.check('cypher_json').exists(),
   val.check('reference').optional(),
 ];
@@ -39,7 +39,7 @@ router.put("/keys",checkUpdatePutKeys, handlePutKeys);
 router.post("/edit", checkEditPost, handleEditPost);
 router.get("/self",checkGetPosts, handleGetMyPosts);
 router.get("/others", checkGetPosts, handleGetOthersPosts);
-router.get("/one/:id", handleGetPostAndKeysById);
 router.get("/last/derivation", handleGetLastDerivation);
+router.get("/:id", handleGetPostAndKeysById);
 router.delete("/:id", handleDeletePostAndReferenceKeys);
 // ------------------° ̿ ̿'''\̵͇̿̿\з=(◕_◕)=ε/̵͇̿̿/'̿'̿ ̿ °------------------
