@@ -17,6 +17,7 @@ read -r server_type
 printf "\n"
 
 if [[ $server_type == *"priv"* ]] || [[ $server_type == *"PRIV"* ]] ; then
+  server_type="PRIVATE"
   echo "[*] Setting up as a private server."
   # echo "Choose an admin password to encrypt your invitation code."
   # read -p "Enter password: " -s admin_password
@@ -41,8 +42,8 @@ if [[ $server_type == *"priv"* ]] || [[ $server_type == *"PRIV"* ]] ; then
   # The above errors due to nopad
   # Currently works, but needs to be looked into later
 else
-  server_type="public"
-  SECRET="public"
+  server_type="PUBLIC"
+  SECRET="PUBLIC"
   echo "Path to your cyphernode gatekeeper:"
   read -r CN_GATEKEEPER
   printf "\n"
@@ -91,7 +92,8 @@ echo "REPO=$REPO_APP" >> .env
 echo "KEYS=$HOME/.keys" >> .env
 echo "TYPE=$TYPE" >> .env
 echo "BADGES=$BADGES" >> .env
-   
+echo "NAME=$NAME" >> .env
+
 echo "[!] Adjuisting permissions! Requires sudo."
 
 sudo chown -R $(whoami):1000 ~/.keys

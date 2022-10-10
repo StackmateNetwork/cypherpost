@@ -14,6 +14,9 @@ import { InvitationCodeType, RegistrationType } from "./interface";
 const { validationResult } = require('express-validator');
 
 const TYPE = process.env.TYPE;
+const NAME = process.env.NAME;
+const SERVER_PUBKEY = process.env.SERVER_PUBKEY;
+
 const INVITE_SECRET = process.env.SECRET;
 
 const identity = new CypherpostIdentity();
@@ -149,11 +152,10 @@ export async function handleGetServerIdentity(req, res) {
   const request = parseRequest(req);
   try {
     const response = {
-      type: TYPE,
-      name: process.env.SERVER_NAME,
-      pubkey: process.env.SERVER_PUBKEY,
+      kind: TYPE,
+      name: NAME,
+      pubkey: SERVER_PUBKEY,
     };
-
     respond(200, response, res, request);
   }
   catch (e) {

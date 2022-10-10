@@ -74,6 +74,7 @@ else
 fi
 
 if [[ $TYPE == *"priv"* ]] || [[ $TYPE == *"PRIV"* ]] ; then
+  TYPE="PRIVATE"
   if [[ $(uname) == "Darwin" ]]; then
     SECRET=$(echo $RANDOM | md5 );
   else
@@ -82,8 +83,8 @@ if [[ $TYPE == *"priv"* ]] || [[ $TYPE == *"PRIV"* ]] ; then
   echo "[*] Setting up as a private server."
   echo "[!] Use the following secret to invite members to your cypherpost server: $SECRET"
 else
-  TYPE="public"
-  SECRET="public"
+  TYPE="PUBLIC"
+  SECRET="PUBLIC"
   echo "[*] Setting up as public server."
 fi
 
