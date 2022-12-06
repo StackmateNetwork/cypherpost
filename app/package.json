@@ -42,7 +42,7 @@
     "bitcoinjs-lib": "^5.2.0",
     "bitcoinjs-message": "^2.2.0",
     "cors": "^2.8.5",
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "express-validator": "^6.12.1",
     "express-ws": "^5.0.2",
     "express-ws-routes": "^1.1.0",
