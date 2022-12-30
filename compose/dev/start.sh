@@ -15,5 +15,5 @@ STATUS=$(docker ps)
 # echo "[*] Successfully decrypted invite code for docker."
 
 # printf $INVITE_CODE | docker secret create invite_code -
-docker-compose -p "cypherpost-development" up -d
+docker compose -p "cypherpost-development" up -d
 echo "[*] Cypherpost rocks!"

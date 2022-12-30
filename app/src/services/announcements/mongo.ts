@@ -129,14 +129,13 @@ export class MongoAnnouncementStore implements AnnouncementStore {
 
       if (docs.length > 0) {
         const announcements = docs.map(doc => {
-          console.log(doc['kind'])
           return {
             genesis: doc["genesis"],
             hash: doc["hash"],
             by: doc["by"],
             to: doc["to"],
             signature: doc["signature"],
-            kind: doc["kind"],
+            kind: doc["kind"] as AnnouncementType,
             nonce: doc["nonce"],
           }
         });
@@ -163,7 +162,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
             by: doc["by"],
             to: doc["to"],
             signature: doc["signature"],
-            kind: doc["kind"],
+            kind: doc["kind"] as AnnouncementType,
             nonce: doc["nonce"],
 
           }
@@ -192,7 +191,7 @@ export class MongoAnnouncementStore implements AnnouncementStore {
             by: doc["by"],
             to: doc["to"],
             signature: doc["signature"],
-            kind: doc["kind"],
+            kind: doc["kind"] as AnnouncementType,
             nonce: doc["nonce"],
           }
         });

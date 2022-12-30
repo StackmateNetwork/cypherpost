@@ -64,7 +64,7 @@ describe("Initalizing Test: Identity Service", function () {
   });
   describe("IDENTITY SERVICE OPERATIONS:", async function () {
     it("should CREATE INVITES for 2 new users", async function () {
-      invite_0 = await identity.createInviteAsAdmin(InvitationCodeType.Privileged,1) as string;
+      invite_0 = await identity.createInviteAsAdmin(InvitationCodeType.Privileged,10) as string;
       invite_1 = await identity.createInviteAsAdmin(InvitationCodeType.Standard,0) as string;
       expect(invite_0).to.be.a('string');
       expect(invite_0).to.be.a('string');
@@ -105,10 +105,12 @@ describe("Initalizing Test: Identity Service", function () {
     it("should get a new invite code as Privileged user - and decrement privilege count.", async function(){
       const response: any = await identity.createInviteAsUser(invite_0);
       if (response instanceof Error) throw response;
+      console.log({response})
       let inviteCode = await inviteStore.findOneByType(invite_0,InvitationCodeType.Privileged);
+      console.log({inviteCode})
+
       if (inviteCode instanceof Error) throw response;
       expect(inviteCode['count']).to.equal(9); //count
-
     });
     it("should REMOVE a user identity", async function () {
       const response = await identity.remove(ecdsa_keys.pubkey);

@@ -65,7 +65,7 @@ server {
 		# enable strict transport security only if you understand the implications
 	}
 	location @websocket {
-		proxy_pass ws://application:3021;
+		proxy_pass http://application:3021;
 		proxy_http_version 1.1;
 		proxy_set_header Upgrade $http_upgrade;
 		proxy_set_header Connection "upgrade";
