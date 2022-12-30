@@ -10,6 +10,7 @@ export interface IdentityInterface{
   all(genesis_filter: number): Promise<Array<UserIdentity> | Error>;
   createInviteAsAdmin(type: InvitationCodeType,count: number): Promise<string | Error>;
   createInviteAsUser(invite_code: string): Promise<string | Error>;
+  getInviteDetail(invite_code: string):Promise<InviteCode | Error>;
   remove(pubkey: string): Promise<boolean | Error>;
 }
 
@@ -40,7 +41,7 @@ export interface UserIdentity{
 export interface InviteCode{
   genesis : number;
   invite_code: string;
-  type:InvitationCodeType;
+  kind:InvitationCodeType;
   status: VerificationStatus;
   claimed_by: string,
   created_by: string,

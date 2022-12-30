@@ -271,7 +271,7 @@ export class MongoInviteStore implements InviteStore {
           claimed_by: doc["claimed_by"],
           created_by: doc["created_by"],
           status: doc["status"] as VerificationStatus,
-          type: doc["type"] as InvitationCodeType,
+          kind: doc["type"] as InvitationCodeType,
           count: doc["count"],
         };
       } else {

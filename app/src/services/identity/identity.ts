@@ -6,7 +6,7 @@ Developed @ Stackmate India
 import { CypherpostBitcoinOps } from "../../lib/bitcoin/bitcoin";
 import { handleError } from "../../lib/errors/e";
 import { S5UID } from "../../lib/uid/uid";
-import { IdentityIndex, IdentityInterface, InvitationCodeStatus,InvitationCodeType, RegistrationType, UserIdentity, VerificationStatus } from "./interface";
+import { IdentityIndex, IdentityInterface, InvitationCodeStatus,InvitationCodeType, InviteCode, RegistrationType, UserIdentity, VerificationStatus } from "./interface";
 import { MongoIdentityStore, MongoInviteStore,  } from "./mongo";
 
 const uid = new S5UID();
@@ -109,6 +109,12 @@ export class CypherpostIdentity implements IdentityInterface {
     if(decStatus instanceof Error) return decStatus;
 
     return code;
+  }
+
+  async getInviteDetail(invite_secret: string): Promise<InviteCode | Error>{
+    const inviteCode = await inviteStore.findOneByType(invite_secret, InvitationCodeType.Privileged);
+    if(inviteCode instanceof Error) return inviteCode;
+    return inviteCode;
   }
 };
 

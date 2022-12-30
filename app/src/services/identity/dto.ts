@@ -219,3 +219,23 @@ export async function handleUserGetInvite(req,res){
     respond(result.code, result.message, res, request);
   }
 }
+
+export async function handleGetInviteDetail(req,res){
+  const request = parseRequest(req);
+  try {
+    if (!request.headers['x-invite-secret']){
+      throw {
+        code: 400,
+        message: "No Invite Secret Provided"
+      }
+    }
+    const invite_code = await identity.getInviteDetail(request.headers['x-invite-secret']);
+    if(invite_code instanceof Error) throw invite_code;
+
+    respond(200, invite_code, res, request);
+  }
+  catch (e) {
+    const result = filterError(e, r_500, request);
+    respond(result.code, result.message, res, request);
+  }
+}
