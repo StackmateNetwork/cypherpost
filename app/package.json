@@ -51,7 +51,7 @@
     "hdkey": "^2.0.1",
     "helmet": "^4.6.0",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^6.0.3",
+    "mongoose": "^6.4.6",
     "socket.io": "^4.5.1",
     "typescript": "^4.7.3",
     "util": "^0.12.4",
