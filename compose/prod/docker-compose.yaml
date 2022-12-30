@@ -12,6 +12,8 @@ services:
       - APP_PORT=3021
       - TYPE=$TYPE
       - SECRET=$SECRET
+      - DB_AUTH=$DB_USER:DB_PASS
+      - NAME=$NAME
     volumes:
       - cp-server-keys:/home/node/.keys
       - cp-server-logs:/home/node/winston
