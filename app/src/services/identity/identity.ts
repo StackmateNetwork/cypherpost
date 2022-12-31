@@ -112,7 +112,7 @@ export class CypherpostIdentity implements IdentityInterface {
   }
 
   async getInviteDetail(invite_secret: string): Promise<InviteCode | Error>{
-    const inviteCode = await inviteStore.findOneByType(invite_secret, InvitationCodeType.Privileged);
+    const inviteCode = await inviteStore.findOne(invite_secret);
     if(inviteCode instanceof Error) return inviteCode;
     return inviteCode;
   }

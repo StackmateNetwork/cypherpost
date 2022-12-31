@@ -72,11 +72,10 @@ export async function handleRegistration(req, res) {
     const status = await identity.register(request.body.username, pubkey, registration_type,(registration_type===RegistrationType.Invite)?invite_code:"");
     if (status instanceof Error) throw status;
 
-    const response = {
-      status
-    };
+    const inviteCodeDetail = await identity.getInviteDetail(invite_code);
+    if(inviteCodeDetail instanceof Error) throw inviteCodeDetail;
 
-    respond(200, response, res, request);
+    respond(200, inviteCodeDetail, res, request);
   }
   catch (e) {
     const result = filterError(e, r_500, request);
@@ -220,22 +219,3 @@ export async function handleUserGetInvite(req,res){
   }
 }
 
-export async function handleGetInviteDetail(req,res){
-  const request = parseRequest(req);
-  try {
-    if (!request.headers['x-invite-secret']){
-      throw {
-        code: 400,
-        message: "No Invite Secret Provided"
-      }
-    }
-    const invite_code = await identity.getInviteDetail(request.headers['x-invite-secret']);
-    if(invite_code instanceof Error) throw invite_code;
-
-    respond(200, invite_code, res, request);
-  }
-  catch (e) {
-    const result = filterError(e, r_500, request);
-    respond(result.code, result.message, res, request);
-  }
-}

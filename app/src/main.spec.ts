@@ -266,20 +266,6 @@ async function userGetInvitationStdRequest(key_set: TestKeySet) {
     pubkey: key_set.identity_pubkey
   }
 }
-async function userGetInvitationDetailRequest(key_set: TestKeySet) {
-  const endpoint = "/api/v2/identity/invitation/detail";
-
-  const nonce = Date.now();
-  const message = `GET ${endpoint} ${nonce}`;
-  const signature = await bitcoin.sign(message, key_set.identity_private) as string;
-
-  return {
-    nonce,
-    endpoint,
-    signature,
-    pubkey: key_set.identity_pubkey
-  }
-}
 async function createIdentityRegistrationRequest(username, key_set: TestKeySet) {
   const endpoint = "/api/v2/identity";
   const body = {
@@ -594,7 +580,6 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     let request_admin_std;
     let request_admin_priv;
     let request_user_std;
-    let request_invite_detail;
     
     it("CREATES REQUEST OBJECTS", async function () {
       request_admin_std = await adminGetInvitationStdRequest();
@@ -635,7 +620,6 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     
     it("CREATES B INVITATION REQUEST OBJECT", async function () {
       request_user_std = await userGetInvitationStdRequest(b_key_set);
-      request_invite_detail = await userGetInvitationDetailRequest(b_key_set);
     });
 
     it("GETS C's INVITATION FROM B", function (done) {
@@ -653,25 +637,6 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
           res.should.have.status(200);
           expect(res.body['invite_code']).to.be.a('string');
           c_invitation = res.body['invite_code']
-          done();
-        });
-    });
-
-    it("GETS B's INVITATION DETAIL", function (done) {
-      // console.log({ request_a })
-      chai
-        .request(server)
-        .get(request_invite_detail.endpoint)
-        .set({
-          "x-client-pubkey": request_invite_detail.pubkey,
-          "x-nonce": request_invite_detail.nonce,
-          "x-client-signature": request_invite_detail.signature,
-          "x-invite-secret": b_invitation
-        })
-        .end((err, res) => {
-          res.should.have.status(200);
-          expect(res.body['invite_code']).to.be.a('string');
-          expect(res.body['count']).to.be.a('number');
           done();
         });
     });
@@ -726,7 +691,8 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
         .send(request_a.body)
         .end((err, res) => {
           res.should.have.status(200);
-          expect(res.body['status']).to.equal(true);
+          console.log(res.body);
+          expect(res.body['invite_code']).to.equal(a_invitation);
           done();
         });
     });
@@ -745,7 +711,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
         .send(request_b.body)
         .end((err, res) => {
           res.should.have.status(200);
-          expect(res.body['status']).to.equal(true);
+          expect(res.body['invite_code']).to.equal(b_invitation);
           done();
         });
     });
@@ -764,7 +730,7 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
         .send(request_c.body)
         .end((err, res) => {
           res.should.have.status(200);
-          expect(res.body['status']).to.equal(true);
+          expect(res.body['invite_code']).to.equal(c_invitation);
           done();
         });
     });

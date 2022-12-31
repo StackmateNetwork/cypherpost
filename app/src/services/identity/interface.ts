@@ -25,7 +25,7 @@ export interface IdentityStore{
 export interface InviteStore{
   createOne(invite_code: string,type: InvitationCodeType,created_by: string,count: number): Promise<boolean | Error>;
   checkOneByStatus(invite_code: string, status: InvitationCodeStatus): Promise<boolean | Error>;
-  findOneByTypeAndCount(invite_code: string, type: InvitationCodeType): Promise<number | Error>;
+  findOne(invite_code: string): Promise<InviteCode | Error>;
   findOneByType(invite_code: string, type: InvitationCodeType): Promise<InviteCode | Error>
   updateOneStatus(invite_code: string, status: InvitationCodeStatus,claimed_by: string):Promise<boolean | Error>;
   removeOne(invite_code: string): Promise<boolean | Error>;

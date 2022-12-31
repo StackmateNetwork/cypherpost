@@ -169,6 +169,7 @@ const invite_schema = new mongoose.Schema(
     claimed_by: {
       type:String,
       required: false,
+      default: "*UNCLAIMED*"
     },
     count: {
       type: Number,
@@ -238,19 +239,30 @@ export class MongoInviteStore implements InviteStore {
       return handleError(e);
     }
   }
-  async findOneByTypeAndCount(invite_code: string, type: InvitationCodeType): Promise<number | Error> {
+  async findOne(invite_code: string): Promise<InviteCode | Error> {
     try {
-      const query =  { invite_code, type };
+      const query =  { invite_code };
       const doc = await inviteStore.findOne(query).exec();
 
       if (doc) {
         if (doc instanceof Error) {
           return handleError(doc);
         }
-        return doc['count'];
+        return {
+          genesis: doc["genesis"],
+          invite_code: doc["invite_code"],
+          claimed_by: doc["claimed_by"],
+          created_by: doc["created_by"],
+          status: doc["status"] as VerificationStatus,
+          kind: doc["type"] as InvitationCodeType,
+          count: doc["count"],
+        };
       } else {
         // no data from findOne
-        return 0;
+        return handleError({
+          code: 404,
+          message: "No Invite Code Found."
+        });
       }
     } catch (e) {
       return handleError(e);
