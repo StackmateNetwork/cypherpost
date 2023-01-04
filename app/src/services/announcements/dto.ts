@@ -23,7 +23,7 @@ export async function announcementsMiddleware(req, res, next) {
     // CHECK SIG AND PUBKEY FORMAT - RETURNS 500 IF NOT VALID
     const nonce = request.headers['x-nonce'];
     const method = request.method;
-    const resource = request.resource;
+    const resource = request.resource.split('?')[0];
     const message = `${method} ${resource} ${nonce}`;
     const status = await identity.authenticate(pubkey, message, signature);
     if (status instanceof Error) throw status;

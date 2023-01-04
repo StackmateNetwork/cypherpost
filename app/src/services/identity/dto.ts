@@ -34,7 +34,7 @@ export async function identityMiddleware(req, res, next) {
 
     const nonce = request.headers['x-nonce'];
     const method = request.method;
-    const resource = request.resource;
+    const resource = request.resource.split('?')[0];
     const message = `${method} ${resource} ${nonce}`;
     if (!resource.startsWith("/api/v2/identity/admin/invitation"))
     {
