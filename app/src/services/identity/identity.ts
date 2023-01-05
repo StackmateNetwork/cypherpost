@@ -19,6 +19,13 @@ const ONE_HOUR = 60 * 60 * 1000;
 const THIRTY_DAYS = 30 * 24 * ONE_HOUR;
 
 export class CypherpostIdentity implements IdentityInterface {
+  async myIdentity(pubkey: string): Promise<Error | UserIdentity> {
+    return idStore.readOne(pubkey, IdentityIndex.Pubkey);
+  }
+
+  async myInviteCode(pubkey: string): Promise<Error | InviteCode> {
+    return inviteStore.findOneByPubkey(pubkey);
+  }
 
   async register(username: string, pubkey: string, type: RegistrationType, invite_code?: string): Promise<boolean | Error> {
     if (type === RegistrationType.Invite){

@@ -266,6 +266,20 @@ async function userGetInvitationStdRequest(key_set: TestKeySet) {
     pubkey: key_set.identity_pubkey
   }
 }
+async function createSelfInvitationRequest(key_set: TestKeySet) {
+  const endpoint = "/api/v2/identity/self/invitation";
+
+  const nonce = Date.now();
+  const message = `GET ${endpoint} ${nonce}`;
+  const signature = await bitcoin.sign(message, key_set.identity_private) as string;
+
+  return {
+    nonce,
+    endpoint,
+    signature,
+    pubkey: key_set.identity_pubkey
+  }
+}
 async function createIdentityRegistrationRequest(username, key_set: TestKeySet) {
   const endpoint = "/api/v2/identity";
   const body = {
@@ -669,12 +683,14 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
     let request_b;
     let request_c;
     let request_c_get;
+    let request_a_self;
 
     it("CREATES REQUEST OBJECTS", async function () {
       request_a = await createIdentityRegistrationRequest("alice", a_key_set);
       request_b = await createIdentityRegistrationRequest("bob", b_key_set);
       request_c = await createIdentityRegistrationRequest("carol", c_key_set);
       request_c_get = await createIdentityGetRequest(c_key_set);
+      request_a_self = await createSelfInvitationRequest(a_key_set);
     });
 
     it("REGISTERS IDENTITY A", function (done) {
@@ -692,6 +708,22 @@ describe("CYPHERPOST: API BEHAVIOUR SIMULATION", function () {
         .end((err, res) => {
           res.should.have.status(200);
           console.log(res.body);
+          expect(res.body['invite_code']).to.equal(a_invitation);
+          done();
+        });
+    });
+    it("GET A INVITE CODE FOR SELF", function (done) {
+      // console.log({ request_a })
+      chai
+        .request(server)
+        .get(request_a_self.endpoint)
+        .set({
+          "x-client-pubkey": request_a_self.pubkey,
+          "x-nonce": request_a_self.nonce,
+          "x-client-signature": request_a_self.signature,
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
           expect(res.body['invite_code']).to.equal(a_invitation);
           done();
         });

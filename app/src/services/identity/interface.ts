@@ -12,6 +12,9 @@ export interface IdentityInterface{
   createInviteAsUser(invite_code: string): Promise<string | Error>;
   getInviteDetail(invite_code: string):Promise<InviteCode | Error>;
   remove(pubkey: string): Promise<boolean | Error>;
+  myIdentity(pubkey:string): Promise<UserIdentity | Error>;
+  myInviteCode(pubkey:string): Promise<InviteCode | Error>;
+
 }
 
 export interface IdentityStore{
@@ -26,6 +29,7 @@ export interface InviteStore{
   createOne(invite_code: string,type: InvitationCodeType,created_by: string,count: number): Promise<boolean | Error>;
   checkOneByStatus(invite_code: string, status: InvitationCodeStatus): Promise<boolean | Error>;
   findOne(invite_code: string): Promise<InviteCode | Error>;
+  findOneByPubkey(pubkey: string): Promise<InviteCode | Error>
   findOneByType(invite_code: string, type: InvitationCodeType): Promise<InviteCode | Error>
   updateOneStatus(invite_code: string, status: InvitationCodeStatus,claimed_by: string):Promise<boolean | Error>;
   removeOne(invite_code: string): Promise<boolean | Error>;

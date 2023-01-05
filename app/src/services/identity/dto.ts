@@ -219,3 +219,26 @@ export async function handleUserGetInvite(req,res){
   }
 }
 
+export async function handleMyInviteCode(req, res) {
+  const request = parseRequest(req);
+
+  try {
+
+    const errors = validationResult(req)
+    if (!errors.isEmpty()) {
+      throw {
+        code: 400,
+        message: errors.array()
+      }
+    }
+
+    const inviteCode = await identity.myInviteCode(request.headers['x-client-pubkey']);
+    if (inviteCode instanceof Error) throw inviteCode;
+
+    respond(200, inviteCode, res, request);
+  }
+  catch (e) {
+    const result = filterError(e, r_500, request);
+    respond(result.code, result.message, res, request);
+  }
+}

@@ -268,6 +268,35 @@ export class MongoInviteStore implements InviteStore {
       return handleError(e);
     }
   }
+  async findOneByPubkey(pubkey: string): Promise<InviteCode | Error> {
+    try {
+      const query =  { claimed_by: pubkey };
+      const doc = await inviteStore.findOne(query).exec();
+
+      if (doc) {
+        if (doc instanceof Error) {
+          return handleError(doc);
+        }
+        return {
+          genesis: doc["genesis"],
+          invite_code: doc["invite_code"],
+          claimed_by: doc["claimed_by"],
+          created_by: doc["created_by"],
+          status: doc["status"] as VerificationStatus,
+          kind: doc["type"] as InvitationCodeType,
+          count: doc["count"],
+        };
+      } else {
+        // no data from findOne
+        return handleError({
+          code: 404,
+          message: "No Invite Code Found."
+        });
+      }
+    } catch (e) {
+      return handleError(e);
+    }
+  }
   async findOneByType(invite_code: string, type: InvitationCodeType): Promise<InviteCode | Error> {
     try {
       const query =  { invite_code, type };
