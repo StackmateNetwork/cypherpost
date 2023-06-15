@@ -49,6 +49,7 @@ printf "\n"
 if [[ "$VOLUMES_PARENT_DIR" == */ ]]; then
   VOLUMES_PARENT_DIR=${VOLUMES_PARENT_DIR%?}
 fi
+
 NODE_VOLUME="$VOLUMES_PARENT_DIR/node"
 MONGO_VOLUME="$VOLUMES_PARENT_DIR/mongo"
 CERTS_VOLUME="$VOLUMES_PARENT_DIR/certs"
@@ -56,7 +57,7 @@ CERTBOTETC_VOLUME="$CERTS_VOLUME/certbot/etc"
 CERTBOTVAR_VOLUME="$CERTS_VOLUME/certbot/var"
 
 mkdir -p "$NODE_VOLUME/.keys" 2> /dev/null
-mkdir -p "$NODE_VOLUME/winston" 2> /dev/null
+mkdir -p "$NODE_VOLUME/winston/logs" 2> /dev/null
 mkdir -p "$MONGO_VOLUME/data/db" 2> /dev/null
 mkdir -p "$MONGO_VOLUME/configdb" 2> /dev/null
 mkdir -p "$CERTS_VOLUME" 2> /dev/null
