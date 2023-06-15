@@ -6,4 +6,4 @@ NGINX_CONF="$REPO/infra/nginx/prod/nginx-conf"
 cp $NGINX_CONF/post $NGINX_CONF/default.conf
 
 # Re-run docker-compose up
-docker-compose -p "cypherpost-production" up -d
+docker compose -p "cypherpost" up -d

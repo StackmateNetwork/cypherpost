@@ -1,3 +1,3 @@
 #!/bin/bash -e
 
-docker-compose -p "cypherpost-production" down
+docker compose -p "cypherpost" down

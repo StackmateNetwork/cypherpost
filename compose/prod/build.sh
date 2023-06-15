@@ -1,3 +1,3 @@
 #!/bin/bash -e
 
-docker-compose -p "cypherpost-production" build
+docker-compose -p "cypherpost" build
