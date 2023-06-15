@@ -177,13 +177,6 @@ else
 fi
 printf "\n"
 
-echo "[*] CONFIGURING DATABASE..."
-bash start.sh
-sleep 21
-bash stop.sh
-
-echo "[*] DATABASE CONFIGURED"
-
 echo "Issue SSL Certificates? (Y/N)"
 printf "\n"
 read -r GET_CERTS
