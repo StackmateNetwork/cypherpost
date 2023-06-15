@@ -20,7 +20,7 @@ export async function postMiddleware(req, res, next) {
   try {
     const signature = request.headers['x-client-signature'];
     if (signature == undefined || signature == "" || signature == null) 
-    throw{
+    throw {
       code: 401,
       message: "Request Signature Required."
     };
