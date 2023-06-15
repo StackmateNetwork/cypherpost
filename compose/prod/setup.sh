@@ -74,6 +74,7 @@ else
   openssl dhparam -out "$CERTS_VOLUME/dhparam.pem" 2048
   echo "[*] DHParam setup for nginx server."
 fi
+printf "\n"
 
 if [[ $TYPE == *"priv"* ]] || [[ $TYPE == *"PRIV"* ]] ; then
   TYPE="PRIVATE"
@@ -92,9 +93,7 @@ fi
 
 sudo openssl genrsa -out $NODE_VOLUME/.keys/sats_sig.pem 4096
 sudo openssl rsa -in $NODE_VOLUME/.keys/sats_sig.pem -outform PEM -pubout -out $NODE_VOLUME/.keys/sats_sig.pub
-echo "[!] Giving node container GUI 1300 permission to use response signing keys."
-# sudo chown -R $(whoami):1300 $NODE_VOLUME
-# sudo chmod -R 770 $NODE_VOLUME
+
 echo "[*] Generated new server signing keys."
 
 ## NGINX CONFIG
@@ -165,6 +164,8 @@ echo "INITDB_ROOT_USER=$INITDB_ROOT_USER" >> .env
 echo "INITDB_ROOT_PASS=$INITDB_ROOT_PASS" >> .env
 echo "DB_USER=$DB_USER" >> .env
 echo "DB_PASS=$DB_PASS" >> .env
+
+printf "\n"
 
 echo "Build docker images? (y/N) Only choose Y if it is the first time."
 printf "\n"

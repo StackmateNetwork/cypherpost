@@ -170,7 +170,7 @@ export class CypherpostBitcoinOps implements BitcoinKeyOperations {
       return status;
     }
     catch (e) {
-      console.error({e});
+      // console.error({e});
       return handleError({
         code: 401,
         message: "Error Verifying Pubkey's Message Signature."

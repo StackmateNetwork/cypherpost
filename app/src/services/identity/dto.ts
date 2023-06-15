@@ -29,6 +29,11 @@ export async function identityMiddleware(req, res, next) {
   const request = parseRequest(req);
   try {
     const signature = request.headers['x-client-signature'];
+    if (signature == undefined || signature == "" || signature == null) 
+    throw{
+      code: 401,
+      message: "Request Signature Required."
+    };
     const pubkey = request.headers['x-client-pubkey'];
     // CHECK SIG AND PUBKEY FORMAT - RETURNS 500 IF NOT VALID
 
