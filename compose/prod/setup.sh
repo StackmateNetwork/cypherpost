@@ -164,6 +164,17 @@ echo "INITDB_ROOT_PASS=$INITDB_ROOT_PASS" >> .env
 echo "DB_USER=$DB_USER" >> .env
 echo "DB_PASS=$DB_PASS" >> .env
 
+echo "Require SSL Certificates? (Y/N)"
+printf "\n"
+read -r GET_CERTS
+
+if [[ $GET_CERTS == "y" ]] || [[ $TYPE == "Y" ]] ; then
+  bash issue_ssl.sh
+else
+  echo "[!] NOT Issuing SSL Certificates."
+fi
+printf "\n"
+
 echo "[*] SETUP COMPLETE! VERIFY YOUR ENVIRONMENT VARIABLES."
 cat .env
 echo "[!] Make sure your domain name points to this server's IP."
