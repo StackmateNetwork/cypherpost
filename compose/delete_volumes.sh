@@ -18,7 +18,6 @@ docker volume rm     cypherpost_cp-server-keys
 docker volume rm     cypherpost_cp-server-logs
 docker volume rm     cypherpost_dhparam
 
-
 #  
 # CAREFUL with that axe, Eugene docker volume rm $(docker volume ls -q)
 

@@ -11,3 +11,4 @@ cp $NGINX_CONF/pre $NGINX_CONF/default.conf
 docker-compose up certbot
 # Run docker-compose down
 docker-compose down
+
