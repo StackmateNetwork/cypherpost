@@ -140,7 +140,7 @@ if [[ -f .secrets.json ]]; then
     DB_USER="cp"
     DB_PASS=$(echo -n $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5sum | cut -d' ' -f1)
     DB_AUTH="$DB_USER:$DB_PASS"
-    jq -n --arg DB_PASS "$DB_PASS" --arg INITDB_ROOT_PASS "$INITDB_ROOT_PASS" '{initdb_name: $INITDB_NAME, initdb_root_user: INITDB_ROOT_USER, initdb_root_pass: $INITDB_ROOT_PASS, db_user: DB_USER, db_pass: $DB_PASS}' > .secrets.json
+    jq -n --arg DB_PASS "$DB_PASS" --arg INITDB_ROOT_PASS "$INITDB_ROOT_PASS" '{initdb_name: "cypherpost", initdb_root_user: "admin", initdb_root_pass: $INITDB_ROOT_PASS, db_user: "cp", db_pass: $DB_PASS}' > .secrets.json
     echo "[*] Created DB secrets"
 
 fi
@@ -149,7 +149,7 @@ perl -i -pe"s/___USER___/$DB_USER/g" ../../infra/mongo/docker-entrypoint-initdb.
 perl -i -pe"s/___PWD___/$DB_PASS/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
 
 touch .env
-echo "COMPOSE_PROJECT_NAME=cypherpost-production" >> .env
+echo "COMPOSE_PROJECT_NAME=cypherpost" >> .env
 echo "REPO=$REPO/app" > .env
 echo "KEYS=$HOME/.keys" >> .env
 echo "TYPE=$TYPE" >> .env
@@ -166,9 +166,19 @@ echo "INITDB_ROOT_PASS=$INITDB_ROOT_PASS" >> .env
 echo "DB_USER=$DB_USER" >> .env
 echo "DB_PASS=$DB_PASS" >> .env
 
-echo "[*] CONFIGURING DATABASE..."
+echo "Build docker images? (y/N) Only choose Y if it is the first time."
+printf "\n"
+read -r IMAGES
 
-docker compose up database
+if [[ $IMAGES == "y" ]] || [[ $IMAGES == "Y" ]] ; then
+  bash build.sh
+else
+  echo "[!] NOT Building Docker Images."
+fi
+printf "\n"
+
+echo "[*] CONFIGURING DATABASE..."
+bash start.sh
 sleep 21
 bash stop.sh
 
