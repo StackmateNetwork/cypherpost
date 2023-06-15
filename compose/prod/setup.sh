@@ -146,7 +146,7 @@ if [[ -f .secrets.json ]]; then
 fi
 
 perl -i -pe"s/___USER___/$DB_USER/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
-perl -i -pe"s/___PWD___/$DB_PASS/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
+perl -i -pe"s/___PASS___/$DB_PASS/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
 
 touch .env
 echo "COMPOSE_PROJECT_NAME=cypherpost" >> .env
