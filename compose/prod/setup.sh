@@ -33,6 +33,7 @@ printf "\n"
 
 
 echo "At what domain name would you like to host cypherpost on?"
+echo "[!] Make sure your domain name points to this server's IP."
 read -r MY_DOMAIN_NAME
 printf "\n"
 
@@ -57,7 +58,7 @@ CERTBOTETC_VOLUME="$CERTS_VOLUME/certbot/etc"
 CERTBOTVAR_VOLUME="$CERTS_VOLUME/certbot/var"
 
 mkdir -p "$NODE_VOLUME/.keys" 2> /dev/null
-mkdir -p "$NODE_VOLUME/winston/logs" 2> /dev/null
+mkdir -p "$NODE_VOLUME/winston" 2> /dev/null
 mkdir -p "$MONGO_VOLUME/data/db" 2> /dev/null
 mkdir -p "$MONGO_VOLUME/configdb" 2> /dev/null
 mkdir -p "$CERTS_VOLUME" 2> /dev/null
@@ -139,8 +140,9 @@ if [[ -f .secrets.json ]]; then
     DB_USER="cp"
     DB_PASS=$(echo -n $RANDOM$RANDOM$RANDOM$RANDOM$RANDOM | md5sum | cut -d' ' -f1)
     DB_AUTH="$DB_USER:$DB_PASS"
-    jq -n --arg DB_PASS "$DB_PASS" --arg INITDB_ROOT_PASS "$INITDB_ROOT_PASS" '{initdb_name: "cypherpost", initdb_root_user: "admin", initdb_root_pass: $INITDB_ROOT_PASS, db_user: "cp", db_pass: $DB_PASS}' > .secrets.json
+    jq -n --arg DB_PASS "$DB_PASS" --arg INITDB_ROOT_PASS "$INITDB_ROOT_PASS" '{initdb_name: $INITDB_NAME, initdb_root_user: INITDB_ROOT_USER, initdb_root_pass: $INITDB_ROOT_PASS, db_user: DB_USER, db_pass: $DB_PASS}' > .secrets.json
     echo "[*] Created DB secrets"
+
 fi
 
 perl -i -pe"s/___USER___/$DB_USER/g" ../../infra/mongo/docker-entrypoint-initdb.d/init-mongo.js
@@ -164,7 +166,15 @@ echo "INITDB_ROOT_PASS=$INITDB_ROOT_PASS" >> .env
 echo "DB_USER=$DB_USER" >> .env
 echo "DB_PASS=$DB_PASS" >> .env
 
-echo "Require SSL Certificates? (Y/N)"
+echo "[*] CONFIGURING DATABASE..."
+
+docker compose up database
+sleep 21
+bash stop.sh
+
+echo "[*] DATABASE CONFIGURED"
+
+echo "Issue SSL Certificates? (Y/N)"
 printf "\n"
 read -r GET_CERTS
 
@@ -177,5 +187,4 @@ printf "\n"
 
 echo "[*] SETUP COMPLETE! VERIFY YOUR ENVIRONMENT VARIABLES."
 cat .env
-echo "[!] Make sure your domain name points to this server's IP."
-echo "[!] Run issue_ssl.sh OR start.sh directly if you have ssl certs issued."
+echo "[!] Run start.sh!"
